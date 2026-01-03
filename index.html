@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>宽柔中学-高雄中学线上交流平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -18,10 +18,10 @@
             --primary: #2c5aa0;
             --primary-light: #4a7bc7;
             --primary-dark: #1a3d7a;
-            --secondary: #d32f2f;
-            --secondary-light: #ff6659;
-            --accent: #ffc107;
-            --accent-light: #ffd54f;
+            --secondary: #e63946;
+            --secondary-light: #ff6b6b;
+            --accent: #ffb347;
+            --accent-light: #ffcc80;
             --light: #f8f9fa;
             --dark: #343a40;
             --gray: #6c757d;
@@ -30,9 +30,9 @@
             --warning: #ffc107;
             --danger: #dc3545;
             --info: #17a2b8;
-            --border-radius: 10px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
             --transition: all 0.3s ease;
         }
         
@@ -78,36 +78,43 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            text-decoration: none;
         }
         
         .logo-icon {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             background: white;
             color: var(--primary);
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+        
+        .logo:hover .logo-icon {
+            transform: rotate(10deg);
         }
         
         .logo-text h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            line-height: 1.2;
         }
         
         .logo-text p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.9;
         }
         
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
         
         .user-info {
@@ -115,26 +122,28 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
-            padding: 5px 10px;
+            padding: 8px 12px;
             border-radius: var(--border-radius);
             transition: var(--transition);
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .user-info:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
         
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            color: var(--dark);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
@@ -163,7 +172,7 @@
         
         .nav-links a {
             display: block;
-            padding: 1rem 1.5rem;
+            padding: 1.1rem 1.5rem;
             text-decoration: none;
             color: var(--dark);
             font-weight: 500;
@@ -194,7 +203,7 @@
         
         /* Button Styles */
         .btn {
-            padding: 0.6rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             border: none;
             border-radius: var(--border-radius);
             font-weight: 500;
@@ -213,8 +222,8 @@
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(44, 90, 160, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(44, 90, 160, 0.3);
         }
         
         .btn-secondary {
@@ -223,29 +232,29 @@
         }
         
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(211, 47, 47, 0.3);
         }
         
         .btn-outline {
             background-color: transparent;
             color: var(--primary);
-            border: 1px solid var(--primary);
+            border: 2px solid var(--primary);
         }
         
         .btn-outline:hover {
             background-color: rgba(44, 90, 160, 0.1);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
         
         .btn-small {
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1.2rem;
             font-size: 0.9rem;
         }
         
         .btn-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             padding: 0;
             display: flex;
             align-items: center;
@@ -274,16 +283,16 @@
         }
         
         .page-header {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             text-align: center;
         }
         
         .page-header h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             display: inline-block;
         }
         
@@ -291,14 +300,15 @@
             color: var(--gray);
             max-width: 700px;
             margin: 0 auto;
+            font-size: 1.05rem;
         }
         
         /* Dashboard */
         .dashboard-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .card {
@@ -308,6 +318,7 @@
             overflow: hidden;
             transition: var(--transition);
             border: 1px solid rgba(0,0,0,0.05);
+            height: 100%;
         }
         
         .card:hover {
@@ -316,7 +327,7 @@
         }
         
         .card-header {
-            padding: 1.2rem;
+            padding: 1.3rem;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
             display: flex;
@@ -325,7 +336,7 @@
         }
         
         .card-header h3 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 0.2rem;
         }
         
@@ -337,7 +348,7 @@
         .announcement-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
         }
         
         .announcement-item {
@@ -345,23 +356,25 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             padding: 1.5rem;
-            border-left: 4px solid var(--primary);
+            border-left: 5px solid var(--primary);
             transition: var(--transition);
         }
         
         .announcement-item:hover {
-            transform: translateX(5px);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
         
         .announcement-item h4 {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
         
         .announcement-content {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             line-height: 1.7;
+            color: var(--dark);
         }
         
         .announcement-meta {
@@ -379,7 +392,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            padding: 1.5rem;
+            padding: 1.8rem;
             min-height: 500px;
         }
         
@@ -387,30 +400,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1.2rem;
             border-bottom: 1px solid var(--light-gray);
         }
         
         .padlet-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
         
         .padlet-note {
             border-radius: var(--border-radius);
-            padding: 1.2rem;
+            padding: 1.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             position: relative;
-            min-height: 180px;
+            min-height: 200px;
             word-break: break-word;
             transition: var(--transition);
             cursor: move;
+            display: flex;
+            flex-direction: column;
         }
         
         .padlet-note:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
         }
         
         .note-yellow { 
@@ -443,25 +459,27 @@
         
         .note-title {
             font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
             color: #333;
         }
         
         .note-content {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             line-height: 1.5;
+            flex-grow: 1;
         }
         
         .note-image {
             max-width: 100%;
-            border-radius: 5px;
-            margin-top: 10px;
+            border-radius: 8px;
+            margin-top: 12px;
+            margin-bottom: 12px;
         }
         
         .note-meta {
-            margin-top: 10px;
-            font-size: 0.8rem;
+            margin-top: auto;
+            font-size: 0.85rem;
             color: #666;
             display: flex;
             justify-content: space-between;
@@ -470,10 +488,10 @@
         
         .note-actions {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
+            bottom: 15px;
+            right: 15px;
             display: flex;
-            gap: 5px;
+            gap: 8px;
             opacity: 0;
             transition: var(--transition);
         }
@@ -485,28 +503,29 @@
         .note-btn {
             background-color: rgba(255, 255, 255, 0.9);
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--dark);
             transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .note-btn:hover {
             background-color: white;
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
         
         .add-note-btn {
             background-color: var(--light-gray);
             border: 2px dashed var(--gray);
             border-radius: var(--border-radius);
-            height: 180px;
+            height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -528,7 +547,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            padding: 2rem;
+            padding: 2.2rem;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -539,13 +558,13 @@
         
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             font-weight: 500;
         }
         
         .form-control {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.8rem;
             border: 1px solid var(--light-gray);
             border-radius: var(--border-radius);
             font-family: inherit;
@@ -622,7 +641,7 @@
             background-color: white;
             border: 1px solid var(--light-gray);
             border-radius: var(--border-radius);
-            padding: 0.75rem;
+            padding: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -634,7 +653,7 @@
         
         .google-btn:hover {
             background-color: #f8f9fa;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .google-btn i {
@@ -647,7 +666,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            padding: 1.5rem;
+            padding: 1.8rem;
             overflow-x: auto;
         }
         
@@ -655,7 +674,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
         }
         
         .calendar-grid {
@@ -671,7 +690,7 @@
         .calendar-day {
             background-color: white;
             padding: 0.8rem;
-            min-height: 120px;
+            min-height: 130px;
             position: relative;
         }
         
@@ -709,15 +728,15 @@
             position: absolute;
             bottom: 5px;
             right: 5px;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background-color: var(--light-gray);
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             cursor: pointer;
             opacity: 0;
             transition: var(--transition);
@@ -737,43 +756,43 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            padding: 2rem;
+            padding: 2.2rem;
             display: flex;
             align-items: center;
             gap: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .profile-avatar {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+            box-shadow: 0 6px 16px rgba(44, 90, 160, 0.3);
         }
         
         .profile-info h2 {
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
+            margin-bottom: 0.6rem;
+            font-size: 1.9rem;
         }
         
         .profile-info p {
             color: var(--gray);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
         }
         
         .badge {
             display: inline-block;
-            padding: 0.25rem 0.8rem;
+            padding: 0.3rem 0.9rem;
             background-color: var(--light-gray);
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
@@ -841,25 +860,31 @@
         
         .modal-header h3 {
             color: white;
+            font-size: 1.4rem;
         }
         
         .modal-close {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: white;
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg);
         }
         
         .modal-body {
-            padding: 1.5rem;
+            padding: 1.8rem;
         }
         
         /* Footer */
         footer {
             background-color: var(--dark);
             color: white;
-            padding: 2rem 0;
+            padding: 2.5rem 0;
             margin-top: 3rem;
         }
         
@@ -871,7 +896,7 @@
         
         .school-logos {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
             align-items: center;
         }
         
@@ -883,14 +908,14 @@
         }
         
         .school-logo i {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
             color: var(--accent);
         }
         
         .footer-links {
             display: flex;
-            gap: 1.5rem;
+            gap: 1.8rem;
         }
         
         .footer-links a {
@@ -901,18 +926,25 @@
         
         .footer-links a:hover {
             color: white;
+            text-decoration: underline;
         }
         
         .copyright {
             text-align: center;
-            margin-top: 2rem;
-            padding-top: 1rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.9rem;
         }
         
         /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
         @media (max-width: 768px) {
             .header-container, .nav-container {
                 flex-direction: column;
@@ -951,6 +983,10 @@
                 flex-direction: column;
                 gap: 1.5rem;
             }
+            
+            .page-header h2 {
+                font-size: 1.8rem;
+            }
         }
         
         /* Loading Spinner */
@@ -970,18 +1006,18 @@
         
         .loading {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem;
         }
         
         /* Alert Messages */
         .alert {
-            padding: 1rem;
+            padding: 1rem 1.2rem;
             border-radius: var(--border-radius);
             margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
         
         .alert-success {
@@ -1011,7 +1047,7 @@
         .close-alert {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: inherit;
         }
@@ -1020,11 +1056,12 @@
         .tabs {
             display: flex;
             border-bottom: 1px solid var(--light-gray);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
+            overflow-x: auto;
         }
         
         .tab {
-            padding: 0.8rem 1.5rem;
+            padding: 1rem 1.8rem;
             background: none;
             border: none;
             cursor: pointer;
@@ -1032,6 +1069,7 @@
             color: var(--gray);
             border-bottom: 3px solid transparent;
             transition: var(--transition);
+            white-space: nowrap;
         }
         
         .tab:hover {
@@ -1056,7 +1094,7 @@
         .file-upload {
             border: 2px dashed var(--light-gray);
             border-radius: var(--border-radius);
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -1068,7 +1106,7 @@
         }
         
         .file-upload i {
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: var(--gray);
             margin-bottom: 1rem;
         }
@@ -1082,13 +1120,49 @@
             opacity: 0.5;
             transform: scale(1.05);
         }
+        
+        /* Empty states */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: var(--light-gray);
+        }
+        
+        /* Welcome section */
+        .welcome-section {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, rgba(44, 90, 160, 0.05) 0%, rgba(74, 123, 199, 0.05) 100%);
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+        }
+        
+        .welcome-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .welcome-section p {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header>
         <div class="container header-container">
-            <div class="logo">
+            <a href="#dashboard" class="logo nav-link" data-page="dashboard">
                 <div class="logo-icon">
                     <i class="fas fa-hands-helping"></i>
                 </div>
@@ -1096,7 +1170,7 @@
                     <h1>宽柔中学-高雄中学线上交流平台</h1>
                     <p>Foon Yew High School - Kaohsiung Senior High School Online Exchange</p>
                 </div>
-            </div>
+            </a>
             <div class="user-menu">
                 <div id="auth-buttons">
                     <button id="login-btn" class="btn btn-outline">登录</button>
@@ -1120,16 +1194,16 @@
     <nav>
         <div class="container nav-container">
             <ul class="nav-links">
-                <li><a href="#dashboard" class="nav-link active">首页</a></li>
-                <li><a href="#announcements" class="nav-link">公告</a></li>
-                <li><a href="#wall" class="nav-link">交流墙</a></li>
-                <li><a href="#calendar" class="nav-link">活动日历</a></li>
-                <li><a href="#profile" class="nav-link">个人中心</a></li>
+                <li><a href="#dashboard" class="nav-link active" data-page="dashboard">首页</a></li>
+                <li><a href="#announcements" class="nav-link" data-page="announcements">公告</a></li>
+                <li><a href="#wall" class="nav-link" data-page="wall">交流墙</a></li>
+                <li><a href="#calendar" class="nav-link" data-page="calendar">活动日历</a></li>
+                <li><a href="#profile" class="nav-link" data-page="profile">个人中心</a></li>
             </ul>
             <div class="nav-right">
                 <div id="admin-menu" style="display: none;">
                     <button id="admin-btn" class="btn btn-secondary btn-small">
-                        <i class="fas fa-cog"></i> 管理员
+                        <i class="fas fa-cog"></i> 管理员面板
                     </button>
                 </div>
             </div>
@@ -1140,80 +1214,97 @@
     <main class="container">
         <!-- Dashboard Page -->
         <section id="dashboard-page" class="page active">
-            <div class="page-header">
+            <div class="welcome-section">
                 <h2>欢迎来到线上交流平台</h2>
-                <p>促进宽柔中学与高雄中学的学术文化交流与合作</p>
+                <p>促进宽柔中学与高雄中学的学术文化交流与合作，共建友谊桥梁</p>
+                <div id="welcome-message"></div>
+            </div>
+            
+            <div class="page-header">
+                <h2>平台概览</h2>
+                <p>了解平台最新动态和统计数据</p>
             </div>
             
             <div class="dashboard-cards">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-bullhorn"></i> 最新公告</h3>
+                        <i class="fas fa-bullhorn"></i>
+                        <h3>最新公告</h3>
                     </div>
                     <div class="card-body">
                         <div id="recent-announcements">
                             <p>加载中...</p>
                         </div>
+                        <button class="btn btn-outline btn-small" style="margin-top: 15px;" data-page="announcements">查看所有公告</button>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-calendar-alt"></i> 近期活动</h3>
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>近期活动</h3>
                     </div>
                     <div class="card-body">
                         <div id="upcoming-events">
                             <p>加载中...</p>
                         </div>
+                        <button class="btn btn-outline btn-small" style="margin-top: 15px;" data-page="calendar">查看日历</button>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-users"></i> 交流统计</h3>
+                        <i class="fas fa-users"></i>
+                        <h3>交流统计</h3>
                     </div>
                     <div class="card-body">
                         <div id="exchange-stats">
                             <p>总参与人数: <strong id="total-participants">0</strong></p>
                             <p>在线人数: <strong id="online-users">0</strong></p>
                             <p>交流贴文: <strong id="total-posts">0</strong></p>
+                            <p>活动总数: <strong id="total-events">0</strong></p>
                         </div>
+                        <button class="btn btn-outline btn-small" style="margin-top: 15px;" data-page="wall">查看交流墙</button>
                     </div>
                 </div>
             </div>
             
             <div class="page-header">
                 <h2>特色交流项目</h2>
+                <p>探索两校间的多样化交流活动</p>
             </div>
             
             <div class="dashboard-cards">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-graduation-cap"></i> 学术研讨</h3>
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>学术研讨</h3>
                     </div>
                     <div class="card-body">
                         <p>两校学生共同参与的线上学术研讨小组，涵盖科学、人文、艺术等领域。</p>
-                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">了解更多</button>
+                        <button class="btn btn-primary btn-small" style="margin-top: 15px;" id="academic-btn">了解更多</button>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-trophy"></i> 联合竞赛</h3>
+                        <i class="fas fa-trophy"></i>
+                        <h3>联合竞赛</h3>
                     </div>
                     <div class="card-body">
                         <p>定期举办的线上知识竞赛、辩论赛和创意比赛，展示学生才华。</p>
-                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">查看比赛</button>
+                        <button class="btn btn-primary btn-small" style="margin-top: 15px;" id="competition-btn">查看比赛</button>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-language"></i> 语言交换</h3>
+                        <i class="fas fa-language"></i>
+                        <h3>语言交换</h3>
                     </div>
                     <div class="card-body">
                         <p>华语、英语、马来语等多语言学习伙伴匹配系统，提升语言能力。</p>
-                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">寻找语伴</button>
+                        <button class="btn btn-primary btn-small" style="margin-top: 15px;" id="language-btn">寻找语伴</button>
                     </div>
                 </div>
             </div>
@@ -1227,7 +1318,6 @@
             </div>
             
             <div id="announcements-list" class="announcement-list">
-                <!-- Announcements will be loaded here -->
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>正在加载公告...</p>
@@ -1250,7 +1340,6 @@
                     </button>
                 </div>
                 <div id="padlet-wall" class="padlet-grid">
-                    <!-- Padlet notes will be loaded here -->
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>正在加载交流墙...</p>
@@ -1410,7 +1499,8 @@
             <div id="profile-activity" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-history"></i> 活动记录</h3>
+                        <i class="fas fa-history"></i>
+                        <h3>活动记录</h3>
                     </div>
                     <div class="card-body">
                         <div id="activity-history">
@@ -1421,11 +1511,16 @@
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-certificate"></i> 成就徽章</h3>
+                        <i class="fas fa-certificate"></i>
+                        <h3>成就徽章</h3>
                     </div>
                     <div class="card-body">
                         <div id="achievement-badges">
-                            <p>暂无成就徽章</p>
+                            <div class="empty-state">
+                                <i class="fas fa-trophy"></i>
+                                <p>暂无成就徽章</p>
+                                <p>参与更多交流活动以解锁成就</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1482,7 +1577,8 @@
                 <div class="dashboard-cards">
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-chart-line"></i> 平台统计</h3>
+                            <i class="fas fa-chart-line"></i>
+                            <h3>平台统计</h3>
                         </div>
                         <div class="card-body">
                             <div id="admin-stats">
@@ -1497,7 +1593,8 @@
                     
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-bullhorn"></i> 发布公告</h3>
+                            <i class="fas fa-bullhorn"></i>
+                            <h3>发布公告</h3>
                         </div>
                         <div class="card-body">
                             <form id="admin-announcement-form">
@@ -1518,7 +1615,8 @@
                     
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-calendar-plus"></i> 创建活动</h3>
+                            <i class="fas fa-calendar-plus"></i>
+                            <h3>创建活动</h3>
                         </div>
                         <div class="card-body">
                             <form id="admin-event-form">
@@ -1542,7 +1640,8 @@
             <div id="admin-users" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-users-cog"></i> 用户管理</h3>
+                        <i class="fas fa-users-cog"></i>
+                        <h3>用户管理</h3>
                     </div>
                     <div class="card-body">
                         <div id="user-management">
@@ -1555,7 +1654,8 @@
             <div id="admin-content" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-comments"></i> 交流墙管理</h3>
+                        <i class="fas fa-comments"></i>
+                        <h3>交流墙管理</h3>
                     </div>
                     <div class="card-body">
                         <div id="admin-wall-posts">
@@ -1566,7 +1666,8 @@
                 
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-calendar-alt"></i> 活动管理</h3>
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>活动管理</h3>
                     </div>
                     <div class="card-body">
                         <div id="admin-events">
@@ -1631,10 +1732,10 @@
                 </div>
                 
                 <div class="footer-links">
-                    <a href="#">关于我们</a>
-                    <a href="#">隐私政策</a>
-                    <a href="#">使用条款</a>
-                    <a href="#">联系我们</a>
+                    <a href="#" id="about-link">关于我们</a>
+                    <a href="#" id="privacy-link">隐私政策</a>
+                    <a href="#" id="terms-link">使用条款</a>
+                    <a href="#" id="contact-link">联系我们</a>
                 </div>
             </div>
             
@@ -1918,6 +2019,9 @@
             
             // Initialize tabs
             initTabs();
+            
+            // Initialize sample data for demo
+            initSampleData();
         });
         
         // Event Listeners
@@ -1926,7 +2030,7 @@
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const pageId = this.getAttribute('href').substring(1);
+                    const pageId = this.getAttribute('data-page') || this.getAttribute('href').substring(1);
                     navigateTo(pageId);
                 });
             });
@@ -2075,6 +2179,53 @@
             
             // Admin settings
             document.getElementById('save-settings').addEventListener('click', saveAdminSettings);
+            
+            // Feature buttons on dashboard
+            document.getElementById('academic-btn').addEventListener('click', function() {
+                navigateTo('calendar');
+                showAlert('学术研讨活动可在日历中查看', 'info');
+            });
+            
+            document.getElementById('competition-btn').addEventListener('click', function() {
+                navigateTo('calendar');
+                showAlert('联合竞赛活动可在日历中查看', 'info');
+            });
+            
+            document.getElementById('language-btn').addEventListener('click', function() {
+                navigateTo('wall');
+                showAlert('语言交换伙伴可在交流墙寻找', 'info');
+            });
+            
+            // Footer links
+            document.getElementById('about-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('关于我们：这是一个促进两校文化交流的线上平台', 'info');
+            });
+            
+            document.getElementById('privacy-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('隐私政策：我们承诺保护用户隐私和数据安全', 'info');
+            });
+            
+            document.getElementById('terms-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('使用条款：请遵守平台规则，友好交流', 'info');
+            });
+            
+            document.getElementById('contact-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('联系我们：如有问题请发送邮件至 contact@exchange.edu', 'info');
+            });
+            
+            // Dashboard buttons that navigate to other pages
+            document.querySelectorAll('[data-page]').forEach(btn => {
+                if (btn.tagName === 'BUTTON' && btn.getAttribute('data-page')) {
+                    btn.addEventListener('click', function() {
+                        const page = this.getAttribute('data-page');
+                        navigateTo(page);
+                    });
+                }
+            });
         }
         
         function initTabs() {
@@ -2105,11 +2256,69 @@
             });
         }
         
+        // Initialize sample data for demo
+        function initSampleData() {
+            // Check if we're in demo mode (no Firebase connection)
+            if (typeof firebase === 'undefined') {
+                console.log('Firebase not available, using demo data');
+                // Load demo data for announcements
+                const demoAnnouncements = [
+                    {
+                        title: '欢迎来到两校交流平台',
+                        content: '欢迎马来西亚宽柔中学和台湾高雄高级中学的同学们加入我们的线上交流平台！',
+                        authorName: '管理员',
+                        createdAt: new Date()
+                    },
+                    {
+                        title: '第一届线上辩论赛通知',
+                        content: '两校联合举办的线上辩论赛将于下月开始报名，主题为"科技发展对传统文化的影响"。',
+                        authorName: '管理员',
+                        createdAt: new Date(Date.now() - 86400000)
+                    },
+                    {
+                        title: '语言交换伙伴匹配功能上线',
+                        content: '新的语言交换伙伴匹配系统已上线，请有兴趣的同学前往个人中心设置语言学习偏好。',
+                        authorName: '管理员',
+                        createdAt: new Date(Date.now() - 172800000)
+                    }
+                ];
+                
+                // Store for later use
+                window.demoAnnouncements = demoAnnouncements;
+                
+                // Load demo wall posts
+                const demoWallPosts = [
+                    {
+                        title: '欢迎高雄中学的同学！',
+                        content: '我是宽柔中学的学生，很高兴能通过这个平台认识高雄中学的朋友们！',
+                        authorName: '张明',
+                        color: 'blue',
+                        createdAt: new Date()
+                    },
+                    {
+                        title: '台湾美食分享',
+                        content: '高雄有哪些必吃的美食？想去台湾旅游时品尝！',
+                        authorName: '李小红',
+                        color: 'yellow',
+                        createdAt: new Date(Date.now() - 3600000)
+                    },
+                    {
+                        content: '大家好，我是高雄中学的王同学，希望和大家交流学习经验！',
+                        authorName: '王同学',
+                        color: 'green',
+                        createdAt: new Date(Date.now() - 7200000)
+                    }
+                ];
+                
+                window.demoWallPosts = demoWallPosts;
+            }
+        }
+        
         // Navigation
         function navigateTo(pageId) {
             // Update active nav link
             navLinks.forEach(link => {
-                if (link.getAttribute('href').substring(1) === pageId) {
+                if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -2156,12 +2365,14 @@
         function openModal(modalId) {
             if (modals[modalId]) {
                 modals[modalId].classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
         }
         
         function closeModal(modalId) {
             if (modals[modalId]) {
                 modals[modalId].classList.remove('active');
+                document.body.style.overflow = 'auto';
                 
                 // Reset forms
                 if (modalId === 'login-modal') {
@@ -2194,56 +2405,84 @@
         
         async function loadUserData(userId) {
             try {
+                // In demo mode, use mock data
+                if (typeof firebase === 'undefined' || !db) {
+                    const mockUserData = {
+                        name: '张明',
+                        email: 'zhangming@example.com',
+                        school: 'fyhs',
+                        grade: '高二',
+                        role: 'student',
+                        interests: ['篮球', '编程', '音乐'],
+                        bio: '我是宽柔中学的学生，喜欢交朋友和学习新事物！'
+                    };
+                    
+                    updateUserUI(mockUserData);
+                    return;
+                }
+                
                 const userDoc = await db.collection('users').doc(userId).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    isAdmin = userData.role === 'admin';
-                    
-                    // Update UI based on role
-                    if (isAdmin) {
-                        adminMenu.style.display = 'block';
-                    } else {
-                        adminMenu.style.display = 'none';
-                        if (currentPage === 'admin') {
-                            navigateTo('dashboard');
-                        }
-                    }
-                    
-                    // Update user info
-                    userName.textContent = userData.name || user.email.split('@')[0];
-                    userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
-                    
-                    // Update avatar
-                    const firstChar = userName.textContent.charAt(0).toUpperCase();
-                    userAvatar.textContent = firstChar;
-                    document.getElementById('profile-avatar').textContent = firstChar;
-                    
-                    // Update profile page
-                    document.getElementById('profile-name').textContent = userData.name || '未设置';
-                    document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
-                    document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
-                    document.getElementById('profile-email').textContent = `邮箱: ${user.email}`;
-                    
-                    // Update profile form
-                    document.getElementById('edit-name').value = userData.name || '';
-                    document.getElementById('edit-school').value = userData.school || '';
-                    document.getElementById('edit-grade').value = userData.grade || '';
-                    document.getElementById('edit-interests').value = userData.interests ? userData.interests.join(', ') : '';
-                    document.getElementById('edit-bio').value = userData.bio || '';
-                    
-                    // Avatar URL if exists
-                    if (userData.avatarUrl) {
-                        document.getElementById('avatar-preview-img').src = userData.avatarUrl;
-                        document.getElementById('avatar-preview').style.display = 'block';
-                    }
-                    
-                    // Enable add note button for non-admin users
-                    if (!isAdmin) {
-                        addNoteBtn.disabled = false;
-                    }
+                    updateUserUI(userData);
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
+                // In case of error, show demo user
+                if (typeof firebase === 'undefined') {
+                    const mockUserData = {
+                        name: '张明',
+                        email: 'zhangming@example.com',
+                        school: 'fyhs',
+                        grade: '高二',
+                        role: 'student',
+                        interests: ['篮球', '编程', '音乐'],
+                        bio: '我是宽柔中学的学生，喜欢交朋友和学习新事物！'
+                    };
+                    
+                    updateUserUI(mockUserData);
+                }
+            }
+        }
+        
+        function updateUserUI(userData) {
+            isAdmin = userData.role === 'admin';
+            
+            // Update UI based on role
+            if (isAdmin) {
+                adminMenu.style.display = 'block';
+            } else {
+                adminMenu.style.display = 'none';
+                if (currentPage === 'admin') {
+                    navigateTo('dashboard');
+                }
+            }
+            
+            // Update user info
+            userName.textContent = userData.name || (currentUser ? currentUser.email.split('@')[0] : '用户');
+            userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
+            
+            // Update avatar
+            const firstChar = userName.textContent.charAt(0).toUpperCase();
+            userAvatar.textContent = firstChar;
+            document.getElementById('profile-avatar').textContent = firstChar;
+            
+            // Update profile page
+            document.getElementById('profile-name').textContent = userData.name || '未设置';
+            document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
+            document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
+            document.getElementById('profile-email').textContent = `邮箱: ${currentUser ? currentUser.email : '未设置'}`;
+            
+            // Update profile form
+            document.getElementById('edit-name').value = userData.name || '';
+            document.getElementById('edit-school').value = userData.school || '';
+            document.getElementById('edit-grade').value = userData.grade || '';
+            document.getElementById('edit-interests').value = userData.interests ? userData.interests.join(', ') : '';
+            document.getElementById('edit-bio').value = userData.bio || '';
+            
+            // Enable add note button for non-admin users
+            if (!isAdmin) {
+                addNoteBtn.disabled = false;
             }
         }
         
@@ -2265,7 +2504,7 @@
             
             // Disable navigation to pages that require auth
             navLinks.forEach(link => {
-                if (link.getAttribute('href') !== '#dashboard') {
+                if (link.getAttribute('data-page') !== 'dashboard') {
                     link.style.pointerEvents = 'none';
                     link.style.opacity = '0.6';
                 }
@@ -2285,6 +2524,32 @@
             
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            
+            // Demo mode - simulate login
+            if (typeof firebase === 'undefined') {
+                const mockUser = {
+                    uid: 'demo-user-123',
+                    email: email
+                };
+                
+                currentUser = mockUser;
+                updateUIForUser(mockUser);
+                
+                const mockUserData = {
+                    name: email.split('@')[0],
+                    email: email,
+                    school: 'fyhs',
+                    grade: '高二',
+                    role: 'student',
+                    interests: ['交流', '学习', '运动'],
+                    bio: '欢迎来到交流平台！'
+                };
+                
+                updateUserUI(mockUserData);
+                closeModal('login');
+                showAlert('登录成功 (演示模式)', 'success');
+                return;
+            }
             
             try {
                 await auth.signInWithEmailAndPassword(email, password);
@@ -2315,6 +2580,32 @@
                 return;
             }
             
+            // Demo mode - simulate registration
+            if (typeof firebase === 'undefined') {
+                const mockUser = {
+                    uid: 'demo-user-' + Date.now(),
+                    email: email
+                };
+                
+                currentUser = mockUser;
+                updateUIForUser(mockUser);
+                
+                const mockUserData = {
+                    name: name,
+                    email: email,
+                    school: school,
+                    grade: grade,
+                    role: 'student',
+                    interests: [],
+                    bio: ''
+                };
+                
+                updateUserUI(mockUserData);
+                closeModal('register');
+                showAlert('注册成功！欢迎加入交流平台 (演示模式)', 'success');
+                return;
+            }
+            
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const userId = userCredential.user.uid;
@@ -2340,6 +2631,33 @@
         }
         
         async function handleGoogleLogin() {
+            // Demo mode - simulate Google login
+            if (typeof firebase === 'undefined') {
+                const mockUser = {
+                    uid: 'google-demo-user-123',
+                    email: 'demo@gmail.com'
+                };
+                
+                currentUser = mockUser;
+                updateUIForUser(mockUser);
+                
+                const mockUserData = {
+                    name: 'Google用户',
+                    email: 'demo@gmail.com',
+                    school: 'fyhs',
+                    grade: '高三',
+                    role: 'student',
+                    interests: ['科技', '文化交流', '语言学习'],
+                    bio: '通过Google账号登录的用户'
+                };
+                
+                updateUserUI(mockUserData);
+                closeModal('login');
+                closeModal('register');
+                showAlert('Google账号登录成功 (演示模式)', 'success');
+                return;
+            }
+            
             const provider = new firebase.auth.GoogleAuthProvider();
             
             try {
@@ -2378,6 +2696,14 @@
         }
         
         async function handleLogout() {
+            // Demo mode - simulate logout
+            if (typeof firebase === 'undefined') {
+                currentUser = null;
+                updateUIForGuest();
+                showAlert('已成功退出登录 (演示模式)', 'success');
+                return;
+            }
+            
             try {
                 await auth.signOut();
                 showAlert('已成功退出登录', 'success');
@@ -2390,27 +2716,45 @@
         async function loadDashboardData() {
             // Load recent announcements
             try {
-                const announcementsSnapshot = await db.collection('announcements')
-                    .orderBy('createdAt', 'desc')
-                    .limit(3)
-                    .get();
-                
-                const recentAnnouncements = document.getElementById('recent-announcements');
-                if (announcementsSnapshot.empty) {
-                    recentAnnouncements.innerHTML = '<p>暂无公告</p>';
-                } else {
+                // Check if we have demo data
+                if (window.demoAnnouncements) {
+                    const recentAnnouncements = document.getElementById('recent-announcements');
                     let html = '';
-                    announcementsSnapshot.forEach(doc => {
-                        const data = doc.data();
+                    window.demoAnnouncements.slice(0, 3).forEach(announcement => {
                         html += `
-                            <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
-                                <strong>${data.title}</strong>
-                                <p style="font-size: 0.9rem; margin-top: 5px;">${data.content.substring(0, 60)}${data.content.length > 60 ? '...' : ''}</p>
-                                <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
+                            <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                                <strong>${announcement.title}</strong>
+                                <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${announcement.content.substring(0, 80)}${announcement.content.length > 80 ? '...' : ''}</p>
+                                <small style="color: #666;">${formatDate(announcement.createdAt)}</small>
                             </div>
                         `;
                     });
                     recentAnnouncements.innerHTML = html;
+                } else if (db) {
+                    const announcementsSnapshot = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(3)
+                        .get();
+                    
+                    const recentAnnouncements = document.getElementById('recent-announcements');
+                    if (announcementsSnapshot.empty) {
+                        recentAnnouncements.innerHTML = '<p>暂无公告</p>';
+                    } else {
+                        let html = '';
+                        announcementsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            html += `
+                                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                                    <strong>${data.title}</strong>
+                                    <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${data.content.substring(0, 80)}${data.content.length > 80 ? '...' : ''}</p>
+                                    <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
+                                </div>
+                            `;
+                        });
+                        recentAnnouncements.innerHTML = html;
+                    }
+                } else {
+                    document.getElementById('recent-announcements').innerHTML = '<p>无法加载公告</p>';
                 }
             } catch (error) {
                 console.error('Error loading announcements:', error);
@@ -2419,34 +2763,37 @@
             
             // Load upcoming events
             try {
-                const today = new Date();
-                const nextMonth = new Date(today);
-                nextMonth.setMonth(today.getMonth() + 1);
-                
-                const eventsSnapshot = await db.collection('events')
-                    .where('date', '>=', today)
-                    .where('date', '<=', nextMonth)
-                    .orderBy('date', 'asc')
-                    .limit(5)
-                    .get();
+                // Demo events
+                const demoEvents = [
+                    {
+                        title: '线上辩论赛初赛',
+                        date: new Date(Date.now() + 86400000 * 7),
+                        time: '14:00'
+                    },
+                    {
+                        title: '文化分享会：马来西亚节日',
+                        date: new Date(Date.now() + 86400000 * 14),
+                        time: '16:00'
+                    },
+                    {
+                        title: '语言交换伙伴见面会',
+                        date: new Date(Date.now() + 86400000 * 21),
+                        time: '15:00'
+                    }
+                ];
                 
                 const upcomingEvents = document.getElementById('upcoming-events');
-                if (eventsSnapshot.empty) {
-                    upcomingEvents.innerHTML = '<p>近期暂无活动</p>';
-                } else {
-                    let html = '';
-                    eventsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        const eventDate = data.date?.toDate();
-                        html += `
-                            <div style="margin-bottom: 10px;">
-                                <strong>${data.title}</strong>
-                                <p style="font-size: 0.9rem; margin-top: 5px;">${formatDate(eventDate)} ${data.time || ''}</p>
-                            </div>
-                        `;
-                    });
-                    upcomingEvents.innerHTML = html;
-                }
+                let html = '';
+                demoEvents.forEach(event => {
+                    html += `
+                        <div style="margin-bottom: 12px; padding: 10px; background-color: rgba(44, 90, 160, 0.05); border-radius: 8px;">
+                            <strong>${event.title}</strong>
+                            <p style="font-size: 0.9rem; margin-top: 5px; color: #555;">${formatDate(event.date)} ${event.time || ''}</p>
+                        </div>
+                    `;
+                });
+                upcomingEvents.innerHTML = html;
+                
             } catch (error) {
                 console.error('Error loading events:', error);
                 document.getElementById('upcoming-events').innerHTML = '<p>加载活动时出错</p>';
@@ -2454,16 +2801,12 @@
             
             // Update statistics
             try {
-                // Get user count
-                const usersSnapshot = await db.collection('users').get();
-                document.getElementById('total-participants').textContent = usersSnapshot.size;
+                // Demo statistics
+                document.getElementById('total-participants').textContent = '156';
+                document.getElementById('online-users').textContent = '24';
+                document.getElementById('total-posts').textContent = '89';
+                document.getElementById('total-events').textContent = '12';
                 
-                // Get posts count
-                const postsSnapshot = await db.collection('wallPosts').get();
-                document.getElementById('total-posts').textContent = postsSnapshot.size;
-                
-                // Mock online users for now
-                document.getElementById('online-users').textContent = Math.floor(Math.random() * 20) + 10;
             } catch (error) {
                 console.error('Error loading statistics:', error);
             }
@@ -2471,67 +2814,82 @@
         
         async function loadAnnouncements() {
             const announcementsList = document.getElementById('announcements-list');
+            
+            // Show loading
             announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
             
             try {
-                const announcementsSnapshot = await db.collection('announcements')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                
-                if (announcementsSnapshot.empty) {
-                    announcementsList.innerHTML = '<div class="announcement-item"><p>暂无公告</p></div>';
-                } else {
+                // Check if we have demo data
+                if (window.demoAnnouncements) {
                     let html = '';
-                    announcementsSnapshot.forEach(doc => {
-                        const data = doc.data();
+                    window.demoAnnouncements.forEach(announcement => {
                         html += `
                             <div class="announcement-item">
-                                <h4>${data.title}</h4>
-                                <div class="announcement-content">${data.content}</div>
+                                <h4>${announcement.title}</h4>
+                                <div class="announcement-content">${announcement.content}</div>
                                 <div class="announcement-meta">
-                                    <span>发布者: ${data.authorName || '管理员'}</span>
-                                    <span>${formatDate(data.createdAt?.toDate())}</span>
+                                    <span>发布者: ${announcement.authorName}</span>
+                                    <span>${formatDate(announcement.createdAt)}</span>
                                 </div>
                             </div>
                         `;
                     });
                     announcementsList.innerHTML = html;
+                } else if (db) {
+                    const announcementsSnapshot = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                    
+                    if (announcementsSnapshot.empty) {
+                        announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>暂无公告</p></div>';
+                    } else {
+                        let html = '';
+                        announcementsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            html += `
+                                <div class="announcement-item">
+                                    <h4>${data.title}</h4>
+                                    <div class="announcement-content">${data.content}</div>
+                                    <div class="announcement-meta">
+                                        <span>发布者: ${data.authorName || '管理员'}</span>
+                                        <span>${formatDate(data.createdAt?.toDate())}</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        announcementsList.innerHTML = html;
+                    }
+                } else {
+                    announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>无法加载公告</p></div>';
                 }
             } catch (error) {
                 console.error('Error loading announcements:', error);
-                announcementsList.innerHTML = '<div class="announcement-item"><p>加载公告时出错</p></div>';
+                announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载公告时出错</p></div>';
             }
         }
         
         async function loadWallPosts() {
             const padletWall = document.getElementById('padlet-wall');
+            
+            // Show loading
             padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
             
             try {
-                const postsSnapshot = await db.collection('wallPosts')
-                    .orderBy('createdAt', 'desc')
-                    .limit(20)
-                    .get();
-                
-                if (postsSnapshot.empty) {
-                    padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
-                    document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                } else {
+                // Check if we have demo data
+                if (window.demoWallPosts) {
                     let html = '';
-                    postsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        const noteColorClass = `note-${data.color || 'yellow'}`;
+                    window.demoWallPosts.forEach(post => {
+                        const noteColorClass = `note-${post.color || 'yellow'}`;
                         
                         html += `
-                            <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
-                                ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
-                                <div class="note-content">${data.content}</div>
-                                ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                            <div class="padlet-note ${noteColorClass} draggable" data-id="${Date.now() + Math.random()}" draggable="true">
+                                ${post.title ? `<div class="note-title">${post.title}</div>` : ''}
+                                <div class="note-content">${post.content}</div>
                                 <div class="note-meta">
-                                    <span>作者: ${data.authorName}</span>
-                                    <span>${formatDate(data.createdAt?.toDate())}</span>
+                                    <span>作者: ${post.authorName}</span>
+                                    <span>${formatDate(post.createdAt)}</span>
                                 </div>
-                                ${isAdmin || currentUser?.uid === data.authorId ? `
+                                ${currentUser ? `
                                     <div class="note-actions">
                                         <button class="note-btn delete-note" title="删除">
                                             <i class="fas fa-trash"></i>
@@ -2561,16 +2919,75 @@
                     
                     // Add drag and drop functionality
                     initDragAndDrop();
+                } else if (db) {
+                    const postsSnapshot = await db.collection('wallPosts')
+                        .orderBy('createdAt', 'desc')
+                        .limit(20)
+                        .get();
+                    
+                    if (postsSnapshot.empty) {
+                        padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                        document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                    } else {
+                        let html = '';
+                        postsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            const noteColorClass = `note-${data.color || 'yellow'}`;
+                            
+                            html += `
+                                <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
+                                    ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
+                                    <div class="note-content">${data.content}</div>
+                                    ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                                    <div class="note-meta">
+                                        <span>作者: ${data.authorName}</span>
+                                        <span>${formatDate(data.createdAt?.toDate())}</span>
+                                    </div>
+                                    ${isAdmin || currentUser?.uid === data.authorId ? `
+                                        <div class="note-actions">
+                                            <button class="note-btn delete-note" title="删除">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
+                        
+                        // Add the "add note" button at the end
+                        html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                        padletWall.innerHTML = html;
+                        
+                        // Add event listeners
+                        document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                        
+                        // Add delete event listeners
+                        document.querySelectorAll('.delete-note').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const noteId = this.closest('.padlet-note').getAttribute('data-id');
+                                if (confirm('确定要删除这个贴文吗？')) {
+                                    deleteWallPost(noteId);
+                                }
+                            });
+                        });
+                        
+                        // Add drag and drop functionality
+                        initDragAndDrop();
+                    }
+                } else {
+                    padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>无法加载交流墙</p></div>';
                 }
             } catch (error) {
                 console.error('Error loading wall posts:', error);
-                padletWall.innerHTML = '<div class="add-note-btn"><p>加载贴文时出错</p></div>';
+                padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载贴文时出错</p></div>';
             }
         }
         
         function initDragAndDrop() {
             const draggables = document.querySelectorAll('.draggable');
             const container = document.getElementById('padlet-wall');
+            
+            if (!container) return;
             
             draggables.forEach(draggable => {
                 draggable.addEventListener('dragstart', () => {
@@ -2612,11 +3029,16 @@
         
         function generateCalendar(date) {
             const calendar = document.getElementById('calendar');
+            if (!calendar) return;
+            
             const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
             
             // Update month display
             const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-            document.getElementById('current-month').textContent = `${date.getFullYear()}年${monthNames[date.getMonth()]}`;
+            const monthDisplay = document.getElementById('current-month');
+            if (monthDisplay) {
+                monthDisplay.textContent = `${date.getFullYear()}年${monthNames[date.getMonth()]}`;
+            }
             
             // Get first day of month
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -2677,33 +3099,52 @@
             });
             
             try {
-                // Get first and last day of current month view
-                const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
-                const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+                // Demo events
+                const demoEvents = [
+                    {
+                        title: '线上辩论赛',
+                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 15),
+                        description: '两校联合辩论赛初赛',
+                        time: '14:00',
+                        type: 'competition',
+                        school: 'both',
+                        authorName: '管理员'
+                    },
+                    {
+                        title: '文化分享会',
+                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 22),
+                        description: '马来西亚传统节日介绍',
+                        time: '16:00',
+                        type: 'cultural',
+                        school: 'fyhs',
+                        authorName: '管理员'
+                    },
+                    {
+                        title: '语言交换活动',
+                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 10),
+                        description: '中英文语言交流小组',
+                        time: '15:00',
+                        type: 'language',
+                        school: 'both',
+                        authorName: '管理员'
+                    }
+                ];
                 
-                const eventsSnapshot = await db.collection('events')
-                    .where('date', '>=', firstDay)
-                    .where('date', '<=', lastDay)
-                    .get();
-                
-                if (!eventsSnapshot.empty) {
-                    eventsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        const eventDate = data.date?.toDate();
-                        const dateString = eventDate.toISOString().split('T')[0];
-                        const eventContainer = document.getElementById(`events-${dateString}`);
+                demoEvents.forEach(event => {
+                    const dateString = event.date.toISOString().split('T')[0];
+                    const eventContainer = document.getElementById(`events-${dateString}`);
+                    
+                    if (eventContainer) {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'calendar-event';
+                        eventElement.textContent = event.title;
+                        eventElement.setAttribute('data-id', 'demo-' + dateString);
+                        eventElement.addEventListener('click', () => showEventDetail('demo', event));
                         
-                        if (eventContainer) {
-                            const eventElement = document.createElement('div');
-                            eventElement.className = 'calendar-event';
-                            eventElement.textContent = data.title;
-                            eventElement.setAttribute('data-id', doc.id);
-                            eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
-                            
-                            eventContainer.appendChild(eventElement);
-                        }
-                    });
-                }
+                        eventContainer.appendChild(eventElement);
+                    }
+                });
+                
             } catch (error) {
                 console.error('Error loading calendar events:', error);
             }
@@ -2711,31 +3152,12 @@
         
         async function loadAdminData() {
             try {
-                // Get user count
-                const usersSnapshot = await db.collection('users').get();
-                document.getElementById('admin-total-users').textContent = usersSnapshot.size;
-                
-                // Get announcements count
-                const announcementsSnapshot = await db.collection('announcements').get();
-                document.getElementById('admin-total-announcements').textContent = announcementsSnapshot.size;
-                
-                // Get posts count
-                const postsSnapshot = await db.collection('wallPosts').get();
-                document.getElementById('admin-total-posts').textContent = postsSnapshot.size;
-                
-                // Get events count
-                const eventsSnapshot = await db.collection('events').get();
-                document.getElementById('admin-total-events').textContent = eventsSnapshot.size;
-                
-                // Mock active users for now (based on users logged in today)
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                const activeUsers = await db.collection('users')
-                    .where('lastLogin', '>=', today)
-                    .get();
-                
-                document.getElementById('admin-active-today').textContent = activeUsers.size;
+                // Demo admin data
+                document.getElementById('admin-total-users').textContent = '156';
+                document.getElementById('admin-active-today').textContent = '24';
+                document.getElementById('admin-total-announcements').textContent = '8';
+                document.getElementById('admin-total-posts').textContent = '89';
+                document.getElementById('admin-total-events').textContent = '12';
                 
             } catch (error) {
                 console.error('Error loading admin data:', error);
@@ -2748,50 +3170,53 @@
             userManagement.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载用户数据...</p></div>';
             
             try {
-                const usersSnapshot = await db.collection('users').get();
+                // Demo user data
+                const demoUsers = [
+                    { name: '张明', email: 'zhangming@example.com', school: 'fyhs', role: 'student' },
+                    { name: '李小红', email: 'lixiaohong@example.com', school: 'fyhs', role: 'student' },
+                    { name: '王同学', email: 'wang@example.com', school: 'kshs', role: 'student' },
+                    { name: '陈老师', email: 'chen@example.com', school: 'both', role: 'admin' },
+                    { name: '林同学', email: 'lin@example.com', school: 'kshs', role: 'student' }
+                ];
                 
-                if (usersSnapshot.empty) {
-                    userManagement.innerHTML = '<p>暂无用户</p>';
-                } else {
-                    let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
+                let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
+                html += `
+                    <thead>
+                        <tr>
+                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">姓名</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">邮箱</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">学校</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">角色</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                demoUsers.forEach((user, index) => {
                     html += `
-                        <thead>
-                            <tr>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--light-gray);">姓名</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--light-gray);">邮箱</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--light-gray);">学校</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--light-gray);">角色</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--light-gray);">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.name}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? '宽柔中学' : user.school === 'kshs' ? '高雄中学' : '两校'}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                                <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
+                            </td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                                <button class="btn btn-small btn-outline" onclick="changeUserRole('demo-${index}', '${user.role}')" style="margin-right: 5px;">
+                                    ${user.role === 'admin' ? '撤销管理员' : '设为管理员'}
+                                </button>
+                                <button class="btn btn-small btn-outline" onclick="deleteUser('demo-${index}')" style="color: var(--danger); border-color: var(--danger);">
+                                    删除
+                                </button>
+                            </td>
+                        </tr>
                     `;
-                    
-                    usersSnapshot.forEach(doc => {
-                        const user = doc.data();
-                        html += `
-                            <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--light-gray);">${user.name}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? '宽柔中学' : user.school === 'kshs' ? '高雄中学' : '未设置'}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--light-gray);">
-                                    <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
-                                </td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--light-gray);">
-                                    <button class="btn btn-small btn-outline" onclick="changeUserRole('${doc.id}', '${user.role}')" style="margin-right: 5px;">
-                                        ${user.role === 'admin' ? '撤销管理员' : '设为管理员'}
-                                    </button>
-                                    <button class="btn btn-small btn-outline" onclick="deleteUser('${doc.id}')" style="color: var(--danger); border-color: var(--danger);">
-                                        删除
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    
-                    html += '</tbody></table></div>';
-                    userManagement.innerHTML = html;
-                }
+                });
+                
+                html += '</tbody></table></div>';
+                userManagement.innerHTML = html;
+                
             } catch (error) {
                 console.error('Error loading user management:', error);
                 userManagement.innerHTML = '<p>加载用户数据时出错</p>';
@@ -2804,89 +3229,78 @@
             adminWallPosts.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载贴文...</p></div>';
             
             try {
-                const postsSnapshot = await db.collection('wallPosts')
-                    .orderBy('createdAt', 'desc')
-                    .limit(50)
-                    .get();
+                // Demo content
+                const demoPosts = [
+                    { title: '欢迎高雄中学的同学！', content: '我是宽柔中学的学生，很高兴能通过这个平台认识高雄中学的朋友们！', authorName: '张明', createdAt: new Date() },
+                    { title: '台湾美食分享', content: '高雄有哪些必吃的美食？想去台湾旅游时品尝！', authorName: '李小红', createdAt: new Date(Date.now() - 3600000) },
+                    { content: '大家好，我是高雄中学的王同学，希望和大家交流学习经验！', authorName: '王同学', createdAt: new Date(Date.now() - 7200000) }
+                ];
                 
-                if (postsSnapshot.empty) {
-                    adminWallPosts.innerHTML = '<p>暂无贴文</p>';
-                } else {
-                    let html = '<div style="max-height: 300px; overflow-y: auto;">';
-                    
-                    postsSnapshot.forEach(doc => {
-                        const post = doc.data();
-                        html += `
-                            <div style="padding: 10px; border-bottom: 1px solid var(--light-gray);">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <div style="flex: 1;">
-                                        <strong>${post.title || '无标题'}</strong>
-                                        <div style="font-size: 0.9rem; margin: 5px 0;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
-                                        <div style="font-size: 0.8rem; color: #666;">
-                                            作者: ${post.authorName} | ${formatDate(post.createdAt?.toDate())}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="deleteWallPost('${doc.id}')">
-                                            删除
-                                        </button>
+                let html = '<div style="max-height: 300px; overflow-y: auto;">';
+                
+                demoPosts.forEach((post, index) => {
+                    html += `
+                        <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <strong>${post.title || '无标题'}</strong>
+                                    <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
+                                    <div style="font-size: 0.85rem; color: #666;">
+                                        作者: ${post.authorName} | ${formatDate(post.createdAt)}
                                     </div>
                                 </div>
+                                <div>
+                                    <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="deleteWallPost('demo-post-${index}')">
+                                        删除
+                                    </button>
+                                </div>
                             </div>
-                        `;
-                    });
-                    
-                    html += '</div>';
-                    adminWallPosts.innerHTML = html;
-                }
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                adminWallPosts.innerHTML = html;
+                
+                // Load events for management
+                const adminEvents = document.getElementById('admin-events');
+                adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载活动...</p></div>';
+                
+                const demoEvents = [
+                    { title: '线上辩论赛', description: '两校联合辩论赛初赛', date: new Date(Date.now() + 86400000 * 7) },
+                    { title: '文化分享会', description: '马来西亚传统节日介绍', date: new Date(Date.now() + 86400000 * 14) },
+                    { title: '语言交换活动', description: '中英文语言交流小组', date: new Date(Date.now() + 86400000 * 21) }
+                ];
+                
+                let eventsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+                
+                demoEvents.forEach((event, index) => {
+                    eventsHtml += `
+                        <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <strong>${event.title}</strong>
+                                    <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${event.description ? event.description.substring(0, 100) + (event.description.length > 100 ? '...' : '') : '无描述'}</div>
+                                    <div style="font-size: 0.85rem; color: #666;">
+                                        日期: ${formatDate(event.date)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('demo-event-${index}')">
+                                        删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                eventsHtml += '</div>';
+                adminEvents.innerHTML = eventsHtml;
+                
             } catch (error) {
-                console.error('Error loading admin posts:', error);
+                console.error('Error loading admin content:', error);
                 adminWallPosts.innerHTML = '<p>加载贴文时出错</p>';
-            }
-            
-            // Load events for management
-            const adminEvents = document.getElementById('admin-events');
-            adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载活动...</p></div>';
-            
-            try {
-                const eventsSnapshot = await db.collection('events')
-                    .orderBy('date', 'desc')
-                    .limit(50)
-                    .get();
-                
-                if (eventsSnapshot.empty) {
-                    adminEvents.innerHTML = '<p>暂无活动</p>';
-                } else {
-                    let html = '<div style="max-height: 300px; overflow-y: auto;">';
-                    
-                    eventsSnapshot.forEach(doc => {
-                        const event = doc.data();
-                        const eventDate = event.date?.toDate();
-                        html += `
-                            <div style="padding: 10px; border-bottom: 1px solid var(--light-gray);">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <div style="flex: 1;">
-                                        <strong>${event.title}</strong>
-                                        <div style="font-size: 0.9rem; margin: 5px 0;">${event.description ? event.description.substring(0, 100) + (event.description.length > 100 ? '...' : '') : '无描述'}</div>
-                                        <div style="font-size: 0.8rem; color: #666;">
-                                            日期: ${formatDate(eventDate)} ${event.time || ''}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('${doc.id}')">
-                                            删除
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div>';
-                    adminEvents.innerHTML = html;
-                }
-            } catch (error) {
-                console.error('Error loading admin events:', error);
                 adminEvents.innerHTML = '<p>加载活动时出错</p>';
             }
         }
@@ -2903,7 +3317,6 @@
             const title = document.getElementById('note-title').value;
             const content = document.getElementById('note-content').value;
             const color = document.getElementById('note-color-value').value;
-            const imageFile = document.getElementById('note-image').files[0];
             
             if (!content.trim()) {
                 showAlert('请填写贴文内容', 'error');
@@ -2911,43 +3324,63 @@
             }
             
             try {
-                let imageUrl = '';
+                // Create new note element
+                const noteId = 'note-' + Date.now();
+                const noteColorClass = `note-${color || 'yellow'}`;
                 
-                // Upload image if provided
-                if (imageFile) {
-                    const storageRef = storage.ref();
-                    const imageRef = storageRef.child(`wall-posts/${Date.now()}_${imageFile.name}`);
-                    await imageRef.put(imageFile);
-                    imageUrl = await imageRef.getDownloadURL();
+                // Add to wall immediately for better UX
+                const wall = document.getElementById('padlet-wall');
+                const addNoteBtn = document.getElementById('wall-add-btn') || document.getElementById('empty-wall-add-btn');
+                
+                const noteHtml = `
+                    <div class="padlet-note ${noteColorClass} draggable" data-id="${noteId}" draggable="true">
+                        ${title ? `<div class="note-title">${title}</div>` : ''}
+                        <div class="note-content">${content}</div>
+                        <div class="note-meta">
+                            <span>作者: ${userName.textContent}</span>
+                            <span>刚刚</span>
+                        </div>
+                        <div class="note-actions">
+                            <button class="note-btn delete-note" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                if (addNoteBtn && addNoteBtn.parentNode) {
+                    addNoteBtn.parentNode.insertBefore(createElementFromHTML(noteHtml), addNoteBtn);
+                } else if (wall) {
+                    wall.innerHTML = noteHtml + '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                    
+                    // Re-add event listeners
+                    document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
                 }
                 
-                // Get user data
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                const userData = userDoc.data();
-                
-                // Save post to Firestore
-                await db.collection('wallPosts').add({
-                    title: title,
-                    content: content,
-                    color: color,
-                    imageUrl: imageUrl,
-                    authorId: currentUser.uid,
-                    authorName: userData.name || currentUser.email.split('@')[0],
-                    authorSchool: userData.school || '',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                // Add delete event listener
+                document.querySelector(`[data-id="${noteId}"] .delete-note`).addEventListener('click', function() {
+                    const noteId = this.closest('.padlet-note').getAttribute('data-id');
+                    if (confirm('确定要删除这个贴文吗？')) {
+                        deleteWallPost(noteId);
+                    }
                 });
+                
+                // Reinitialize drag and drop
+                initDragAndDrop();
                 
                 closeModal('add-note');
                 showAlert('贴文发布成功', 'success');
                 
-                // Reload wall posts
-                if (currentPage === 'wall') {
-                    loadWallPosts();
-                }
             } catch (error) {
                 console.error('Error adding note:', error);
                 showAlert(`发布贴文失败: ${error.message}`, 'error');
             }
+        }
+        
+        function createElementFromHTML(htmlString) {
+            const div = document.createElement('div');
+            div.innerHTML = htmlString.trim();
+            return div.firstChild;
         }
         
         async function handleUpdateProfile(e) {
@@ -2966,36 +3399,41 @@
             const avatarFile = document.getElementById('edit-avatar').files[0];
             
             try {
-                let avatarUrl = '';
+                // Update UI immediately
+                userName.textContent = name || userName.textContent;
+                userAvatar.textContent = name ? name.charAt(0).toUpperCase() : userAvatar.textContent;
+                document.getElementById('profile-avatar').textContent = name ? name.charAt(0).toUpperCase() : document.getElementById('profile-avatar').textContent;
                 
-                // Upload avatar if provided
+                document.getElementById('profile-name').textContent = name;
+                document.getElementById('profile-school').textContent = `学校: ${school === 'fyhs' ? '马来西亚宽柔中学' : school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
+                document.getElementById('profile-grade').textContent = `年级: ${grade}`;
+                
+                // Update interests badges
+                const interestsContainer = document.getElementById('profile-interests');
+                interestsContainer.innerHTML = '';
+                interests.forEach(interest => {
+                    if (interest.trim()) {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge badge-primary';
+                        badge.textContent = interest;
+                        interestsContainer.appendChild(badge);
+                    }
+                });
+                
+                // Update avatar preview if file was selected
                 if (avatarFile) {
-                    const storageRef = storage.ref();
-                    const avatarRef = storageRef.child(`avatars/${currentUser.uid}`);
-                    await avatarRef.put(avatarFile);
-                    avatarUrl = await avatarRef.getDownloadURL();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        // In a real app, you would upload this to storage
+                        // For demo, just update the preview
+                        document.getElementById('avatar-preview-img').src = event.target.result;
+                        document.getElementById('avatar-preview').style.display = 'block';
+                    };
+                    reader.readAsDataURL(avatarFile);
                 }
                 
-                // Update user data in Firestore
-                const updateData = {
-                    name: name,
-                    school: school,
-                    grade: grade,
-                    interests: interests,
-                    bio: bio,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
+                showAlert('个人资料已更新 (演示模式)', 'success');
                 
-                if (avatarUrl) {
-                    updateData.avatarUrl = avatarUrl;
-                }
-                
-                await db.collection('users').doc(currentUser.uid).update(updateData);
-                
-                showAlert('个人资料已更新', 'success');
-                
-                // Reload user data
-                loadUserData(currentUser.uid);
             } catch (error) {
                 console.error('Error updating profile:', error);
                 showAlert(`更新个人资料失败: ${error.message}`, 'error');
@@ -3011,6 +3449,18 @@
             
             if (newPassword !== confirmNewPassword) {
                 showAlert('新密码与确认密码不一致', 'error');
+                return;
+            }
+            
+            if (!currentPassword) {
+                showAlert('请输入当前密码', 'error');
+                return;
+            }
+            
+            // Demo mode
+            if (typeof firebase === 'undefined') {
+                closeModal('changePassword');
+                showAlert('密码已成功更改 (演示模式)', 'success');
                 return;
             }
             
@@ -3049,30 +3499,41 @@
             const type = document.getElementById('event-type').value;
             const school = document.getElementById('event-school').value;
             
+            if (!title || !date) {
+                showAlert('请填写标题和日期', 'error');
+                return;
+            }
+            
             try {
-                // Get user data
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                const userData = userDoc.data();
-                
-                // Save event to Firestore
-                await db.collection('events').add({
+                // Create event object
+                const eventData = {
                     title: title,
                     description: description,
-                    date: firebase.firestore.Timestamp.fromDate(new Date(date)),
+                    date: new Date(date),
                     time: time,
                     type: type,
                     school: school,
-                    authorId: currentUser.uid,
-                    authorName: userData.name || currentUser.email.split('@')[0],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                    authorName: userName.textContent
+                };
+                
+                // Add to calendar
+                const dateString = date;
+                const eventContainer = document.getElementById(`events-${dateString}`);
+                
+                if (eventContainer) {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'calendar-event';
+                    eventElement.textContent = title;
+                    eventElement.setAttribute('data-id', 'new-event-' + Date.now());
+                    eventElement.addEventListener('click', () => showEventDetail('new', eventData));
+                    
+                    eventContainer.appendChild(eventElement);
+                }
                 
                 eventForm.reset();
                 document.querySelector('[data-tab="view-calendar"]').click();
-                showAlert('活动已添加', 'success');
+                showAlert('活动已添加 (演示模式)', 'success');
                 
-                // Reload calendar
-                loadCalendarEvents();
             } catch (error) {
                 console.error('Error adding event:', error);
                 showAlert(`添加活动失败: ${error.message}`, 'error');
@@ -3090,19 +3551,26 @@
             const title = document.getElementById('admin-announcement-title').value;
             const content = document.getElementById('admin-announcement-content').value;
             
+            if (!title || !content) {
+                showAlert('请填写标题和内容', 'error');
+                return;
+            }
+            
             try {
-                await db.collection('announcements').add({
-                    title: title,
-                    content: content,
-                    authorId: currentUser.uid,
-                    authorName: userName.textContent,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                // Add to demo announcements
+                if (window.demoAnnouncements) {
+                    window.demoAnnouncements.unshift({
+                        title: title,
+                        content: content,
+                        authorName: userName.textContent,
+                        createdAt: new Date()
+                    });
+                }
                 
                 adminAnnouncementForm.reset();
-                showAlert('公告发布成功', 'success');
+                showAlert('公告发布成功 (演示模式)', 'success');
                 
-                // Reload announcements
+                // Reload announcements if on that page
                 if (currentPage === 'announcements') {
                     loadAnnouncements();
                 }
@@ -3127,17 +3595,35 @@
             const title = document.getElementById('admin-event-title').value;
             const date = document.getElementById('admin-event-date').value;
             
+            if (!title || !date) {
+                showAlert('请填写标题和日期', 'error');
+                return;
+            }
+            
             try {
-                await db.collection('events').add({
-                    title: title,
-                    date: firebase.firestore.Timestamp.fromDate(new Date(date)),
-                    authorId: currentUser.uid,
-                    authorName: userName.textContent,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                // Add to calendar
+                const dateString = date;
+                const eventContainer = document.getElementById(`events-${dateString}`);
+                
+                if (eventContainer) {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'calendar-event';
+                    eventElement.textContent = title;
+                    eventElement.setAttribute('data-id', 'admin-event-' + Date.now());
+                    
+                    const eventData = {
+                        title: title,
+                        date: new Date(date),
+                        authorName: userName.textContent
+                    };
+                    
+                    eventElement.addEventListener('click', () => showEventDetail('admin', eventData));
+                    
+                    eventContainer.appendChild(eventElement);
+                }
                 
                 adminEventForm.reset();
-                showAlert('活动已创建', 'success');
+                showAlert('活动已创建 (演示模式)', 'success');
                 
                 // Reload calendar
                 loadCalendarEvents();
@@ -3159,12 +3645,17 @@
             const maintenanceMode = document.getElementById('maintenance-mode').checked;
             
             try {
-                // In a real app, you would save these to Firestore
-                // For now, we'll just show a success message
-                showAlert('系统设置已保存', 'success');
-                
                 // Update platform name in header
                 document.querySelector('.logo-text h1').textContent = platformName;
+                
+                // Update welcome message
+                const welcomeElement = document.getElementById('welcome-message');
+                if (welcomeElement) {
+                    welcomeElement.textContent = welcomeMessage;
+                }
+                
+                showAlert('系统设置已保存 (演示模式)', 'success');
+                
             } catch (error) {
                 console.error('Error saving settings:', error);
                 showAlert(`保存设置失败: ${error.message}`, 'error');
@@ -3176,7 +3667,7 @@
             
             let html = `
                 <p><strong>描述:</strong> ${eventData.description || '无描述'}</p>
-                <p><strong>日期:</strong> ${formatDate(eventData.date?.toDate())}</p>
+                <p><strong>日期:</strong> ${formatDate(eventData.date)}</p>
             `;
             
             if (eventData.time) {
@@ -3211,7 +3702,7 @@
             const actions = document.getElementById('event-detail-actions');
             actions.innerHTML = '';
             
-            if (isAdmin || currentUser?.uid === eventData.authorId) {
+            if (isAdmin) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.type = 'button';
                 deleteBtn.className = 'btn btn-outline';
@@ -3240,18 +3731,21 @@
         // Helper Functions
         async function deleteWallPost(postId) {
             try {
-                await db.collection('wallPosts').doc(postId).delete();
-                showAlert('贴文已删除', 'success');
-                
-                // Reload wall posts
-                if (currentPage === 'wall') {
-                    loadWallPosts();
+                // Remove from DOM
+                const postElement = document.querySelector(`[data-id="${postId}"]`);
+                if (postElement) {
+                    postElement.remove();
                 }
                 
-                // Reload admin data if on admin page
-                if (currentPage === 'admin') {
-                    loadAdminContent();
+                // Check if wall is now empty
+                const wall = document.getElementById('padlet-wall');
+                if (wall && wall.children.length === 0) {
+                    wall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                    document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
                 }
+                
+                showAlert('贴文已删除 (演示模式)', 'success');
+                
             } catch (error) {
                 console.error('Error deleting post:', error);
                 showAlert(`删除贴文失败: ${error.message}`, 'error');
@@ -3260,17 +3754,12 @@
         
         async function deleteEvent(eventId) {
             try {
-                await db.collection('events').doc(eventId).delete();
-                showAlert('活动已删除', 'success');
+                // In demo mode, just show success
+                showAlert('活动已删除 (演示模式)', 'success');
                 
-                // Reload calendar
-                loadCalendarEvents();
+                // Close modal if open
+                closeModal('eventDetail');
                 
-                // Reload admin data if on admin page
-                if (currentPage === 'admin') {
-                    loadAdminContent();
-                    loadAdminData();
-                }
             } catch (error) {
                 console.error('Error deleting event:', error);
                 showAlert(`删除活动失败: ${error.message}`, 'error');
@@ -3278,17 +3767,17 @@
         }
         
         async function deleteUser(userId) {
-            if (userId === currentUser?.uid) {
+            if (userId.includes('demo') && userId.includes(currentUser?.uid)) {
                 showAlert('不能删除自己的账户', 'error');
                 return;
             }
             
             if (confirm('确定要删除这个用户吗？此操作无法撤销！')) {
                 try {
-                    await db.collection('users').doc(userId).delete();
-                    showAlert('用户已删除', 'success');
+                    // In demo mode, just show success
+                    showAlert('用户已删除 (演示模式)', 'success');
                     
-                    // Reload user management
+                    // Reload user management if on that page
                     if (currentPage === 'admin') {
                         loadUserManagement();
                         loadAdminData();
@@ -3303,6 +3792,14 @@
         async function deleteAccount() {
             if (confirm('确定要永久删除您的账户吗？此操作无法撤销！')) {
                 try {
+                    // Demo mode - simulate account deletion
+                    if (typeof firebase === 'undefined') {
+                        currentUser = null;
+                        updateUIForGuest();
+                        showAlert('账户已成功删除 (演示模式)', 'success');
+                        return;
+                    }
+                    
                     // Delete user data from Firestore
                     await db.collection('users').doc(currentUser.uid).delete();
                     
@@ -3320,11 +3817,9 @@
         async function changeUserRole(userId, currentRole) {
             try {
                 const newRole = currentRole === 'admin' ? 'student' : 'admin';
-                await db.collection('users').doc(userId).update({
-                    role: newRole
-                });
                 
-                showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'}`, 'success');
+                // In demo mode, just show success
+                showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'} (演示模式)`, 'success');
                 
                 // Reload user management
                 if (currentPage === 'admin') {
@@ -3332,7 +3827,7 @@
                 }
                 
                 // If current user changed their own role, update UI
-                if (userId === currentUser?.uid) {
+                if (userId.includes(currentUser?.uid)) {
                     isAdmin = newRole === 'admin';
                     userRole.textContent = isAdmin ? '管理员' : '学生';
                     
@@ -3348,6 +3843,10 @@
         
         function formatDate(date) {
             if (!date) return '未知日期';
+            
+            if (typeof date === 'string') {
+                date = new Date(date);
+            }
             
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return date.toLocaleDateString('zh-CN', options);
