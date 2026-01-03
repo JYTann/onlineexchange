@@ -2904,7 +2904,6 @@ const firebaseConfig = {
     // Current user state
     let currentUser = null;
     let isAdmin = false;
-    let canEdit = false;
     let currentPage = 'dashboard';
     let currentCalendarDate = new Date();
     let editHistory = {
@@ -4479,7 +4478,7 @@ function formatDateTime(date) {
     
     async function loadAnnouncements() {
         const announcementsList = document.getElementById('announcements-list');
-        
+        const canEdit = isAdmin || currentUser?.uid === data.authorId;
         // Show loading
         announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
         
