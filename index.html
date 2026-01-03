@@ -1656,6 +1656,198 @@ html {
         border: 1px solid #ddd !important;
     }
 }
+
+        /* ==== 新增：编辑相关样式 ==== */
+.edit-mode {
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+.edit-control {
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    padding: 8px;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    resize: vertical;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: flex-end;
+}
+
+/* 确认对话框样式 */
+.confirm-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.confirm-content {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* 批量操作样式 */
+.batch-actions {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 80px;
+    z-index: 100;
+}
+
+.batch-actions.active {
+    display: flex;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.select-all {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 撤回按钮样式 */
+.btn-undo {
+    background-color: var(--gray);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-undo:hover {
+    background-color: #666;
+}
+
+/* 版本历史样式 */
+.version-history {
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.version-item {
+    background-color: white;
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary);
+}
+
+/* 快捷编辑样式 */
+.quick-edit-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.announcement-item:hover .quick-edit-btn,
+.padlet-note:hover .quick-edit-btn,
+.calendar-event:hover .quick-edit-btn {
+    opacity: 1;
+}
+
+/* 编辑日志样式 */
+.edit-log {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--light-gray);
+}
+
+/* 自动保存提示 */
+.autosave-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    z-index: 2000;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 键盘快捷键提示 */
+.shortcut-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    z-index: 1999;
+    display: none;
+}
     </style>
 </head>
 <body>
@@ -2439,6 +2631,206 @@ html {
             </div>
         </div>
     </div>
+
+    <!-- 添加到所有现有模态框之后，</body>标签之前 -->
+
+<!-- 编辑公告模态框 -->
+<div id="edit-announcement-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>编辑公告</h3>
+            <button class="modal-close" data-modal="edit-announcement-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-announcement-form">
+                <input type="hidden" id="edit-announcement-id">
+                <div class="form-group">
+                    <label for="edit-announcement-title">公告标题</label>
+                    <input type="text" id="edit-announcement-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-announcement-content">公告内容</label>
+                    <textarea id="edit-announcement-content" class="form-control" rows="6" required></textarea>
+                </div>
+                <div class="edit-log" id="announcement-edit-log"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                    <button type="button" class="btn btn-outline" data-modal="edit-announcement-modal">取消</button>
+                    <button type="button" class="btn btn-undo" id="undo-announcement-changes">
+                        <i class="fas fa-undo"></i> 撤销
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑贴文模态框 -->
+<div id="edit-note-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>编辑贴文</h3>
+            <button class="modal-close" data-modal="edit-note-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-note-form">
+                <input type="hidden" id="edit-note-id">
+                <input type="hidden" id="edit-note-color" value="yellow">
+                <div class="form-group">
+                    <label for="edit-note-title">标题 (可选)</label>
+                    <input type="text" id="edit-note-title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-note-content">内容</label>
+                    <textarea id="edit-note-content" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-note-color-picker">贴文颜色</label>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="note-color-option edit" data-color="yellow" style="background-color: #fffacd; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                        <div class="note-color-option edit" data-color="blue" style="background-color: #d0e7ff; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                        <div class="note-color-option edit" data-color="green" style="background-color: #d4edda; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                        <div class="note-color-option edit" data-color="pink" style="background-color: #f8d7da; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>当前图片</label>
+                    <div id="current-note-image" style="margin-top: 10px;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-note-image">更换图片 (可选)</label>
+                    <div class="file-upload" id="edit-note-image-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>点击上传新图片</p>
+                        <p>支持JPG、PNG格式，最大5MB</p>
+                        <input type="file" id="edit-note-image" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="edit-image-preview" style="margin-top: 10px; display: none;">
+                        <img id="edit-image-preview-img" style="max-width: 200px; border-radius: 5px;">
+                        <button type="button" id="remove-edit-image" style="margin-left: 10px; color: var(--danger);">移除新图片</button>
+                    </div>
+                    <div id="image-actions" style="margin-top: 10px;">
+                        <button type="button" class="btn btn-small btn-outline" id="remove-existing-image" style="color: var(--danger);">
+                            <i class="fas fa-trash"></i> 删除当前图片
+                        </button>
+                    </div>
+                </div>
+                <div class="edit-log" id="note-edit-log"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                    <button type="button" class="btn btn-outline" data-modal="edit-note-modal">取消</button>
+                    <button type="button" class="btn btn-undo" id="undo-note-changes">
+                        <i class="fas fa-undo"></i> 撤销
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑活动模态框 -->
+<div id="edit-event-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>编辑活动</h3>
+            <button class="modal-close" data-modal="edit-event-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-event-form">
+                <input type="hidden" id="edit-event-id">
+                <div class="form-group">
+                    <label for="edit-event-title">活动标题</label>
+                    <input type="text" id="edit-event-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-description">活动描述</label>
+                    <textarea id="edit-event-description" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-date">活动日期</label>
+                    <input type="date" id="edit-event-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-time">活动时间</label>
+                    <input type="time" id="edit-event-time" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-type">活动类型</label>
+                    <select id="edit-event-type" class="form-control">
+                        <option value="academic">学术研讨</option>
+                        <option value="cultural">文化交流</option>
+                        <option value="competition">联合竞赛</option>
+                        <option value="language">语言交换</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-school">主办学校</label>
+                    <select id="edit-event-school" class="form-control">
+                        <option value="both">两校联合</option>
+                        <option value="fyhs">宽柔中学</option>
+                        <option value="kshs">高雄中学</option>
+                    </select>
+                </div>
+                <div class="edit-log" id="event-edit-log"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                    <button type="button" class="btn btn-outline" data-modal="edit-event-modal">取消</button>
+                    <button type="button" class="btn btn-undo" id="undo-event-changes">
+                        <i class="fas fa-undo"></i> 撤销
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 确认删除模态框 -->
+<div id="confirm-delete-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="background: var(--gradient-secondary);">
+            <h3>确认删除</h3>
+            <button class="modal-close" data-modal="confirm-delete-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="delete-message">确定要删除这个项目吗？</div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="confirm-delete-btn">确认删除</button>
+                <button type="button" class="btn btn-outline" data-modal="confirm-delete-modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 批量操作工具栏 -->
+<div id="batch-actions" class="batch-actions">
+    <div class="select-all">
+        <input type="checkbox" id="select-all-items">
+        <label for="select-all-items">全选</label>
+        <span id="selected-count">已选择 0 个项目</span>
+    </div>
+    <div class="batch-buttons">
+        <button id="batch-delete" class="btn btn-small" style="background-color: var(--danger); color: white;">
+            <i class="fas fa-trash"></i> 批量删除
+        </button>
+        <button id="clear-selection" class="btn btn-small btn-outline">
+            清除选择
+        </button>
+    </div>
+</div>
+
+<!-- 自动保存状态提示 -->
+<div id="autosave-status" class="autosave-status">
+    <i class="fas fa-save"></i>
+    <span id="autosave-text">正在保存...</span>
+</div>
+
+<!-- 键盘快捷键提示 -->
+<div id="shortcut-hint" class="shortcut-hint">
+    <div><kbd>Ctrl+S</kbd> 保存</div>
+    <div><kbd>Ctrl+Z</kbd> 撤销</div>
+    <div><kbd>Delete</kbd> 删除</div>
+</div>
     
     <!-- Alert Container -->
     <div id="alert-container" style="position: fixed; top: 100px; right: 20px; z-index: 10000; max-width: 350px;"></div>
@@ -2514,6 +2906,13 @@ const firebaseConfig = {
     let isAdmin = false;
     let currentPage = 'dashboard';
     let currentCalendarDate = new Date();
+    let editHistory = {
+        announcements: {},
+        notes: {},
+        events: {}
+    };
+    let selectedItems = new Set();
+    let autoSaveTimer = null;
     
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
@@ -2527,6 +2926,7 @@ const firebaseConfig = {
         
         // Initialize Firebase collections if needed
         initializeFirestore();
+        setupBatchOperations();
     });
     
     // Initialize Firebase collections with default data
@@ -2817,7 +3217,829 @@ const firebaseConfig = {
                 });
             }
         });
+
+            document.getElementById('edit-announcement-form').addEventListener('submit', handleEditAnnouncement);
+    document.getElementById('edit-note-form').addEventListener('submit', handleEditNote);
+    document.getElementById('edit-event-form').addEventListener('submit', handleEditEvent);
+    
+    // 撤销按钮
+    document.getElementById('undo-announcement-changes').addEventListener('click', () => undoChanges('announcement'));
+    document.getElementById('undo-note-changes').addEventListener('click', () => undoChanges('note'));
+    document.getElementById('undo-event-changes').addEventListener('click', () => undoChanges('event'));
+    
+    // 编辑颜色选择
+    document.querySelectorAll('.note-color-option.edit').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.note-color-option.edit').forEach(opt => {
+                opt.style.borderColor = '#ccc';
+            });
+            this.style.borderColor = '#2c5aa0';
+            document.getElementById('edit-note-color').value = this.getAttribute('data-color');
+        });
+    });
+    
+    // 编辑图片上传
+    document.getElementById('edit-note-image-upload').addEventListener('click', function() {
+        document.getElementById('edit-note-image').click();
+    });
+    
+    document.getElementById('edit-note-image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('edit-image-preview-img').src = event.target.result;
+                document.getElementById('edit-image-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    document.getElementById('remove-edit-image').addEventListener('click', function() {
+        document.getElementById('edit-note-image').value = '';
+        document.getElementById('edit-image-preview').style.display = 'none';
+    });
+    
+    document.getElementById('remove-existing-image').addEventListener('click', function() {
+        document.getElementById('current-note-image').innerHTML = '<p style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> 图片将在保存后删除</p>';
+    });
+    
+    // 批量操作
+    document.getElementById('batch-delete').addEventListener('click', handleBatchDelete);
+    document.getElementById('clear-selection').addEventListener('click', clearSelection);
+    document.getElementById('select-all-items').addEventListener('change', toggleSelectAll);
+    
+    // 确认删除
+    document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
+    
+    // 键盘快捷键
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+    
+    // 自动保存
+    document.getElementById('edit-announcement-content').addEventListener('input', () => scheduleAutoSave('announcement'));
+    document.getElementById('edit-note-content').addEventListener('input', () => scheduleAutoSave('note'));
+    document.getElementById('edit-event-description').addEventListener('input', () => scheduleAutoSave('event'));
+    
+    // 显示快捷键提示
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.key === 'Delete') {
+            showShortcutHint();
+        }
+    });
     }
+
+       function openEditAnnouncementModal(announcementId, announcementData) {
+    document.getElementById('edit-announcement-id').value = announcementId;
+    document.getElementById('edit-announcement-title').value = announcementData.title;
+    document.getElementById('edit-announcement-content').value = announcementData.content;
+    
+    // 保存初始状态以便撤销
+    saveEditState('announcement', announcementId, {
+        title: announcementData.title,
+        content: announcementData.content
+    });
+    
+    // 显示编辑日志
+    displayEditLog('announcement', announcementId);
+    
+    openModal('edit-announcement-modal');
+}
+
+// 打开编辑贴文模态框
+function openEditNoteModal(noteId, noteData) {
+    document.getElementById('edit-note-id').value = noteId;
+    document.getElementById('edit-note-title').value = noteData.title || '';
+    document.getElementById('edit-note-content').value = noteData.content;
+    document.getElementById('edit-note-color').value = noteData.color || 'yellow';
+    
+    // 设置颜色选择
+    document.querySelectorAll('.note-color-option.edit').forEach(opt => {
+        opt.style.borderColor = opt.getAttribute('data-color') === (noteData.color || 'yellow') ? '#2c5aa0' : '#ccc';
+    });
+    
+    // 显示当前图片
+    const currentImageDiv = document.getElementById('current-note-image');
+    if (noteData.imageUrl) {
+        currentImageDiv.innerHTML = `
+            <img src="${noteData.imageUrl}" alt="当前图片" style="max-width: 200px; border-radius: 5px;">
+        `;
+        document.getElementById('image-actions').style.display = 'block';
+    } else {
+        currentImageDiv.innerHTML = '<p>无图片</p>';
+        document.getElementById('image-actions').style.display = 'none';
+    }
+    
+    // 保存初始状态
+    saveEditState('note', noteId, {
+        title: noteData.title || '',
+        content: noteData.content,
+        color: noteData.color || 'yellow',
+        imageUrl: noteData.imageUrl || ''
+    });
+    
+    // 显示编辑日志
+    displayEditLog('note', noteId);
+    
+    openModal('edit-note-modal');
+}
+
+// 打开编辑活动模态框
+function openEditEventModal(eventId, eventData) {
+    document.getElementById('edit-event-id').value = eventId;
+    document.getElementById('edit-event-title').value = eventData.title;
+    document.getElementById('edit-event-description').value = eventData.description || '';
+    
+    const eventDate = eventData.date?.toDate();
+    if (eventDate) {
+        document.getElementById('edit-event-date').value = eventDate.toISOString().split('T')[0];
+    }
+    
+    document.getElementById('edit-event-time').value = eventData.time || '';
+    document.getElementById('edit-event-type').value = eventData.type || 'other';
+    document.getElementById('edit-event-school').value = eventData.school || 'both';
+    
+    // 保存初始状态
+    saveEditState('event', eventId, {
+        title: eventData.title,
+        description: eventData.description || '',
+        date: eventDate,
+        time: eventData.time || '',
+        type: eventData.type || 'other',
+        school: eventData.school || 'both'
+    });
+    
+    // 显示编辑日志
+    displayEditLog('event', eventId);
+    
+    openModal('edit-event-modal');
+}
+
+// 处理编辑公告
+async function handleEditAnnouncement(e) {
+    e.preventDefault();
+    
+    const announcementId = document.getElementById('edit-announcement-id').value;
+    const title = document.getElementById('edit-announcement-title').value;
+    const content = document.getElementById('edit-announcement-content').value;
+    
+    try {
+        await db.collection('announcements').doc(announcementId).update({
+            title: title,
+            content: content,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentUser.uid,
+            lastEdited: new Date()
+        });
+        
+        // 记录编辑历史
+        await recordEditHistory('announcements', announcementId, {
+            title: title,
+            content: content,
+            editedBy: currentUser.uid,
+            editedAt: new Date()
+        });
+        
+        closeModal('edit-announcement-modal');
+        showAlert('公告已更新', 'success');
+        
+        // 刷新页面数据
+        if (currentPage === 'announcements') {
+            loadAnnouncements();
+        } else if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+        
+    } catch (error) {
+        console.error('Error updating announcement:', error);
+        showAlert(`更新公告失败: ${error.message}`, 'error');
+    }
+}
+
+// 处理编辑贴文
+async function handleEditNote(e) {
+    e.preventDefault();
+    
+    const noteId = document.getElementById('edit-note-id').value;
+    const title = document.getElementById('edit-note-title').value;
+    const content = document.getElementById('edit-note-content').value;
+    const color = document.getElementById('edit-note-color').value;
+    const imageFile = document.getElementById('edit-note-image').files[0];
+    const removeImage = document.getElementById('current-note-image').innerHTML.includes('将在保存后删除');
+    
+    try {
+        let imageUrl = null;
+        const updateData = {
+            title: title || '',
+            content: content,
+            color: color,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentUser.uid,
+            lastEdited: new Date()
+        };
+        
+        // 处理图片
+        if (imageFile) {
+            // 上传新图片
+            const storageRef = storage.ref();
+            const imageRef = storageRef.child(`wall-posts/${currentUser.uid}/${Date.now()}-${imageFile.name}`);
+            await imageRef.put(imageFile);
+            imageUrl = await imageRef.getDownloadURL();
+            updateData.imageUrl = imageUrl;
+            
+            // 删除旧图片
+            const oldNote = await db.collection('wallPosts').doc(noteId).get();
+            const oldData = oldNote.data();
+            if (oldData.imageUrl) {
+                try {
+                    const oldImageRef = storage.refFromURL(oldData.imageUrl);
+                    await oldImageRef.delete();
+                } catch (storageError) {
+                    console.error('Error deleting old image:', storageError);
+                }
+            }
+        } else if (removeImage) {
+            // 删除现有图片
+            const oldNote = await db.collection('wallPosts').doc(noteId).get();
+            const oldData = oldNote.data();
+            if (oldData.imageUrl) {
+                try {
+                    const oldImageRef = storage.refFromURL(oldData.imageUrl);
+                    await oldImageRef.delete();
+                } catch (storageError) {
+                    console.error('Error deleting image:', storageError);
+                }
+            }
+            updateData.imageUrl = null;
+        }
+        
+        // 更新贴文
+        await db.collection('wallPosts').doc(noteId).update(updateData);
+        
+        // 记录编辑历史
+        await recordEditHistory('wallPosts', noteId, {
+            title: title || '',
+            content: content,
+            color: color,
+            imageUrl: imageUrl || null,
+            editedBy: currentUser.uid,
+            editedAt: new Date()
+        });
+        
+        closeModal('edit-note-modal');
+        showAlert('贴文已更新', 'success');
+        
+        // 刷新页面数据
+        if (currentPage === 'wall') {
+            loadWallPosts();
+        }
+        
+    } catch (error) {
+        console.error('Error updating note:', error);
+        showAlert(`更新贴文失败: ${error.message}`, 'error');
+    }
+}
+
+// 处理编辑活动
+async function handleEditEvent(e) {
+    e.preventDefault();
+    
+    const eventId = document.getElementById('edit-event-id').value;
+    const title = document.getElementById('edit-event-title').value;
+    const description = document.getElementById('edit-event-description').value;
+    const date = document.getElementById('edit-event-date').value;
+    const time = document.getElementById('edit-event-time').value;
+    const type = document.getElementById('edit-event-type').value;
+    const school = document.getElementById('edit-event-school').value;
+    
+    try {
+        const eventDate = new Date(date);
+        if (time) {
+            const [hours, minutes] = time.split(':');
+            eventDate.setHours(hours, minutes);
+        }
+        
+        await db.collection('events').doc(eventId).update({
+            title: title,
+            description: description,
+            date: eventDate,
+            time: time || '',
+            type: type,
+            school: school,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentUser.uid,
+            lastEdited: new Date()
+        });
+        
+        // 记录编辑历史
+        await recordEditHistory('events', eventId, {
+            title: title,
+            description: description,
+            date: eventDate,
+            time: time || '',
+            type: type,
+            school: school,
+            editedBy: currentUser.uid,
+            editedAt: new Date()
+        });
+        
+        closeModal('edit-event-modal');
+        showAlert('活动已更新', 'success');
+        
+        // 刷新页面数据
+        if (currentPage === 'calendar') {
+            loadCalendarEvents();
+        }
+        
+    } catch (error) {
+        console.error('Error updating event:', error);
+        showAlert(`更新活动失败: ${error.message}`, 'error');
+    }
+}
+
+// 保存编辑状态（用于撤销功能）
+function saveEditState(type, id, data) {
+    if (!editHistory[type]) {
+        editHistory[type] = {};
+    }
+    editHistory[type][id] = {
+        timestamp: new Date(),
+        data: {...data}
+    };
+}
+
+// 撤销更改
+async function undoChanges(type) {
+    let modalId, formId, idField;
+    
+    switch(type) {
+        case 'announcement':
+            modalId = 'edit-announcement-modal';
+            formId = 'edit-announcement-form';
+            idField = 'edit-announcement-id';
+            break;
+        case 'note':
+            modalId = 'edit-note-modal';
+            formId = 'edit-note-form';
+            idField = 'edit-note-id';
+            break;
+        case 'event':
+            modalId = 'edit-event-modal';
+            formId = 'edit-event-form';
+            idField = 'edit-event-id';
+            break;
+    }
+    
+    const id = document.getElementById(idField).value;
+    const originalData = editHistory[type]?.[id]?.data;
+    
+    if (!originalData) {
+        showAlert('没有可撤销的更改', 'warning');
+        return;
+    }
+    
+    // 恢复原始数据到表单
+    if (type === 'announcement') {
+        document.getElementById('edit-announcement-title').value = originalData.title;
+        document.getElementById('edit-announcement-content').value = originalData.content;
+    } else if (type === 'note') {
+        document.getElementById('edit-note-title').value = originalData.title;
+        document.getElementById('edit-note-content').value = originalData.content;
+        document.getElementById('edit-note-color').value = originalData.color;
+        
+        document.querySelectorAll('.note-color-option.edit').forEach(opt => {
+            opt.style.borderColor = opt.getAttribute('data-color') === originalData.color ? '#2c5aa0' : '#ccc';
+        });
+        
+        if (originalData.imageUrl) {
+            document.getElementById('current-note-image').innerHTML = `
+                <img src="${originalData.imageUrl}" alt="当前图片" style="max-width: 200px; border-radius: 5px;">
+            `;
+        }
+    } else if (type === 'event') {
+        document.getElementById('edit-event-title').value = originalData.title;
+        document.getElementById('edit-event-description').value = originalData.description;
+        
+        if (originalData.date) {
+            document.getElementById('edit-event-date').value = originalData.date.toISOString().split('T')[0];
+        }
+        
+        document.getElementById('edit-event-time').value = originalData.time;
+        document.getElementById('edit-event-type').value = originalData.type;
+        document.getElementById('edit-event-school').value = originalData.school;
+    }
+    
+    showAlert('更改已撤销', 'success');
+}
+
+// 显示编辑日志
+async function displayEditLog(collection, docId) {
+    const logContainer = document.getElementById(`${collection}-edit-log`);
+    
+    try {
+        const historySnapshot = await db.collection(`${collection}History`)
+            .where('docId', '==', docId)
+            .orderBy('editedAt', 'desc')
+            .limit(5)
+            .get();
+        
+        if (historySnapshot.empty) {
+            logContainer.innerHTML = '<p>暂无编辑历史</p>';
+            return;
+        }
+        
+        let html = '<strong>编辑历史:</strong><ul style="margin-top: 10px; padding-left: 20px;">';
+        
+        historySnapshot.forEach(doc => {
+            const history = doc.data();
+            const date = history.editedAt?.toDate();
+            html += `
+                <li style="margin-bottom: 5px;">
+                    ${date ? formatDateTime(date) : '未知时间'} 
+                    - 由 ${history.editedByName || '用户'} 编辑
+                </li>
+            `;
+        });
+        
+        html += '</ul>';
+        logContainer.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading edit history:', error);
+        logContainer.innerHTML = '<p>加载编辑历史失败</p>';
+    }
+}
+
+// 记录编辑历史
+async function recordEditHistory(collection, docId, data) {
+    try {
+        await db.collection(`${collection}History`).add({
+            docId: docId,
+            ...data,
+            editedByName: userName.textContent,
+            editedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Error recording edit history:', error);
+    }
+}
+
+// ==================== 新增：删除功能增强 ====================
+
+// 打开删除确认对话框
+function openDeleteConfirmation(itemId, itemType, itemName) {
+    const modal = document.getElementById('confirm-delete-modal');
+    const message = document.getElementById('delete-message');
+    
+    modal.setAttribute('data-delete-id', itemId);
+    modal.setAttribute('data-delete-type', itemType);
+    
+    message.textContent = `确定要删除 "${itemName}" 吗？此操作无法撤销。`;
+    
+    openModal('confirm-delete-modal');
+}
+
+// 确认删除
+async function confirmDelete() {
+    const modal = document.getElementById('confirm-delete-modal');
+    const itemId = modal.getAttribute('data-delete-id');
+    const itemType = modal.getAttribute('data-delete-type');
+    
+    closeModal('confirm-delete-modal');
+    
+    try {
+        switch(itemType) {
+            case 'announcement':
+                await deleteAnnouncement(itemId);
+                break;
+            case 'note':
+                await deleteWallPost(itemId);
+                break;
+            case 'event':
+                await deleteEvent(itemId);
+                break;
+        }
+        
+        showAlert('删除成功', 'success');
+    } catch (error) {
+        showAlert(`删除失败: ${error.message}`, 'error');
+    }
+}
+
+// 删除公告
+async function deleteAnnouncement(announcementId) {
+    try {
+        const announcementDoc = await db.collection('announcements').doc(announcementId).get();
+        const announcementData = announcementDoc.data();
+        
+        if (!isAdmin && announcementData.authorId !== currentUser?.uid) {
+            showAlert('您没有权限删除此公告', 'error');
+            return;
+        }
+        
+        // 先保存到回收站
+        await db.collection('recycleBin').add({
+            originalCollection: 'announcements',
+            originalId: announcementId,
+            data: announcementData,
+            deletedBy: currentUser.uid,
+            deletedByName: userName.textContent,
+            deletedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // 然后删除原文档
+        await db.collection('announcements').doc(announcementId).delete();
+        
+        // 刷新页面
+        if (currentPage === 'announcements') {
+            loadAnnouncements();
+        } else if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+        
+    } catch (error) {
+        console.error('Error deleting announcement:', error);
+        throw error;
+    }
+}
+
+// ==================== 新增：批量操作功能 ====================
+
+// 设置批量操作
+function setupBatchOperations() {
+    const batchActions = document.getElementById('batch-actions');
+    
+    // 监听选择框变化
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.item-checkbox')) {
+            const itemId = e.target.getAttribute('data-id');
+            const itemType = e.target.getAttribute('data-type');
+            
+            if (e.target.checked) {
+                selectedItems.add(`${itemType}_${itemId}`);
+            } else {
+                selectedItems.delete(`${itemType}_${itemId}`);
+            }
+            
+            updateBatchUI();
+        }
+    });
+}
+
+// 更新批量操作UI
+function updateBatchUI() {
+    const batchActions = document.getElementById('batch-actions');
+    const selectedCount = document.getElementById('selected-count');
+    
+    if (selectedItems.size > 0) {
+        batchActions.classList.add('active');
+        selectedCount.textContent = `已选择 ${selectedItems.size} 个项目`;
+    } else {
+        batchActions.classList.remove('active');
+    }
+    
+    // 更新全选框状态
+    const allCheckboxes = document.querySelectorAll('.item-checkbox');
+    const allChecked = allCheckboxes.length > 0 && 
+        Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+    
+    document.getElementById('select-all-items').checked = allChecked;
+}
+
+// 全选/取消全选
+function toggleSelectAll(e) {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = e.target.checked;
+        const itemId = checkbox.getAttribute('data-id');
+        const itemType = checkbox.getAttribute('data-type');
+        
+        if (e.target.checked) {
+            selectedItems.add(`${itemType}_${itemId}`);
+        } else {
+            selectedItems.delete(`${itemType}_${itemId}`);
+        }
+    });
+    
+    updateBatchUI();
+}
+
+// 批量删除
+async function handleBatchDelete() {
+    if (selectedItems.size === 0) {
+        showAlert('请先选择要删除的项目', 'warning');
+        return;
+    }
+    
+    if (!confirm(`确定要删除选中的 ${selectedItems.size} 个项目吗？`)) {
+        return;
+    }
+    
+    try {
+        const deletePromises = [];
+        
+        for (const itemKey of selectedItems) {
+            const [itemType, itemId] = itemKey.split('_');
+            
+            switch(itemType) {
+                case 'announcement':
+                    deletePromises.push(deleteAnnouncement(itemId));
+                    break;
+                case 'note':
+                    deletePromises.push(deleteWallPost(itemId));
+                    break;
+                case 'event':
+                    deletePromises.push(deleteEvent(itemId));
+                    break;
+            }
+        }
+        
+        await Promise.all(deletePromises);
+        
+        // 清除选择
+        clearSelection();
+        
+        showAlert(`已成功删除 ${selectedItems.size} 个项目`, 'success');
+        
+    } catch (error) {
+        console.error('Error in batch delete:', error);
+        showAlert('批量删除过程中出现错误', 'error');
+    }
+}
+
+// 清除选择
+function clearSelection() {
+    selectedItems.clear();
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateBatchUI();
+}
+
+// ==================== 新增：键盘快捷键 ====================
+
+// 处理键盘快捷键
+function handleKeyboardShortcuts(e) {
+    // 仅在编辑模式下启用
+    const activeModal = document.querySelector('.modal.active');
+    if (!activeModal) return;
+    
+    // Ctrl+S 保存
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        
+        switch(activeModal.id) {
+            case 'edit-announcement-modal':
+                document.getElementById('edit-announcement-form').dispatchEvent(new Event('submit'));
+                break;
+            case 'edit-note-modal':
+                document.getElementById('edit-note-form').dispatchEvent(new Event('submit'));
+                break;
+            case 'edit-event-modal':
+                document.getElementById('edit-event-form').dispatchEvent(new Event('submit'));
+                break;
+        }
+    }
+    
+    // Ctrl+Z 撤销
+    if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        
+        switch(activeModal.id) {
+            case 'edit-announcement-modal':
+                undoChanges('announcement');
+                break;
+            case 'edit-note-modal':
+                undoChanges('note');
+                break;
+            case 'edit-event-modal':
+                undoChanges('event');
+                break;
+        }
+    }
+    
+    // Delete 键删除
+    if (e.key === 'Delete' && selectedItems.size > 0) {
+        e.preventDefault();
+        handleBatchDelete();
+    }
+}
+
+// ==================== 新增：自动保存功能 ====================
+
+// 安排自动保存
+function scheduleAutoSave(type) {
+    if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer);
+    }
+    
+    showAutoSaveStatus('正在保存...', 'saving');
+    
+    autoSaveTimer = setTimeout(() => {
+        autoSaveContent(type);
+    }, 2000); // 2秒后自动保存
+}
+
+// 执行自动保存
+async function autoSaveContent(type) {
+    try {
+        let id, data = {};
+        
+        switch(type) {
+            case 'announcement':
+                id = document.getElementById('edit-announcement-id').value;
+                data = {
+                    title: document.getElementById('edit-announcement-title').value,
+                    content: document.getElementById('edit-announcement-content').value
+                };
+                await db.collection('announcements').doc(id).update({
+                    ...data,
+                    autoSavedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                break;
+            case 'note':
+                id = document.getElementById('edit-note-id').value;
+                data = {
+                    title: document.getElementById('edit-note-title').value,
+                    content: document.getElementById('edit-note-content').value
+                };
+                await db.collection('wallPosts').doc(id).update({
+                    ...data,
+                    autoSavedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                break;
+            case 'event':
+                id = document.getElementById('edit-event-id').value;
+                data = {
+                    title: document.getElementById('edit-event-title').value,
+                    description: document.getElementById('edit-event-description').value
+                };
+                await db.collection('events').doc(id).update({
+                    ...data,
+                    autoSavedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                break;
+        }
+        
+        showAutoSaveStatus('已自动保存', 'saved');
+        
+    } catch (error) {
+        console.error('Auto-save error:', error);
+        showAutoSaveStatus('保存失败', 'error');
+    }
+}
+
+// 显示自动保存状态
+function showAutoSaveStatus(text, status) {
+    const statusDiv = document.getElementById('autosave-status');
+    const textSpan = document.getElementById('autosave-text');
+    
+    textSpan.textContent = text;
+    
+    // 根据状态设置颜色
+    switch(status) {
+        case 'saving':
+            statusDiv.style.backgroundColor = 'var(--warning)';
+            break;
+        case 'saved':
+            statusDiv.style.backgroundColor = 'var(--success)';
+            break;
+        case 'error':
+            statusDiv.style.backgroundColor = 'var(--danger)';
+            break;
+    }
+    
+    statusDiv.style.display = 'flex';
+    
+    // 3秒后隐藏
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 3000);
+}
+
+// 显示快捷键提示
+function showShortcutHint() {
+    const hint = document.getElementById('shortcut-hint');
+    hint.style.display = 'block';
+    
+    setTimeout(() => {
+        hint.style.display = 'none';
+    }, 2000);
+}
+
+// 格式化日期时间
+function formatDateTime(date) {
+    if (!date) return '未知时间';
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return '刚刚';
+    if (diffMins < 60) return `${diffMins}分钟前`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}小时前`;
+    
+    return formatDate(date);
+}
+
     
     function initTabs() {
         // Tab switching
@@ -3271,16 +4493,36 @@ const firebaseConfig = {
                 let html = '';
                 announcementsSnapshot.forEach(doc => {
                     const data = doc.data();
-                    html += `
-                        <div class="announcement-item">
-                            <h4>${data.title}</h4>
-                            <div class="announcement-content">${data.content}</div>
-                            <div class="announcement-meta">
-                                <span>发布者: ${data.authorName || '管理员'}</span>
-                                <span>${formatDate(data.createdAt?.toDate())}</span>
-                            </div>
-                        </div>
-                    `;
+                        html += `
+        <div class="announcement-item" data-id="${doc.id}">
+            ${canEdit ? `
+                <div class="item-checkbox" style="position: absolute; top: 15px; right: 60px;">
+                    <input type="checkbox" class="item-checkbox" data-id="${doc.id}" data-type="announcement">
+                </div>
+                <button class="quick-edit-btn edit-announcement" data-id="${doc.id}" title="编辑公告">
+                    <i class="fas fa-edit"></i>
+                </button>
+            ` : ''}
+            <h4>${data.title}</h4>
+            <div class="announcement-content">${data.content}</div>
+            <div class="announcement-meta">
+                <span>发布者: ${data.authorName || '管理员'}</span>
+                <span>${formatDate(data.createdAt?.toDate())}</span>
+                ${data.lastEdited ? `<span>最后编辑: ${formatDate(data.lastEdited?.toDate())}</span>` : ''}
+            </div>
+            ${canEdit ? `
+                <div class="edit-actions">
+                    <button class="btn btn-small btn-outline edit-announcement-btn" data-id="${doc.id}">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    <button class="btn btn-small" style="background-color: var(--danger); color: white;" 
+                            onclick="openDeleteConfirmation('${doc.id}', 'announcement', '${data.title}')">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
                 });
                 announcementsList.innerHTML = html;
             }
@@ -4381,6 +5623,10 @@ const firebaseConfig = {
     window.deleteEvent = deleteEvent;
     window.deleteUser = deleteUser;
     window.showEventDetail = showEventDetail;
+       window.openDeleteConfirmation = openDeleteConfirmation;
+window.openEditAnnouncementModal = openEditAnnouncementModal;
+window.openEditNoteModal = openEditNoteModal;
+window.openEditEventModal = openEditEventModal;
 </script>
 </body>
 </html>
