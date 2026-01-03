@@ -2443,1949 +2443,1944 @@ html {
     <!-- Alert Container -->
     <div id="alert-container" style="position: fixed; top: 100px; right: 20px; z-index: 10000; max-width: 350px;"></div>
     
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD1FOM9GSgVTLd4p0JJEbFtrwHQlF751nM",
-            authDomain: "fyhs-kshs-online-exchange.firebaseapp.com",
-            projectId: "fyhs-kshs-online-exchange",
-            storageBucket: "fyhs-kshs-online-exchange.firebasestorage.app",
-            messagingSenderId: "67080755408",
-            appId: "1:67080755408:web:7e02b55ff12162f456a6d5",
-            measurementId: "G-BX3JHH3CDZ"
-        };
-        
-        // Initialize Firebase
+ <script>
+    // Firebase Configuration - 替换为您自己的配置
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID",
+        measurementId: "YOUR_MEASUREMENT_ID"
+    };
+    
+    // Initialize Firebase
+    try {
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+    } catch (error) {
+        console.log("Firebase already initialized");
+    }
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    
+    // DOM Elements
+    const pages = {
+        dashboard: document.getElementById('dashboard-page'),
+        announcements: document.getElementById('announcements-page'),
+        wall: document.getElementById('wall-page'),
+        calendar: document.getElementById('calendar-page'),
+        profile: document.getElementById('profile-page'),
+        admin: document.getElementById('admin-page')
+    };
+    
+    const navLinks = document.querySelectorAll('.nav-link');
+    const authButtons = document.getElementById('auth-buttons');
+    const userProfile = document.getElementById('user-profile');
+    const userName = document.getElementById('user-name');
+    const userRole = document.getElementById('user-role');
+    const userAvatar = document.getElementById('user-avatar');
+    const adminMenu = document.getElementById('admin-menu');
+    const adminBtn = document.getElementById('admin-btn');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const addNoteBtn = document.getElementById('add-note-btn');
+    const userInfoBtn = document.getElementById('user-info-btn');
+    
+    // Modals
+    const modals = {
+        login: document.getElementById('login-modal'),
+        register: document.getElementById('register-modal'),
+        addNote: document.getElementById('add-note-modal'),
+        changePassword: document.getElementById('change-password-modal'),
+        eventDetail: document.getElementById('event-detail-modal')
+    };
+    
+    // Forms
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const noteForm = document.getElementById('note-form');
+    const profileForm = document.getElementById('profile-form');
+    const changePasswordForm = document.getElementById('change-password-form');
+    const eventForm = document.getElementById('event-form');
+    const adminAnnouncementForm = document.getElementById('admin-announcement-form');
+    const adminEventForm = document.getElementById('admin-event-form');
+    
+    // Current user state
+    let currentUser = null;
+    let isAdmin = false;
+    let currentPage = 'dashboard';
+    let currentCalendarDate = new Date();
+    
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        initEventListeners();
+        initAuthStateListener();
+        generateCalendar(currentCalendarDate);
+        loadDashboardData();
         
-        // DOM Elements
-        const pages = {
-            dashboard: document.getElementById('dashboard-page'),
-            announcements: document.getElementById('announcements-page'),
-            wall: document.getElementById('wall-page'),
-            calendar: document.getElementById('calendar-page'),
-            profile: document.getElementById('profile-page'),
-            admin: document.getElementById('admin-page')
-        };
+        // Initialize tabs
+        initTabs();
         
-        const navLinks = document.querySelectorAll('.nav-link');
-        const authButtons = document.getElementById('auth-buttons');
-        const userProfile = document.getElementById('user-profile');
-        const userName = document.getElementById('user-name');
-        const userRole = document.getElementById('user-role');
-        const userAvatar = document.getElementById('user-avatar');
-        const adminMenu = document.getElementById('admin-menu');
-        const adminBtn = document.getElementById('admin-btn');
-        const loginBtn = document.getElementById('login-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const addNoteBtn = document.getElementById('add-note-btn');
-        const userInfoBtn = document.getElementById('user-info-btn');
-        
-        // Modals
-        const modals = {
-            login: document.getElementById('login-modal'),
-            register: document.getElementById('register-modal'),
-            addNote: document.getElementById('add-note-modal'),
-            changePassword: document.getElementById('change-password-modal'),
-            eventDetail: document.getElementById('event-detail-modal')
-        };
-        
-        // Forms
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const noteForm = document.getElementById('note-form');
-        const profileForm = document.getElementById('profile-form');
-        const changePasswordForm = document.getElementById('change-password-form');
-        const eventForm = document.getElementById('event-form');
-        const adminAnnouncementForm = document.getElementById('admin-announcement-form');
-        const adminEventForm = document.getElementById('admin-event-form');
-        
-        // Current user state
-        let currentUser = null;
-        let isAdmin = false;
-        let currentPage = 'dashboard';
-        let currentCalendarDate = new Date();
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            initEventListeners();
-            initAuthStateListener();
-            generateCalendar(currentCalendarDate);
-            loadDashboardData();
+        // Initialize Firebase collections if needed
+        initializeFirestore();
+    });
+    
+    // Initialize Firebase collections with default data
+    async function initializeFirestore() {
+        try {
+            // Check if we need to create default data
+            const announcementsSnapshot = await db.collection('announcements').limit(1).get();
             
-            // Initialize tabs
-            initTabs();
-            
-            // Initialize sample data for demo
-            initSampleData();
-        });
-        
-        // Event Listeners
-        function initEventListeners() {
-            // Navigation
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.getAttribute('data-page') || this.getAttribute('href').substring(1);
-                    navigateTo(pageId);
-                });
-            });
-            
-            // Auth buttons
-            loginBtn.addEventListener('click', () => openModal('login'));
-            registerBtn.addEventListener('click', () => openModal('register'));
-            logoutBtn.addEventListener('click', handleLogout);
-            userInfoBtn.addEventListener('click', () => navigateTo('profile'));
-            
-            // Admin button
-            adminBtn.addEventListener('click', () => navigateTo('admin'));
-            
-            // Modal close buttons
-            document.querySelectorAll('.modal-close').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const modalId = this.getAttribute('data-modal');
-                    closeModal(modalId);
-                });
-            });
-            
-            // Switch between login and register modals
-            document.getElementById('switch-to-register').addEventListener('click', function(e) {
-                e.preventDefault();
-                closeModal('login');
-                openModal('register');
-            });
-            
-            document.getElementById('switch-to-login').addEventListener('click', function(e) {
-                e.preventDefault();
-                closeModal('register');
-                openModal('login');
-            });
-            
-            // Close modals when clicking outside
-            Object.values(modals).forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal(this.id);
-                    }
-                });
-            });
-            
-            // Form submissions
-            loginForm.addEventListener('submit', handleLogin);
-            registerForm.addEventListener('submit', handleRegister);
-            noteForm.addEventListener('submit', handleAddNote);
-            profileForm.addEventListener('submit', handleUpdateProfile);
-            changePasswordForm.addEventListener('submit', handleChangePassword);
-            eventForm.addEventListener('submit', handleAddEvent);
-            adminAnnouncementForm.addEventListener('submit', handleAdminAddAnnouncement);
-            adminEventForm.addEventListener('submit', handleAdminAddEvent);
-            
-            // Google login buttons
-            document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
-            document.getElementById('google-register-btn').addEventListener('click', handleGoogleLogin);
-            
-            // Add note button
-            addNoteBtn.addEventListener('click', () => openModal('add-note'));
-            
-            // Note color selection
-            document.querySelectorAll('.note-color-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.note-color-option').forEach(opt => {
-                        opt.style.borderColor = '#ccc';
-                    });
-                    this.style.borderColor = '#2c5aa0';
-                    document.getElementById('note-color-value').value = this.getAttribute('data-color');
-                });
-            });
-            
-            // File uploads
-            document.getElementById('avatar-upload').addEventListener('click', function() {
-                document.getElementById('edit-avatar').click();
-            });
-            
-            document.getElementById('edit-avatar').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        document.getElementById('avatar-preview-img').src = event.target.result;
-                        document.getElementById('avatar-preview').style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            document.getElementById('note-image-upload').addEventListener('click', function() {
-                document.getElementById('note-image').click();
-            });
-            
-            document.getElementById('note-image').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        document.getElementById('image-preview-img').src = event.target.result;
-                        document.getElementById('image-preview').style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            document.getElementById('remove-image').addEventListener('click', function() {
-                document.getElementById('note-image').value = '';
-                document.getElementById('image-preview').style.display = 'none';
-            });
-            
-            // Calendar navigation
-            document.getElementById('prev-month').addEventListener('click', function() {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                generateCalendar(currentCalendarDate);
-                loadCalendarEvents();
-            });
-            
-            document.getElementById('next-month').addEventListener('click', function() {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                generateCalendar(currentCalendarDate);
-                loadCalendarEvents();
-            });
-            
-            document.getElementById('today-btn').addEventListener('click', function() {
-                currentCalendarDate = new Date();
-                generateCalendar(currentCalendarDate);
-                loadCalendarEvents();
-            });
-            
-            // Event form cancel button
-            document.getElementById('cancel-event').addEventListener('click', function() {
-                document.querySelector('[data-tab="view-calendar"]').click();
-                eventForm.reset();
-            });
-            
-            // Change password button
-            document.getElementById('change-password-btn').addEventListener('click', function() {
-                openModal('changePassword');
-            });
-            
-            // Delete account button
-            document.getElementById('delete-account-btn').addEventListener('click', function() {
-                if (confirm('确定要删除您的账户吗？此操作无法撤销！')) {
-                    deleteAccount();
-                }
-            });
-            
-            // Admin settings
-            document.getElementById('save-settings').addEventListener('click', saveAdminSettings);
-            
-            // Feature buttons on dashboard
-            document.getElementById('academic-btn').addEventListener('click', function() {
-                navigateTo('calendar');
-                showAlert('学术研讨活动可在日历中查看', 'info');
-            });
-            
-            document.getElementById('competition-btn').addEventListener('click', function() {
-                navigateTo('calendar');
-                showAlert('联合竞赛活动可在日历中查看', 'info');
-            });
-            
-            document.getElementById('language-btn').addEventListener('click', function() {
-                navigateTo('wall');
-                showAlert('语言交换伙伴可在交流墙寻找', 'info');
-            });
-            
-            // Footer links
-            document.getElementById('about-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                showAlert('关于我们：这是一个促进两校文化交流的线上平台', 'info');
-            });
-            
-            document.getElementById('privacy-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                showAlert('隐私政策：我们承诺保护用户隐私和数据安全', 'info');
-            });
-            
-            document.getElementById('terms-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                showAlert('使用条款：请遵守平台规则，友好交流', 'info');
-            });
-            
-            document.getElementById('contact-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                showAlert('联系我们：如有问题请发送邮件至 contact@exchange.edu', 'info');
-            });
-            
-            // Dashboard buttons that navigate to other pages
-            document.querySelectorAll('[data-page]').forEach(btn => {
-                if (btn.tagName === 'BUTTON' && btn.getAttribute('data-page')) {
-                    btn.addEventListener('click', function() {
-                        const page = this.getAttribute('data-page');
-                        navigateTo(page);
-                    });
-                }
-            });
-        }
-        
-        function initTabs() {
-            // Tab switching
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Update active tab
-                    document.querySelectorAll('.tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Show active tab content
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    // Load data if needed
-                    if (tabId === 'admin-users' && isAdmin) {
-                        loadUserManagement();
-                    } else if (tabId === 'admin-content' && isAdmin) {
-                        loadAdminContent();
-                    }
-                });
-            });
-        }
-        
-        // Initialize sample data for demo
-        function initSampleData() {
-            // Check if we're in demo mode (no Firebase connection)
-            if (typeof firebase === 'undefined') {
-                console.log('Firebase not available, using demo data');
-                // Load demo data for announcements
-                const demoAnnouncements = [
+            if (announcementsSnapshot.empty) {
+                // Create default announcements
+                const defaultAnnouncements = [
                     {
                         title: '欢迎来到两校交流平台',
-                        content: '欢迎马来西亚宽柔中学和台湾高雄高级中学的同学们加入我们的线上交流平台！',
-                        authorName: '管理员',
-                        createdAt: new Date()
+                        content: '欢迎马来西亚宽柔中学和台湾高雄高级中学的同学们加入我们的线上交流平台！本平台旨在促进两校之间的文化交流与学术合作。',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     },
                     {
                         title: '第一届线上辩论赛通知',
-                        content: '两校联合举办的线上辩论赛将于下月开始报名，主题为"科技发展对传统文化的影响"。',
-                        authorName: '管理员',
-                        createdAt: new Date(Date.now() - 86400000)
+                        content: '两校联合举办的线上辩论赛将于下月开始报名，主题为"科技发展对传统文化的影响"。请有兴趣参加的同学在本月底前联系各自学校的负责人。',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     },
                     {
                         title: '语言交换伙伴匹配功能上线',
-                        content: '新的语言交换伙伴匹配系统已上线，请有兴趣的同学前往个人中心设置语言学习偏好。',
-                        authorName: '管理员',
-                        createdAt: new Date(Date.now() - 172800000)
+                        content: '新的语言交换伙伴匹配系统已上线，请有兴趣的同学前往个人中心设置语言学习偏好。系统将根据您的兴趣和语言水平为您匹配交流伙伴。',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     }
                 ];
                 
-                // Store for later use
-                window.demoAnnouncements = demoAnnouncements;
+                // Add default announcements
+                for (const announcement of defaultAnnouncements) {
+                    await db.collection('announcements').add(announcement);
+                }
                 
-                // Load demo wall posts
-                const demoWallPosts = [
+                // Create default events
+                const defaultEvents = [
                     {
-                        title: '欢迎高雄中学的同学！',
-                        content: '我是宽柔中学的学生，很高兴能通过这个平台认识高雄中学的朋友们！',
-                        authorName: '张明',
-                        color: 'blue',
-                        createdAt: new Date()
+                        title: '线上辩论赛初赛',
+                        description: '两校联合辩论赛初赛，主题：科技发展对传统文化的影响',
+                        date: new Date(new Date().setDate(new Date().getDate() + 7)),
+                        time: '14:00',
+                        type: 'competition',
+                        school: 'both',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     },
                     {
-                        title: '台湾美食分享',
-                        content: '高雄有哪些必吃的美食？想去台湾旅游时品尝！',
-                        authorName: '李小红',
-                        color: 'yellow',
-                        createdAt: new Date(Date.now() - 3600000)
+                        title: '文化分享会：马来西亚节日',
+                        description: '由宽柔中学同学分享马来西亚传统节日与文化习俗',
+                        date: new Date(new Date().setDate(new Date().getDate() + 14)),
+                        time: '16:00',
+                        type: 'cultural',
+                        school: 'fyhs',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     },
                     {
-                        content: '大家好，我是高雄中学的王同学，希望和大家交流学习经验！',
-                        authorName: '王同学',
-                        color: 'green',
-                        createdAt: new Date(Date.now() - 7200000)
+                        title: '语言交换伙伴见面会',
+                        description: '线上语言交换伙伴首次见面交流活动',
+                        date: new Date(new Date().setDate(new Date().getDate() + 21)),
+                        time: '15:00',
+                        type: 'language',
+                        school: 'both',
+                        authorName: '平台管理员',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdBy: 'system'
                     }
                 ];
                 
-                window.demoWallPosts = demoWallPosts;
+                // Add default events
+                for (const event of defaultEvents) {
+                    await db.collection('events').add(event);
+                }
+                
+                console.log('Default data created successfully');
             }
+        } catch (error) {
+            console.error('Error initializing Firestore:', error);
         }
-        
+    }
+    
+    // Event Listeners
+    function initEventListeners() {
         // Navigation
-        function navigateTo(pageId) {
-            // Update active nav link
-            navLinks.forEach(link => {
-                if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageId = this.getAttribute('data-page') || this.getAttribute('href').substring(1);
+                navigateTo(pageId);
+            });
+        });
+        
+        // Auth buttons
+        loginBtn.addEventListener('click', () => openModal('login'));
+        registerBtn.addEventListener('click', () => openModal('register'));
+        logoutBtn.addEventListener('click', handleLogout);
+        userInfoBtn.addEventListener('click', () => navigateTo('profile'));
+        
+        // Admin button
+        adminBtn.addEventListener('click', () => navigateTo('admin'));
+        
+        // Modal close buttons
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = this.getAttribute('data-modal');
+                closeModal(modalId);
+            });
+        });
+        
+        // Switch between login and register modals
+        document.getElementById('switch-to-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            closeModal('login');
+            openModal('register');
+        });
+        
+        document.getElementById('switch-to-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            closeModal('register');
+            openModal('login');
+        });
+        
+        // Close modals when clicking outside
+        Object.values(modals).forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
                 }
             });
-            
-            // Hide all pages
-            Object.values(pages).forEach(page => {
-                page.classList.remove('active');
+        });
+        
+        // Form submissions
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        noteForm.addEventListener('submit', handleAddNote);
+        profileForm.addEventListener('submit', handleUpdateProfile);
+        changePasswordForm.addEventListener('submit', handleChangePassword);
+        eventForm.addEventListener('submit', handleAddEvent);
+        adminAnnouncementForm.addEventListener('submit', handleAdminAddAnnouncement);
+        adminEventForm.addEventListener('submit', handleAdminAddEvent);
+        
+        // Google login buttons
+        document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
+        document.getElementById('google-register-btn').addEventListener('click', handleGoogleLogin);
+        
+        // Add note button
+        addNoteBtn.addEventListener('click', () => openModal('add-note'));
+        
+        // Note color selection
+        document.querySelectorAll('.note-color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.note-color-option').forEach(opt => {
+                    opt.style.borderColor = '#ccc';
+                });
+                this.style.borderColor = '#2c5aa0';
+                document.getElementById('note-color-value').value = this.getAttribute('data-color');
             });
-            
-            // Show target page
-            if (pages[pageId]) {
-                pages[pageId].classList.add('active');
-                currentPage = pageId;
+        });
+        
+        // File uploads
+        document.getElementById('avatar-upload').addEventListener('click', function() {
+            document.getElementById('edit-avatar').click();
+        });
+        
+        document.getElementById('edit-avatar').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('avatar-preview-img').src = event.target.result;
+                    document.getElementById('avatar-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('note-image-upload').addEventListener('click', function() {
+            document.getElementById('note-image').click();
+        });
+        
+        document.getElementById('note-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('image-preview-img').src = event.target.result;
+                    document.getElementById('image-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('remove-image').addEventListener('click', function() {
+            document.getElementById('note-image').value = '';
+            document.getElementById('image-preview').style.display = 'none';
+        });
+        
+        // Calendar navigation
+        document.getElementById('prev-month').addEventListener('click', function() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            generateCalendar(currentCalendarDate);
+            loadCalendarEvents();
+        });
+        
+        document.getElementById('next-month').addEventListener('click', function() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            generateCalendar(currentCalendarDate);
+            loadCalendarEvents();
+        });
+        
+        document.getElementById('today-btn').addEventListener('click', function() {
+            currentCalendarDate = new Date();
+            generateCalendar(currentCalendarDate);
+            loadCalendarEvents();
+        });
+        
+        // Event form cancel button
+        document.getElementById('cancel-event').addEventListener('click', function() {
+            document.querySelector('[data-tab="view-calendar"]').click();
+            eventForm.reset();
+        });
+        
+        // Change password button
+        document.getElementById('change-password-btn').addEventListener('click', function() {
+            openModal('changePassword');
+        });
+        
+        // Delete account button
+        document.getElementById('delete-account-btn').addEventListener('click', function() {
+            if (confirm('确定要删除您的账户吗？此操作无法撤销！')) {
+                deleteAccount();
+            }
+        });
+        
+        // Admin settings
+        document.getElementById('save-settings').addEventListener('click', saveAdminSettings);
+        
+        // Feature buttons on dashboard
+        document.getElementById('academic-btn').addEventListener('click', function() {
+            navigateTo('calendar');
+            showAlert('学术研讨活动可在日历中查看', 'info');
+        });
+        
+        document.getElementById('competition-btn').addEventListener('click', function() {
+            navigateTo('calendar');
+            showAlert('联合竞赛活动可在日历中查看', 'info');
+        });
+        
+        document.getElementById('language-btn').addEventListener('click', function() {
+            navigateTo('wall');
+            showAlert('语言交换伙伴可在交流墙寻找', 'info');
+        });
+        
+        // Footer links
+        document.getElementById('about-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlert('关于我们：这是一个促进两校文化交流的线上平台', 'info');
+        });
+        
+        document.getElementById('privacy-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlert('隐私政策：我们承诺保护用户隐私和数据安全', 'info');
+        });
+        
+        document.getElementById('terms-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlert('使用条款：请遵守平台规则，友好交流', 'info');
+        });
+        
+        document.getElementById('contact-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlert('联系我们：如有问题请发送邮件至 contact@exchange.edu', 'info');
+        });
+        
+        // Dashboard buttons that navigate to other pages
+        document.querySelectorAll('[data-page]').forEach(btn => {
+            if (btn.tagName === 'BUTTON' && btn.getAttribute('data-page')) {
+                btn.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            }
+        });
+    }
+    
+    function initTabs() {
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
                 
-                // Load page-specific data
-                switch(pageId) {
-                    case 'dashboard':
-                        loadDashboardData();
-                        break;
-                    case 'announcements':
-                        loadAnnouncements();
-                        break;
-                    case 'wall':
-                        loadWallPosts();
-                        break;
-                    case 'calendar':
-                        loadCalendarEvents();
-                        break;
-                    case 'admin':
-                        if (isAdmin) {
-                            loadAdminData();
-                        } else {
-                            navigateTo('dashboard');
-                            showAlert('您没有管理员权限', 'error');
-                        }
-                        break;
-                }
-            }
-        }
-        
-        // Modal controls
-        function openModal(modalId) {
-            if (modals[modalId]) {
-                modals[modalId].classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        
-        function closeModal(modalId) {
-            if (modals[modalId]) {
-                modals[modalId].classList.remove('active');
-                document.body.style.overflow = 'auto';
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
                 
-                // Reset forms
-                if (modalId === 'login-modal') {
-                    loginForm.reset();
-                } else if (modalId === 'register-modal') {
-                    registerForm.reset();
-                } else if (modalId === 'add-note-modal') {
-                    noteForm.reset();
-                    document.querySelectorAll('.note-color-option')[0].click();
-                    document.getElementById('image-preview').style.display = 'none';
-                } else if (modalId === 'change-password-modal') {
-                    changePasswordForm.reset();
-                }
-            }
-        }
-        
-        // Authentication
-        function initAuthStateListener() {
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    updateUIForUser(user);
-                    loadUserData(user.uid);
-                } else {
-                    currentUser = null;
-                    updateUIForGuest();
+                // Show active tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+                
+                // Load data if needed
+                if (tabId === 'admin-users' && isAdmin) {
+                    loadUserManagement();
+                } else if (tabId === 'admin-content' && isAdmin) {
+                    loadAdminContent();
                 }
             });
-        }
-        
-        async function loadUserData(userId) {
-            try {
-                // In demo mode, use mock data
-                if (typeof firebase === 'undefined' || !db) {
-                    const mockUserData = {
-                        name: '张明',
-                        email: 'zhangming@example.com',
-                        school: 'fyhs',
-                        grade: '高二',
-                        role: 'student',
-                        interests: ['篮球', '编程', '音乐'],
-                        bio: '我是宽柔中学的学生，喜欢交朋友和学习新事物！'
-                    };
-                    
-                    updateUserUI(mockUserData);
-                    return;
-                }
-                
-                const userDoc = await db.collection('users').doc(userId).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    updateUserUI(userData);
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                // In case of error, show demo user
-                if (typeof firebase === 'undefined') {
-                    const mockUserData = {
-                        name: '张明',
-                        email: 'zhangming@example.com',
-                        school: 'fyhs',
-                        grade: '高二',
-                        role: 'student',
-                        interests: ['篮球', '编程', '音乐'],
-                        bio: '我是宽柔中学的学生，喜欢交朋友和学习新事物！'
-                    };
-                    
-                    updateUserUI(mockUserData);
-                }
-            }
-        }
-        
-        function updateUserUI(userData) {
-            isAdmin = userData.role === 'admin';
-            
-            // Update UI based on role
-            if (isAdmin) {
-                adminMenu.style.display = 'block';
+        });
+    }
+    
+    // Navigation
+    function navigateTo(pageId) {
+        // Update active nav link
+        navLinks.forEach(link => {
+            if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
+                link.classList.add('active');
             } else {
-                adminMenu.style.display = 'none';
-                if (currentPage === 'admin') {
-                    navigateTo('dashboard');
-                }
+                link.classList.remove('active');
             }
+        });
+        
+        // Hide all pages
+        Object.values(pages).forEach(page => {
+            page.classList.remove('active');
+        });
+        
+        // Show target page
+        if (pages[pageId]) {
+            pages[pageId].classList.add('active');
+            currentPage = pageId;
             
-            // Update user info
-            userName.textContent = userData.name || (currentUser ? currentUser.email.split('@')[0] : '用户');
-            userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
-            
-            // Update avatar
-            const firstChar = userName.textContent.charAt(0).toUpperCase();
-            userAvatar.textContent = firstChar;
-            document.getElementById('profile-avatar').textContent = firstChar;
-            
-            // Update profile page
-            document.getElementById('profile-name').textContent = userData.name || '未设置';
-            document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
-            document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
-            document.getElementById('profile-email').textContent = `邮箱: ${currentUser ? currentUser.email : '未设置'}`;
-            
-            // Update profile form
-            document.getElementById('edit-name').value = userData.name || '';
-            document.getElementById('edit-school').value = userData.school || '';
-            document.getElementById('edit-grade').value = userData.grade || '';
-            document.getElementById('edit-interests').value = userData.interests ? userData.interests.join(', ') : '';
-            document.getElementById('edit-bio').value = userData.bio || '';
-            
-            // Enable add note button for non-admin users
-            if (!isAdmin) {
-                addNoteBtn.disabled = false;
+            // Load page-specific data
+            switch(pageId) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'announcements':
+                    loadAnnouncements();
+                    break;
+                case 'wall':
+                    loadWallPosts();
+                    break;
+                case 'calendar':
+                    loadCalendarEvents();
+                    break;
+                case 'admin':
+                    if (isAdmin) {
+                        loadAdminData();
+                    } else {
+                        navigateTo('dashboard');
+                        showAlert('您没有管理员权限', 'error');
+                    }
+                    break;
             }
         }
-        
-        function updateUIForUser(user) {
-            authButtons.style.display = 'none';
-            userProfile.style.display = 'flex';
-            
-            // Enable navigation to all pages
-            navLinks.forEach(link => {
-                link.style.pointerEvents = 'auto';
-                link.style.opacity = '1';
-            });
+    }
+    
+    // Modal controls
+    function openModal(modalId) {
+        if (modals[modalId]) {
+            modals[modalId].classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
-        
-        function updateUIForGuest() {
-            authButtons.style.display = 'block';
-            userProfile.style.display = 'none';
-            adminMenu.style.display = 'none';
+    }
+    
+    function closeModal(modalId) {
+        if (modals[modalId]) {
+            modals[modalId].classList.remove('active');
+            document.body.style.overflow = 'auto';
             
-            // Disable navigation to pages that require auth
-            navLinks.forEach(link => {
-                if (link.getAttribute('data-page') !== 'dashboard') {
-                    link.style.pointerEvents = 'none';
-                    link.style.opacity = '0.6';
-                }
-            });
-            
-            // If on a restricted page, redirect to dashboard
-            if (currentPage !== 'dashboard') {
-                navigateTo('dashboard');
-            }
-            
-            // Disable add note button
-            addNoteBtn.disabled = true;
-        }
-        
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            // Demo mode - simulate login
-            if (typeof firebase === 'undefined') {
-                const mockUser = {
-                    uid: 'demo-user-123',
-                    email: email
-                };
-                
-                currentUser = mockUser;
-                updateUIForUser(mockUser);
-                
-                const mockUserData = {
-                    name: email.split('@')[0],
-                    email: email,
-                    school: 'fyhs',
-                    grade: '高二',
-                    role: 'student',
-                    interests: ['交流', '学习', '运动'],
-                    bio: '欢迎来到交流平台！'
-                };
-                
-                updateUserUI(mockUserData);
-                closeModal('login');
-                showAlert('登录成功 (演示模式)', 'success');
-                return;
-            }
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                closeModal('login');
-                showAlert('登录成功', 'success');
-            } catch (error) {
-                showAlert(`登录失败: ${error.message}`, 'error');
+            // Reset forms
+            if (modalId === 'login-modal') {
+                loginForm.reset();
+            } else if (modalId === 'register-modal') {
+                registerForm.reset();
+            } else if (modalId === 'add-note-modal') {
+                noteForm.reset();
+                document.querySelectorAll('.note-color-option')[0].click();
+                document.getElementById('image-preview').style.display = 'none';
+            } else if (modalId === 'change-password-modal') {
+                changePasswordForm.reset();
             }
         }
-        
-        async function handleRegister(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('register-name').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-            const school = document.getElementById('register-school').value;
-            const grade = document.getElementById('register-grade').value;
-            
-            if (password !== confirmPassword) {
-                showAlert('两次输入的密码不一致', 'error');
-                return;
+    }
+    
+    // Authentication
+    function initAuthStateListener() {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                updateUIForUser(user);
+                loadUserData(user.uid);
+            } else {
+                currentUser = null;
+                updateUIForGuest();
             }
-            
-            if (!school) {
-                showAlert('请选择所属学校', 'error');
-                return;
-            }
-            
-            // Demo mode - simulate registration
-            if (typeof firebase === 'undefined') {
-                const mockUser = {
-                    uid: 'demo-user-' + Date.now(),
-                    email: email
-                };
-                
-                currentUser = mockUser;
-                updateUIForUser(mockUser);
-                
-                const mockUserData = {
-                    name: name,
-                    email: email,
-                    school: school,
-                    grade: grade,
-                    role: 'student',
-                    interests: [],
-                    bio: ''
-                };
-                
-                updateUserUI(mockUserData);
-                closeModal('register');
-                showAlert('注册成功！欢迎加入交流平台 (演示模式)', 'success');
-                return;
-            }
-            
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const userId = userCredential.user.uid;
-                
-                // Save additional user data to Firestore
+        });
+    }
+    
+    async function loadUserData(userId) {
+        try {
+            const userDoc = await db.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                updateUserUI(userData);
+            } else {
+                // Create user document if it doesn't exist
                 await db.collection('users').doc(userId).set({
-                    name: name,
-                    email: email,
-                    school: school,
-                    grade: grade,
-                    role: 'student', // Default role
+                    name: currentUser.displayName || currentUser.email.split('@')[0],
+                    email: currentUser.email,
+                    school: '',
+                    grade: '',
+                    role: 'student',
                     interests: [],
                     bio: '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                closeModal('register');
-                showAlert('注册成功！欢迎加入交流平台', 'success');
-            } catch (error) {
-                showAlert(`注册失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function handleGoogleLogin() {
-            // Demo mode - simulate Google login
-            if (typeof firebase === 'undefined') {
-                const mockUser = {
-                    uid: 'google-demo-user-123',
-                    email: 'demo@gmail.com'
-                };
-                
-                currentUser = mockUser;
-                updateUIForUser(mockUser);
-                
-                const mockUserData = {
-                    name: 'Google用户',
-                    email: 'demo@gmail.com',
-                    school: 'fyhs',
-                    grade: '高三',
+                updateUserUI({
+                    name: currentUser.displayName || currentUser.email.split('@')[0],
+                    email: currentUser.email,
+                    school: '',
+                    grade: '',
                     role: 'student',
-                    interests: ['科技', '文化交流', '语言学习'],
-                    bio: '通过Google账号登录的用户'
-                };
-                
-                updateUserUI(mockUserData);
-                closeModal('login');
-                closeModal('register');
-                showAlert('Google账号登录成功 (演示模式)', 'success');
-                return;
+                    interests: [],
+                    bio: ''
+                });
             }
-            
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            try {
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                
-                // Check if user already exists in Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                
-                if (!userDoc.exists) {
-                    // Create new user record
-                    await db.collection('users').doc(user.uid).set({
-                        name: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        school: '', // User will need to complete profile
-                        grade: '',
-                        role: 'student',
-                        interests: [],
-                        bio: '',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    // Update last login time
-                    await db.collection('users').doc(user.uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                
-                closeModal('login');
-                closeModal('register');
-                showAlert('Google账号登录成功', 'success');
-            } catch (error) {
-                showAlert(`Google登录失败: ${error.message}`, 'error');
+        } catch (error) {
+            console.error('Error loading user data:', error);
+            showAlert('加载用户数据失败，请刷新页面重试', 'error');
+        }
+    }
+    
+    function updateUserUI(userData) {
+        isAdmin = userData.role === 'admin';
+        
+        // Update UI based on role
+        if (isAdmin) {
+            adminMenu.style.display = 'block';
+        } else {
+            adminMenu.style.display = 'none';
+            if (currentPage === 'admin') {
+                navigateTo('dashboard');
             }
         }
         
-        async function handleLogout() {
-            // Demo mode - simulate logout
-            if (typeof firebase === 'undefined') {
-                currentUser = null;
-                updateUIForGuest();
-                showAlert('已成功退出登录 (演示模式)', 'success');
-                return;
+        // Update user info
+        userName.textContent = userData.name || (currentUser ? currentUser.email.split('@')[0] : '用户');
+        userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
+        
+        // Update avatar
+        const firstChar = userName.textContent.charAt(0).toUpperCase();
+        userAvatar.textContent = firstChar;
+        document.getElementById('profile-avatar').textContent = firstChar;
+        
+        // Update profile page
+        document.getElementById('profile-name').textContent = userData.name || '未设置';
+        document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
+        document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
+        document.getElementById('profile-email').textContent = `邮箱: ${currentUser ? currentUser.email : '未设置'}`;
+        
+        // Update profile form
+        document.getElementById('edit-name').value = userData.name || '';
+        document.getElementById('edit-school').value = userData.school || '';
+        document.getElementById('edit-grade').value = userData.grade || '';
+        document.getElementById('edit-interests').value = userData.interests ? userData.interests.join(', ') : '';
+        document.getElementById('edit-bio').value = userData.bio || '';
+        
+        // Enable add note button for non-admin users
+        if (!isAdmin) {
+            addNoteBtn.disabled = false;
+        }
+    }
+    
+    function updateUIForUser(user) {
+        authButtons.style.display = 'none';
+        userProfile.style.display = 'flex';
+        
+        // Enable navigation to all pages
+        navLinks.forEach(link => {
+            link.style.pointerEvents = 'auto';
+            link.style.opacity = '1';
+        });
+    }
+    
+    function updateUIForGuest() {
+        authButtons.style.display = 'block';
+        userProfile.style.display = 'none';
+        adminMenu.style.display = 'none';
+        
+        // Disable navigation to pages that require auth
+        navLinks.forEach(link => {
+            if (link.getAttribute('data-page') !== 'dashboard') {
+                link.style.pointerEvents = 'none';
+                link.style.opacity = '0.6';
             }
-            
-            try {
-                await auth.signOut();
-                showAlert('已成功退出登录', 'success');
-            } catch (error) {
-                showAlert(`退出登录失败: ${error.message}`, 'error');
-            }
+        });
+        
+        // If on a restricted page, redirect to dashboard
+        if (currentPage !== 'dashboard') {
+            navigateTo('dashboard');
         }
         
-        // Data Loading Functions
-        async function loadDashboardData() {
-            // Load recent announcements
-            try {
-                // Check if we have demo data
-                if (window.demoAnnouncements) {
-                    const recentAnnouncements = document.getElementById('recent-announcements');
-                    let html = '';
-                    window.demoAnnouncements.slice(0, 3).forEach(announcement => {
-                        html += `
-                            <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                                <strong>${announcement.title}</strong>
-                                <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${announcement.content.substring(0, 80)}${announcement.content.length > 80 ? '...' : ''}</p>
-                                <small style="color: #666;">${formatDate(announcement.createdAt)}</small>
-                            </div>
-                        `;
-                    });
-                    recentAnnouncements.innerHTML = html;
-                } else if (db) {
-                    const announcementsSnapshot = await db.collection('announcements')
-                        .orderBy('createdAt', 'desc')
-                        .limit(3)
-                        .get();
-                    
-                    const recentAnnouncements = document.getElementById('recent-announcements');
-                    if (announcementsSnapshot.empty) {
-                        recentAnnouncements.innerHTML = '<p>暂无公告</p>';
-                    } else {
-                        let html = '';
-                        announcementsSnapshot.forEach(doc => {
-                            const data = doc.data();
-                            html += `
-                                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                                    <strong>${data.title}</strong>
-                                    <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${data.content.substring(0, 80)}${data.content.length > 80 ? '...' : ''}</p>
-                                    <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
-                                </div>
-                            `;
-                        });
-                        recentAnnouncements.innerHTML = html;
-                    }
-                } else {
-                    document.getElementById('recent-announcements').innerHTML = '<p>无法加载公告</p>';
-                }
-            } catch (error) {
-                console.error('Error loading announcements:', error);
-                document.getElementById('recent-announcements').innerHTML = '<p>加载公告时出错</p>';
+        // Disable add note button
+        addNoteBtn.disabled = true;
+    }
+    
+    async function handleLogin(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            
+            // Update last login time
+            await db.collection('users').doc(userCredential.user.uid).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            closeModal('login');
+            showAlert('登录成功', 'success');
+        } catch (error) {
+            showAlert(`登录失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleRegister(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+        const school = document.getElementById('register-school').value;
+        const grade = document.getElementById('register-grade').value;
+        
+        if (password !== confirmPassword) {
+            showAlert('两次输入的密码不一致', 'error');
+            return;
+        }
+        
+        if (!school) {
+            showAlert('请选择所属学校', 'error');
+            return;
+        }
+        
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const userId = userCredential.user.uid;
+            
+            // Save additional user data to Firestore
+            await db.collection('users').doc(userId).set({
+                name: name,
+                email: email,
+                school: school,
+                grade: grade,
+                role: 'student', // Default role
+                interests: [],
+                bio: '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            closeModal('register');
+            showAlert('注册成功！欢迎加入交流平台', 'success');
+        } catch (error) {
+            showAlert(`注册失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleGoogleLogin() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        
+        try {
+            const result = await auth.signInWithPopup(provider);
+            const user = result.user;
+            
+            // Check if user already exists in Firestore
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                // Create new user record
+                await db.collection('users').doc(user.uid).set({
+                    name: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    school: '', // User will need to complete profile
+                    grade: '',
+                    role: 'student',
+                    interests: [],
+                    bio: '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                // Update last login time
+                await db.collection('users').doc(user.uid).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
             }
             
-            // Load upcoming events
-            try {
-                // Demo events
-                const demoEvents = [
-                    {
-                        title: '线上辩论赛初赛',
-                        date: new Date(Date.now() + 86400000 * 7),
-                        time: '14:00'
-                    },
-                    {
-                        title: '文化分享会：马来西亚节日',
-                        date: new Date(Date.now() + 86400000 * 14),
-                        time: '16:00'
-                    },
-                    {
-                        title: '语言交换伙伴见面会',
-                        date: new Date(Date.now() + 86400000 * 21),
-                        time: '15:00'
-                    }
-                ];
-                
-                const upcomingEvents = document.getElementById('upcoming-events');
+            closeModal('login');
+            closeModal('register');
+            showAlert('Google账号登录成功', 'success');
+        } catch (error) {
+            showAlert(`Google登录失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleLogout() {
+        try {
+            await auth.signOut();
+            showAlert('已成功退出登录', 'success');
+        } catch (error) {
+            showAlert(`退出登录失败: ${error.message}`, 'error');
+        }
+    }
+    
+    // Data Loading Functions
+    async function loadDashboardData() {
+        // Load recent announcements
+        try {
+            const announcementsSnapshot = await db.collection('announcements')
+                .orderBy('createdAt', 'desc')
+                .limit(3)
+                .get();
+            
+            const recentAnnouncements = document.getElementById('recent-announcements');
+            if (announcementsSnapshot.empty) {
+                recentAnnouncements.innerHTML = '<p>暂无公告</p>';
+            } else {
                 let html = '';
-                demoEvents.forEach(event => {
+                announcementsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <strong>${data.title}</strong>
+                            <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${data.content.substring(0, 80)}${data.content.length > 80 ? '...' : ''}</p>
+                            <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
+                        </div>
+                    `;
+                });
+                recentAnnouncements.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+            document.getElementById('recent-announcements').innerHTML = '<p>加载公告时出错</p>';
+        }
+        
+        // Load upcoming events (next 7 days)
+        try {
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            const eventsSnapshot = await db.collection('events')
+                .where('date', '>=', today)
+                .where('date', '<=', nextWeek)
+                .orderBy('date')
+                .limit(3)
+                .get();
+            
+            const upcomingEvents = document.getElementById('upcoming-events');
+            if (eventsSnapshot.empty) {
+                upcomingEvents.innerHTML = '<p>暂无近期活动</p>';
+            } else {
+                let html = '';
+                eventsSnapshot.forEach(doc => {
+                    const data = doc.data();
                     html += `
                         <div style="margin-bottom: 12px; padding: 10px; background-color: rgba(44, 90, 160, 0.05); border-radius: 8px;">
-                            <strong>${event.title}</strong>
-                            <p style="font-size: 0.9rem; margin-top: 5px; color: #555;">${formatDate(event.date)} ${event.time || ''}</p>
+                            <strong>${data.title}</strong>
+                            <p style="font-size: 0.9rem; margin-top: 5px; color: #555;">${formatDate(data.date?.toDate())} ${data.time || ''}</p>
                         </div>
                     `;
                 });
                 upcomingEvents.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading events:', error);
-                document.getElementById('upcoming-events').innerHTML = '<p>加载活动时出错</p>';
             }
-            
-            // Update statistics
-            try {
-                // Demo statistics
-                document.getElementById('total-participants').textContent = '156';
-                document.getElementById('online-users').textContent = '24';
-                document.getElementById('total-posts').textContent = '89';
-                document.getElementById('total-events').textContent = '12';
-                
-            } catch (error) {
-                console.error('Error loading statistics:', error);
-            }
+        } catch (error) {
+            console.error('Error loading events:', error);
+            document.getElementById('upcoming-events').innerHTML = '<p>加载活动时出错</p>';
         }
         
-        async function loadAnnouncements() {
-            const announcementsList = document.getElementById('announcements-list');
+        // Update statistics
+        try {
+            // Get total users count
+            const usersSnapshot = await db.collection('users').get();
+            const totalUsers = usersSnapshot.size;
             
-            // Show loading
-            announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
+            // Get total posts count
+            const postsSnapshot = await db.collection('wallPosts').get();
+            const totalPosts = postsSnapshot.size;
             
-            try {
-                // Check if we have demo data
-                if (window.demoAnnouncements) {
-                    let html = '';
-                    window.demoAnnouncements.forEach(announcement => {
-                        html += `
-                            <div class="announcement-item">
-                                <h4>${announcement.title}</h4>
-                                <div class="announcement-content">${announcement.content}</div>
-                                <div class="announcement-meta">
-                                    <span>发布者: ${announcement.authorName}</span>
-                                    <span>${formatDate(announcement.createdAt)}</span>
-                                </div>
+            // Get total events count
+            const eventsSnapshot = await db.collection('events').get();
+            const totalEvents = eventsSnapshot.size;
+            
+            // Update statistics display
+            document.getElementById('total-participants').textContent = totalUsers;
+            document.getElementById('total-posts').textContent = totalPosts;
+            document.getElementById('total-events').textContent = totalEvents;
+            
+            // Online users is estimated (users active in last 15 minutes)
+            const activeTime = new Date(Date.now() - 15 * 60 * 1000);
+            const activeUsersQuery = await db.collection('users')
+                .where('lastLogin', '>=', activeTime)
+                .get();
+            
+            document.getElementById('online-users').textContent = activeUsersQuery.size;
+            
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+        }
+    }
+    
+    async function loadAnnouncements() {
+        const announcementsList = document.getElementById('announcements-list');
+        
+        // Show loading
+        announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
+        
+        try {
+            const announcementsSnapshot = await db.collection('announcements')
+                .orderBy('createdAt', 'desc')
+                .get();
+            
+            if (announcementsSnapshot.empty) {
+                announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>暂无公告</p></div>';
+            } else {
+                let html = '';
+                announcementsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <div class="announcement-item">
+                            <h4>${data.title}</h4>
+                            <div class="announcement-content">${data.content}</div>
+                            <div class="announcement-meta">
+                                <span>发布者: ${data.authorName || '管理员'}</span>
+                                <span>${formatDate(data.createdAt?.toDate())}</span>
                             </div>
-                        `;
-                    });
-                    announcementsList.innerHTML = html;
-                } else if (db) {
-                    const announcementsSnapshot = await db.collection('announcements')
-                        .orderBy('createdAt', 'desc')
-                        .get();
-                    
-                    if (announcementsSnapshot.empty) {
-                        announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>暂无公告</p></div>';
-                    } else {
-                        let html = '';
-                        announcementsSnapshot.forEach(doc => {
-                            const data = doc.data();
-                            html += `
-                                <div class="announcement-item">
-                                    <h4>${data.title}</h4>
-                                    <div class="announcement-content">${data.content}</div>
-                                    <div class="announcement-meta">
-                                        <span>发布者: ${data.authorName || '管理员'}</span>
-                                        <span>${formatDate(data.createdAt?.toDate())}</span>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        announcementsList.innerHTML = html;
-                    }
-                } else {
-                    announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>无法加载公告</p></div>';
-                }
-            } catch (error) {
-                console.error('Error loading announcements:', error);
-                announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载公告时出错</p></div>';
+                        </div>
+                    `;
+                });
+                announcementsList.innerHTML = html;
             }
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+            announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载公告时出错</p></div>';
         }
+    }
+    
+    async function loadWallPosts() {
+        const padletWall = document.getElementById('padlet-wall');
         
-        async function loadWallPosts() {
-            const padletWall = document.getElementById('padlet-wall');
+        // Show loading
+        padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
+        
+        try {
+            const postsSnapshot = await db.collection('wallPosts')
+                .orderBy('createdAt', 'desc')
+                .limit(20)
+                .get();
             
-            // Show loading
-            padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
-            
-            try {
-                // Check if we have demo data
-                if (window.demoWallPosts) {
-                    let html = '';
-                    window.demoWallPosts.forEach(post => {
-                        const noteColorClass = `note-${post.color || 'yellow'}`;
-                        
-                        html += `
-                            <div class="padlet-note ${noteColorClass} draggable" data-id="${Date.now() + Math.random()}" draggable="true">
-                                ${post.title ? `<div class="note-title">${post.title}</div>` : ''}
-                                <div class="note-content">${post.content}</div>
-                                <div class="note-meta">
-                                    <span>作者: ${post.authorName}</span>
-                                    <span>${formatDate(post.createdAt)}</span>
-                                </div>
-                                ${currentUser ? `
-                                    <div class="note-actions">
-                                        <button class="note-btn delete-note" title="删除">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                ` : ''}
+            if (postsSnapshot.empty) {
+                padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
+            } else {
+                let html = '';
+                postsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const noteColorClass = `note-${data.color || 'yellow'}`;
+                    
+                    html += `
+                        <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
+                            ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
+                            <div class="note-content">${data.content}</div>
+                            ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                            <div class="note-meta">
+                                <span>作者: ${data.authorName}</span>
+                                <span>${formatDate(data.createdAt?.toDate())}</span>
                             </div>
-                        `;
-                    });
-                    
-                    // Add the "add note" button at the end
-                    html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
-                    padletWall.innerHTML = html;
-                    
-                    // Add event listeners
-                    document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                    
-                    // Add delete event listeners
-                    document.querySelectorAll('.delete-note').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const noteId = this.closest('.padlet-note').getAttribute('data-id');
-                            if (confirm('确定要删除这个贴文吗？')) {
-                                deleteWallPost(noteId);
-                            }
-                        });
-                    });
-                    
-                    // Add drag and drop functionality
-                    initDragAndDrop();
-                } else if (db) {
-                    const postsSnapshot = await db.collection('wallPosts')
-                        .orderBy('createdAt', 'desc')
-                        .limit(20)
-                        .get();
-                    
-                    if (postsSnapshot.empty) {
-                        padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
-                        document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                    } else {
-                        let html = '';
-                        postsSnapshot.forEach(doc => {
-                            const data = doc.data();
-                            const noteColorClass = `note-${data.color || 'yellow'}`;
-                            
-                            html += `
-                                <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
-                                    ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
-                                    <div class="note-content">${data.content}</div>
-                                    ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
-                                    <div class="note-meta">
-                                        <span>作者: ${data.authorName}</span>
-                                        <span>${formatDate(data.createdAt?.toDate())}</span>
-                                    </div>
-                                    ${isAdmin || currentUser?.uid === data.authorId ? `
-                                        <div class="note-actions">
-                                            <button class="note-btn delete-note" title="删除">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    ` : ''}
+                            ${isAdmin || currentUser?.uid === data.authorId ? `
+                                <div class="note-actions">
+                                    <button class="note-btn delete-note" title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                            `;
-                        });
-                        
-                        // Add the "add note" button at the end
-                        html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
-                        padletWall.innerHTML = html;
-                        
-                        // Add event listeners
-                        document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                        
-                        // Add delete event listeners
-                        document.querySelectorAll('.delete-note').forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                const noteId = this.closest('.padlet-note').getAttribute('data-id');
-                                if (confirm('确定要删除这个贴文吗？')) {
-                                    deleteWallPost(noteId);
-                                }
-                            });
-                        });
-                        
-                        // Add drag and drop functionality
-                        initDragAndDrop();
-                    }
-                } else {
-                    padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>无法加载交流墙</p></div>';
-                }
-            } catch (error) {
-                console.error('Error loading wall posts:', error);
-                padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载贴文时出错</p></div>';
-            }
-        }
-        
-        function initDragAndDrop() {
-            const draggables = document.querySelectorAll('.draggable');
-            const container = document.getElementById('padlet-wall');
-            
-            if (!container) return;
-            
-            draggables.forEach(draggable => {
-                draggable.addEventListener('dragstart', () => {
-                    draggable.classList.add('dragging');
+                            ` : ''}
+                        </div>
+                    `;
                 });
                 
-                draggable.addEventListener('dragend', () => {
-                    draggable.classList.remove('dragging');
+                // Add the "add note" button at the end
+                html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                padletWall.innerHTML = html;
+                
+                // Add event listeners
+                document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                
+                // Add delete event listeners
+                document.querySelectorAll('.delete-note').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const noteId = this.closest('.padlet-note').getAttribute('data-id');
+                        if (confirm('确定要删除这个贴文吗？')) {
+                            deleteWallPost(noteId);
+                        }
+                    });
                 });
+                
+                // Add drag and drop functionality
+                initDragAndDrop();
+            }
+        } catch (error) {
+            console.error('Error loading wall posts:', error);
+            padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载贴文时出错</p></div>';
+        }
+    }
+    
+    function initDragAndDrop() {
+        const draggables = document.querySelectorAll('.draggable');
+        const container = document.getElementById('padlet-wall');
+        
+        if (!container) return;
+        
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
             });
             
-            container.addEventListener('dragover', e => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(container, e.clientY);
-                const draggable = document.querySelector('.dragging');
-                
-                if (afterElement == null) {
-                    container.appendChild(draggable);
-                } else {
-                    container.insertBefore(draggable, afterElement);
-                }
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
             });
+        });
+        
+        container.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(container, e.clientY);
+            const draggable = document.querySelector('.dragging');
+            
+            if (afterElement == null) {
+                container.appendChild(draggable);
+            } else {
+                container.insertBefore(draggable, afterElement);
+            }
+        });
+    }
+    
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    function generateCalendar(date) {
+        const calendar = document.getElementById('calendar');
+        if (!calendar) return;
+        
+        const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+        
+        // Update month display
+        const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        const monthDisplay = document.getElementById('current-month');
+        if (monthDisplay) {
+            monthDisplay.textContent = `${date.getFullYear()}年${monthNames[date.getMonth()]}`;
         }
         
-        function getDragAfterElement(container, y) {
-            const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')];
-            
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        // Get first day of month
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+        // Get last day of month
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        
+        // Calculate days in month
+        const daysInMonth = lastDay.getDate();
+        // Calculate day of week for first day (0 = Sunday, 1 = Monday, etc.)
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Create header
+        let html = '';
+        daysOfWeek.forEach(day => {
+            html += `<div class="calendar-day header">${day}</div>`;
+        });
+        
+        // Add empty cells for days before first day of month
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            html += `<div class="calendar-day"></div>`;
         }
         
-        function generateCalendar(date) {
-            const calendar = document.getElementById('calendar');
-            if (!calendar) return;
+        // Add cells for each day of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayDate = new Date(date.getFullYear(), date.getMonth(), day);
+            const isToday = isSameDay(dayDate, new Date());
             
-            const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-            
-            // Update month display
-            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-            const monthDisplay = document.getElementById('current-month');
-            if (monthDisplay) {
-                monthDisplay.textContent = `${date.getFullYear()}年${monthNames[date.getMonth()]}`;
-            }
-            
-            // Get first day of month
-            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-            // Get last day of month
-            const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-            
-            // Calculate days in month
-            const daysInMonth = lastDay.getDate();
-            // Calculate day of week for first day (0 = Sunday, 1 = Monday, etc.)
-            const firstDayOfWeek = firstDay.getDay();
-            
-            // Create header
-            let html = '';
-            daysOfWeek.forEach(day => {
-                html += `<div class="calendar-day header">${day}</div>`;
-            });
-            
-            // Add empty cells for days before first day of month
-            for (let i = 0; i < firstDayOfWeek; i++) {
-                html += `<div class="calendar-day"></div>`;
-            }
-            
-            // Add cells for each day of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayDate = new Date(date.getFullYear(), date.getMonth(), day);
-                const isToday = isSameDay(dayDate, new Date());
-                
-                html += `
-                    <div class="calendar-day" data-date="${dayDate.toISOString().split('T')[0]}">
-                        <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">${day}</div>
-                        <div id="events-${dayDate.toISOString().split('T')[0]}"></div>
-                        ${currentUser ? `<button class="add-event-btn" data-date="${dayDate.toISOString().split('T')[0]}"><i class="fas fa-plus"></i></button>` : ''}
-                    </div>
-                `;
-            }
-            
-            calendar.innerHTML = html;
-            
-            // Add event listeners to add event buttons
-            document.querySelectorAll('.add-event-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const date = this.getAttribute('data-date');
-                    document.getElementById('event-date').value = date;
-                    document.querySelector('[data-tab="add-event"]').click();
-                });
-            });
+            html += `
+                <div class="calendar-day" data-date="${dayDate.toISOString().split('T')[0]}">
+                    <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">${day}</div>
+                    <div id="events-${dayDate.toISOString().split('T')[0]}"></div>
+                    ${currentUser ? `<button class="add-event-btn" data-date="${dayDate.toISOString().split('T')[0]}"><i class="fas fa-plus"></i></button>` : ''}
+                </div>
+            `;
         }
         
-        async function loadCalendarEvents() {
-            const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
-            
-            // Clear existing events
-            calendarDays.forEach(day => {
-                const eventContainer = day.querySelector('div[id^="events-"]');
-                if (eventContainer) {
-                    eventContainer.innerHTML = '';
-                }
+        calendar.innerHTML = html;
+        
+        // Add event listeners to add event buttons
+        document.querySelectorAll('.add-event-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const date = this.getAttribute('data-date');
+                document.getElementById('event-date').value = date;
+                document.querySelector('[data-tab="add-event"]').click();
             });
+        });
+    }
+    
+    async function loadCalendarEvents() {
+        const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
+        
+        // Clear existing events
+        calendarDays.forEach(day => {
+            const eventContainer = day.querySelector('div[id^="events-"]');
+            if (eventContainer) {
+                eventContainer.innerHTML = '';
+            }
+        });
+        
+        try {
+            // Get first and last day of current month view
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
             
-            try {
-                // Demo events
-                const demoEvents = [
-                    {
-                        title: '线上辩论赛',
-                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 15),
-                        description: '两校联合辩论赛初赛',
-                        time: '14:00',
-                        type: 'competition',
-                        school: 'both',
-                        authorName: '管理员'
-                    },
-                    {
-                        title: '文化分享会',
-                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 22),
-                        description: '马来西亚传统节日介绍',
-                        time: '16:00',
-                        type: 'cultural',
-                        school: 'fyhs',
-                        authorName: '管理员'
-                    },
-                    {
-                        title: '语言交换活动',
-                        date: new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 10),
-                        description: '中英文语言交流小组',
-                        time: '15:00',
-                        type: 'language',
-                        school: 'both',
-                        authorName: '管理员'
-                    }
-                ];
-                
-                demoEvents.forEach(event => {
-                    const dateString = event.date.toISOString().split('T')[0];
+            const eventsSnapshot = await db.collection('events')
+                .where('date', '>=', firstDay)
+                .where('date', '<=', lastDay)
+                .orderBy('date')
+                .get();
+            
+            eventsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const date = data.date?.toDate();
+                if (date) {
+                    const dateString = date.toISOString().split('T')[0];
                     const eventContainer = document.getElementById(`events-${dateString}`);
                     
                     if (eventContainer) {
                         const eventElement = document.createElement('div');
                         eventElement.className = 'calendar-event';
-                        eventElement.textContent = event.title;
-                        eventElement.setAttribute('data-id', 'demo-' + dateString);
-                        eventElement.addEventListener('click', () => showEventDetail('demo', event));
+                        eventElement.textContent = data.title;
+                        eventElement.setAttribute('data-id', doc.id);
+                        eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
                         
                         eventContainer.appendChild(eventElement);
                     }
-                });
-                
-            } catch (error) {
-                console.error('Error loading calendar events:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error loading calendar events:', error);
         }
-        
-        async function loadAdminData() {
-            try {
-                // Demo admin data
-                document.getElementById('admin-total-users').textContent = '156';
-                document.getElementById('admin-active-today').textContent = '24';
-                document.getElementById('admin-total-announcements').textContent = '8';
-                document.getElementById('admin-total-posts').textContent = '89';
-                document.getElementById('admin-total-events').textContent = '12';
-                
-            } catch (error) {
-                console.error('Error loading admin data:', error);
-                showAlert('加载管理员数据时出错', 'error');
-            }
-        }
-        
-        async function loadUserManagement() {
-            const userManagement = document.getElementById('user-management');
-            userManagement.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载用户数据...</p></div>';
+    }
+    
+    async function loadAdminData() {
+        try {
+            // Get total users count
+            const usersSnapshot = await db.collection('users').get();
+            const totalUsers = usersSnapshot.size;
             
-            try {
-                // Demo user data
-                const demoUsers = [
-                    { name: '张明', email: 'zhangming@example.com', school: 'fyhs', role: 'student' },
-                    { name: '李小红', email: 'lixiaohong@example.com', school: 'fyhs', role: 'student' },
-                    { name: '王同学', email: 'wang@example.com', school: 'kshs', role: 'student' },
-                    { name: '陈老师', email: 'chen@example.com', school: 'both', role: 'admin' },
-                    { name: '林同学', email: 'lin@example.com', school: 'kshs', role: 'student' }
-                ];
+            // Get users active today
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const activeUsersQuery = await db.collection('users')
+                .where('lastLogin', '>=', today)
+                .get();
+            
+            // Get total announcements count
+            const announcementsSnapshot = await db.collection('announcements').get();
+            
+            // Get total posts count
+            const postsSnapshot = await db.collection('wallPosts').get();
+            
+            // Get total events count
+            const eventsSnapshot = await db.collection('events').get();
+            
+            // Update admin statistics
+            document.getElementById('admin-total-users').textContent = totalUsers;
+            document.getElementById('admin-active-today').textContent = activeUsersQuery.size;
+            document.getElementById('admin-total-announcements').textContent = announcementsSnapshot.size;
+            document.getElementById('admin-total-posts').textContent = postsSnapshot.size;
+            document.getElementById('admin-total-events').textContent = eventsSnapshot.size;
+            
+        } catch (error) {
+            console.error('Error loading admin data:', error);
+            showAlert('加载管理员数据时出错', 'error');
+        }
+    }
+    
+    async function loadUserManagement() {
+        const userManagement = document.getElementById('user-management');
+        userManagement.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载用户数据...</p></div>';
+        
+        try {
+            const usersSnapshot = await db.collection('users').get();
+            
+            let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
+            html += `
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">姓名</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">邮箱</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">学校</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">角色</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            usersSnapshot.forEach(doc => {
+                const user = doc.data();
+                const userId = doc.id;
                 
-                let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
                 html += `
-                    <thead>
-                        <tr>
-                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">姓名</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">邮箱</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">学校</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">角色</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                `;
-                
-                demoUsers.forEach((user, index) => {
-                    html += `
-                        <tr>
-                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.name}</td>
-                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
-                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? '宽柔中学' : user.school === 'kshs' ? '高雄中学' : '两校'}</td>
-                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
-                                <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
-                            </td>
-                            <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
-                                <button class="btn btn-small btn-outline" onclick="changeUserRole('demo-${index}', '${user.role}')" style="margin-right: 5px;">
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.name}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? '宽柔中学' : user.school === 'kshs' ? '高雄中学' : user.school || '未设置'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                            <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                            ${userId !== currentUser?.uid ? `
+                                <button class="btn btn-small btn-outline" onclick="changeUserRole('${userId}', '${user.role}')" style="margin-right: 5px;">
                                     ${user.role === 'admin' ? '撤销管理员' : '设为管理员'}
                                 </button>
-                                <button class="btn btn-small btn-outline" onclick="deleteUser('demo-${index}')" style="color: var(--danger); border-color: var(--danger);">
+                                <button class="btn btn-small btn-outline" onclick="deleteUser('${userId}')" style="color: var(--danger); border-color: var(--danger);">
                                     删除
                                 </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table></div>';
-                userManagement.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading user management:', error);
-                userManagement.innerHTML = '<p>加载用户数据时出错</p>';
-            }
-        }
-        
-        async function loadAdminContent() {
-            // Load wall posts for management
-            const adminWallPosts = document.getElementById('admin-wall-posts');
-            adminWallPosts.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载贴文...</p></div>';
+                            ` : '<span>当前用户</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
             
-            try {
-                // Demo content
-                const demoPosts = [
-                    { title: '欢迎高雄中学的同学！', content: '我是宽柔中学的学生，很高兴能通过这个平台认识高雄中学的朋友们！', authorName: '张明', createdAt: new Date() },
-                    { title: '台湾美食分享', content: '高雄有哪些必吃的美食？想去台湾旅游时品尝！', authorName: '李小红', createdAt: new Date(Date.now() - 3600000) },
-                    { content: '大家好，我是高雄中学的王同学，希望和大家交流学习经验！', authorName: '王同学', createdAt: new Date(Date.now() - 7200000) }
-                ];
+            html += '</tbody></table></div>';
+            userManagement.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error loading user management:', error);
+            userManagement.innerHTML = '<p>加载用户数据时出错</p>';
+        }
+    }
+    
+    async function loadAdminContent() {
+        // Load wall posts for management
+        const adminWallPosts = document.getElementById('admin-wall-posts');
+        adminWallPosts.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载贴文...</p></div>';
+        
+        try {
+            const postsSnapshot = await db.collection('wallPosts')
+                .orderBy('createdAt', 'desc')
+                .limit(10)
+                .get();
+            
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            
+            postsSnapshot.forEach(doc => {
+                const post = doc.data();
+                const postId = doc.id;
                 
-                let html = '<div style="max-height: 300px; overflow-y: auto;">';
-                
-                demoPosts.forEach((post, index) => {
-                    html += `
-                        <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div style="flex: 1;">
-                                    <strong>${post.title || '无标题'}</strong>
-                                    <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
-                                    <div style="font-size: 0.85rem; color: #666;">
-                                        作者: ${post.authorName} | ${formatDate(post.createdAt)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="deleteWallPost('demo-post-${index}')">
-                                        删除
-                                    </button>
+                html += `
+                    <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <strong>${post.title || '无标题'}</strong>
+                                <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
+                                <div style="font-size: 0.85rem; color: #666;">
+                                    作者: ${post.authorName} | ${formatDate(post.createdAt?.toDate())}
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-                adminWallPosts.innerHTML = html;
-                
-                // Load events for management
-                const adminEvents = document.getElementById('admin-events');
-                adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载活动...</p></div>';
-                
-                const demoEvents = [
-                    { title: '线上辩论赛', description: '两校联合辩论赛初赛', date: new Date(Date.now() + 86400000 * 7) },
-                    { title: '文化分享会', description: '马来西亚传统节日介绍', date: new Date(Date.now() + 86400000 * 14) },
-                    { title: '语言交换活动', description: '中英文语言交流小组', date: new Date(Date.now() + 86400000 * 21) }
-                ];
-                
-                let eventsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
-                
-                demoEvents.forEach((event, index) => {
-                    eventsHtml += `
-                        <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div style="flex: 1;">
-                                    <strong>${event.title}</strong>
-                                    <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${event.description ? event.description.substring(0, 100) + (event.description.length > 100 ? '...' : '') : '无描述'}</div>
-                                    <div style="font-size: 0.85rem; color: #666;">
-                                        日期: ${formatDate(event.date)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('demo-event-${index}')">
-                                        删除
-                                    </button>
-                                </div>
+                            <div>
+                                <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="deleteWallPost('${postId}')">
+                                    删除
+                                </button>
                             </div>
-                        </div>
-                    `;
-                });
-                
-                eventsHtml += '</div>';
-                adminEvents.innerHTML = eventsHtml;
-                
-            } catch (error) {
-                console.error('Error loading admin content:', error);
-                adminWallPosts.innerHTML = '<p>加载贴文时出错</p>';
-                adminEvents.innerHTML = '<p>加载活动时出错</p>';
-            }
-        }
-        
-        // Form Handlers
-        async function handleAddNote(e) {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                showAlert('请先登录', 'error');
-                return;
-            }
-            
-            const title = document.getElementById('note-title').value;
-            const content = document.getElementById('note-content').value;
-            const color = document.getElementById('note-color-value').value;
-            
-            if (!content.trim()) {
-                showAlert('请填写贴文内容', 'error');
-                return;
-            }
-            
-            try {
-                // Create new note element
-                const noteId = 'note-' + Date.now();
-                const noteColorClass = `note-${color || 'yellow'}`;
-                
-                // Add to wall immediately for better UX
-                const wall = document.getElementById('padlet-wall');
-                const addNoteBtn = document.getElementById('wall-add-btn') || document.getElementById('empty-wall-add-btn');
-                
-                const noteHtml = `
-                    <div class="padlet-note ${noteColorClass} draggable" data-id="${noteId}" draggable="true">
-                        ${title ? `<div class="note-title">${title}</div>` : ''}
-                        <div class="note-content">${content}</div>
-                        <div class="note-meta">
-                            <span>作者: ${userName.textContent}</span>
-                            <span>刚刚</span>
-                        </div>
-                        <div class="note-actions">
-                            <button class="note-btn delete-note" title="删除">
-                                <i class="fas fa-trash"></i>
-                            </button>
                         </div>
                     </div>
                 `;
+            });
+            
+            html += '</div>';
+            adminWallPosts.innerHTML = html;
+            
+            // Load events for management
+            const adminEvents = document.getElementById('admin-events');
+            adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载活动...</p></div>';
+            
+            const eventsSnapshot = await db.collection('events')
+                .orderBy('date', 'desc')
+                .limit(10)
+                .get();
+            
+            let eventsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+            
+            eventsSnapshot.forEach(doc => {
+                const event = doc.data();
+                const eventId = doc.id;
                 
-                if (addNoteBtn && addNoteBtn.parentNode) {
-                    addNoteBtn.parentNode.insertBefore(createElementFromHTML(noteHtml), addNoteBtn);
-                } else if (wall) {
-                    wall.innerHTML = noteHtml + '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
-                    
-                    // Re-add event listeners
-                    document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                }
-                
-                // Add delete event listener
-                document.querySelector(`[data-id="${noteId}"] .delete-note`).addEventListener('click', function() {
-                    const noteId = this.closest('.padlet-note').getAttribute('data-id');
-                    if (confirm('确定要删除这个贴文吗？')) {
-                        deleteWallPost(noteId);
-                    }
-                });
-                
-                // Reinitialize drag and drop
-                initDragAndDrop();
-                
-                closeModal('add-note');
-                showAlert('贴文发布成功', 'success');
-                
-            } catch (error) {
-                console.error('Error adding note:', error);
-                showAlert(`发布贴文失败: ${error.message}`, 'error');
-            }
+                eventsHtml += `
+                    <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <strong>${event.title}</strong>
+                                <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${event.description ? event.description.substring(0, 100) + (event.description.length > 100 ? '...' : '') : '无描述'}</div>
+                                <div style="font-size: 0.85rem; color: #666;">
+                                    日期: ${formatDate(event.date?.toDate())}
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('${eventId}')">
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            eventsHtml += '</div>';
+            adminEvents.innerHTML = eventsHtml;
+            
+        } catch (error) {
+            console.error('Error loading admin content:', error);
+            adminWallPosts.innerHTML = '<p>加载贴文时出错</p>';
+            adminEvents.innerHTML = '<p>加载活动时出错</p>';
+        }
+    }
+    
+    // Form Handlers
+    async function handleAddNote(e) {
+        e.preventDefault();
+        
+        if (!currentUser) {
+            showAlert('请先登录', 'error');
+            return;
         }
         
-        function createElementFromHTML(htmlString) {
-            const div = document.createElement('div');
-            div.innerHTML = htmlString.trim();
-            return div.firstChild;
+        const title = document.getElementById('note-title').value;
+        const content = document.getElementById('note-content').value;
+        const color = document.getElementById('note-color-value').value;
+        const imageFile = document.getElementById('note-image').files[0];
+        
+        if (!content.trim()) {
+            showAlert('请填写贴文内容', 'error');
+            return;
         }
         
-        async function handleUpdateProfile(e) {
-            e.preventDefault();
+        try {
+            let imageUrl = '';
             
-            if (!currentUser) {
-                showAlert('请先登录', 'error');
-                return;
+            // Upload image if provided
+            if (imageFile) {
+                const storageRef = storage.ref();
+                const imageRef = storageRef.child(`wall-posts/${currentUser.uid}/${Date.now()}-${imageFile.name}`);
+                await imageRef.put(imageFile);
+                imageUrl = await imageRef.getDownloadURL();
             }
             
-            const name = document.getElementById('edit-name').value;
-            const school = document.getElementById('edit-school').value;
-            const grade = document.getElementById('edit-grade').value;
-            const interests = document.getElementById('edit-interests').value.split(',').map(i => i.trim()).filter(i => i);
-            const bio = document.getElementById('edit-bio').value;
-            const avatarFile = document.getElementById('edit-avatar').files[0];
+            // Create new post in Firestore
+            const postData = {
+                title: title || '',
+                content: content,
+                color: color,
+                imageUrl: imageUrl,
+                authorId: currentUser.uid,
+                authorName: userName.textContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
             
-            try {
-                // Update UI immediately
-                userName.textContent = name || userName.textContent;
-                userAvatar.textContent = name ? name.charAt(0).toUpperCase() : userAvatar.textContent;
-                document.getElementById('profile-avatar').textContent = name ? name.charAt(0).toUpperCase() : document.getElementById('profile-avatar').textContent;
-                
-                document.getElementById('profile-name').textContent = name;
-                document.getElementById('profile-school').textContent = `学校: ${school === 'fyhs' ? '马来西亚宽柔中学' : school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
-                document.getElementById('profile-grade').textContent = `年级: ${grade}`;
-                
-                // Update interests badges
-                const interestsContainer = document.getElementById('profile-interests');
-                interestsContainer.innerHTML = '';
-                interests.forEach(interest => {
-                    if (interest.trim()) {
-                        const badge = document.createElement('span');
-                        badge.className = 'badge badge-primary';
-                        badge.textContent = interest;
-                        interestsContainer.appendChild(badge);
-                    }
-                });
-                
-                // Update avatar preview if file was selected
-                if (avatarFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        // In a real app, you would upload this to storage
-                        // For demo, just update the preview
-                        document.getElementById('avatar-preview-img').src = event.target.result;
-                        document.getElementById('avatar-preview').style.display = 'block';
-                    };
-                    reader.readAsDataURL(avatarFile);
-                }
-                
-                showAlert('个人资料已更新 (演示模式)', 'success');
-                
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                showAlert(`更新个人资料失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function handleChangePassword(e) {
-            e.preventDefault();
+            const docRef = await db.collection('wallPosts').add(postData);
             
-            const currentPassword = document.getElementById('current-password').value;
-            const newPassword = document.getElementById('new-password').value;
-            const confirmNewPassword = document.getElementById('confirm-new-password').value;
+            // Add to wall immediately for better UX
+            const wall = document.getElementById('padlet-wall');
+            const addNoteBtn = document.getElementById('wall-add-btn') || document.getElementById('empty-wall-add-btn');
             
-            if (newPassword !== confirmNewPassword) {
-                showAlert('新密码与确认密码不一致', 'error');
-                return;
-            }
-            
-            if (!currentPassword) {
-                showAlert('请输入当前密码', 'error');
-                return;
-            }
-            
-            // Demo mode
-            if (typeof firebase === 'undefined') {
-                closeModal('changePassword');
-                showAlert('密码已成功更改 (演示模式)', 'success');
-                return;
-            }
-            
-            try {
-                // Reauthenticate user
-                const credential = firebase.auth.EmailAuthProvider.credential(
-                    currentUser.email, 
-                    currentPassword
-                );
-                
-                await currentUser.reauthenticateWithCredential(credential);
-                
-                // Update password
-                await currentUser.updatePassword(newPassword);
-                
-                closeModal('changePassword');
-                showAlert('密码已成功更改', 'success');
-            } catch (error) {
-                console.error('Error changing password:', error);
-                showAlert(`更改密码失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function handleAddEvent(e) {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                showAlert('请先登录', 'error');
-                return;
-            }
-            
-            const title = document.getElementById('event-title').value;
-            const description = document.getElementById('event-description').value;
-            const date = document.getElementById('event-date').value;
-            const time = document.getElementById('event-time').value;
-            const type = document.getElementById('event-type').value;
-            const school = document.getElementById('event-school').value;
-            
-            if (!title || !date) {
-                showAlert('请填写标题和日期', 'error');
-                return;
-            }
-            
-            try {
-                // Create event object
-                const eventData = {
-                    title: title,
-                    description: description,
-                    date: new Date(date),
-                    time: time,
-                    type: type,
-                    school: school,
-                    authorName: userName.textContent
-                };
-                
-                // Add to calendar
-                const dateString = date;
-                const eventContainer = document.getElementById(`events-${dateString}`);
-                
-                if (eventContainer) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'calendar-event';
-                    eventElement.textContent = title;
-                    eventElement.setAttribute('data-id', 'new-event-' + Date.now());
-                    eventElement.addEventListener('click', () => showEventDetail('new', eventData));
-                    
-                    eventContainer.appendChild(eventElement);
-                }
-                
-                eventForm.reset();
-                document.querySelector('[data-tab="view-calendar"]').click();
-                showAlert('活动已添加 (演示模式)', 'success');
-                
-            } catch (error) {
-                console.error('Error adding event:', error);
-                showAlert(`添加活动失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function handleAdminAddAnnouncement(e) {
-            e.preventDefault();
-            
-            if (!isAdmin) {
-                showAlert('您没有权限发布公告', 'error');
-                return;
-            }
-            
-            const title = document.getElementById('admin-announcement-title').value;
-            const content = document.getElementById('admin-announcement-content').value;
-            
-            if (!title || !content) {
-                showAlert('请填写标题和内容', 'error');
-                return;
-            }
-            
-            try {
-                // Add to demo announcements
-                if (window.demoAnnouncements) {
-                    window.demoAnnouncements.unshift({
-                        title: title,
-                        content: content,
-                        authorName: userName.textContent,
-                        createdAt: new Date()
-                    });
-                }
-                
-                adminAnnouncementForm.reset();
-                showAlert('公告发布成功 (演示模式)', 'success');
-                
-                // Reload announcements if on that page
-                if (currentPage === 'announcements') {
-                    loadAnnouncements();
-                }
-                
-                // Update dashboard
-                loadDashboardData();
-                loadAdminData();
-            } catch (error) {
-                console.error('Error adding announcement:', error);
-                showAlert(`发布公告失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function handleAdminAddEvent(e) {
-            e.preventDefault();
-            
-            if (!isAdmin) {
-                showAlert('您没有权限创建活动', 'error');
-                return;
-            }
-            
-            const title = document.getElementById('admin-event-title').value;
-            const date = document.getElementById('admin-event-date').value;
-            
-            if (!title || !date) {
-                showAlert('请填写标题和日期', 'error');
-                return;
-            }
-            
-            try {
-                // Add to calendar
-                const dateString = date;
-                const eventContainer = document.getElementById(`events-${dateString}`);
-                
-                if (eventContainer) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'calendar-event';
-                    eventElement.textContent = title;
-                    eventElement.setAttribute('data-id', 'admin-event-' + Date.now());
-                    
-                    const eventData = {
-                        title: title,
-                        date: new Date(date),
-                        authorName: userName.textContent
-                    };
-                    
-                    eventElement.addEventListener('click', () => showEventDetail('admin', eventData));
-                    
-                    eventContainer.appendChild(eventElement);
-                }
-                
-                adminEventForm.reset();
-                showAlert('活动已创建 (演示模式)', 'success');
-                
-                // Reload calendar
-                loadCalendarEvents();
-                loadAdminData();
-            } catch (error) {
-                console.error('Error adding admin event:', error);
-                showAlert(`创建活动失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function saveAdminSettings() {
-            if (!isAdmin) {
-                showAlert('您没有权限更改系统设置', 'error');
-                return;
-            }
-            
-            const platformName = document.getElementById('platform-name').value;
-            const welcomeMessage = document.getElementById('welcome-message').value;
-            const maintenanceMode = document.getElementById('maintenance-mode').checked;
-            
-            try {
-                // Update platform name in header
-                document.querySelector('.logo-text h1').textContent = platformName;
-                
-                // Update welcome message
-                const welcomeElement = document.getElementById('welcome-message');
-                if (welcomeElement) {
-                    welcomeElement.textContent = welcomeMessage;
-                }
-                
-                showAlert('系统设置已保存 (演示模式)', 'success');
-                
-            } catch (error) {
-                console.error('Error saving settings:', error);
-                showAlert(`保存设置失败: ${error.message}`, 'error');
-            }
-        }
-        
-        async function showEventDetail(eventId, eventData) {
-            document.getElementById('event-detail-title').textContent = eventData.title;
-            
-            let html = `
-                <p><strong>描述:</strong> ${eventData.description || '无描述'}</p>
-                <p><strong>日期:</strong> ${formatDate(eventData.date)}</p>
+            const noteColorClass = `note-${color || 'yellow'}`;
+            const noteHtml = `
+                <div class="padlet-note ${noteColorClass} draggable" data-id="${docRef.id}" draggable="true">
+                    ${title ? `<div class="note-title">${title}</div>` : ''}
+                    <div class="note-content">${content}</div>
+                    ${imageUrl ? `<img src="${imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                    <div class="note-meta">
+                        <span>作者: ${userName.textContent}</span>
+                        <span>刚刚</span>
+                    </div>
+                    <div class="note-actions">
+                        <button class="note-btn delete-note" title="删除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
             `;
             
-            if (eventData.time) {
-                html += `<p><strong>时间:</strong> ${eventData.time}</p>`;
+            // Create element from HTML string
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = noteHtml;
+            const newNote = tempDiv.firstChild;
+            
+            if (addNoteBtn && addNoteBtn.parentNode) {
+                addNoteBtn.parentNode.insertBefore(newNote, addNoteBtn);
+            } else if (wall) {
+                wall.innerHTML = noteHtml + '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                
+                // Re-add event listeners
+                document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
             }
             
-            if (eventData.type) {
-                const typeMap = {
-                    'academic': '学术研讨',
-                    'cultural': '文化交流',
-                    'competition': '联合竞赛',
-                    'language': '语言交换',
-                    'other': '其他'
-                };
-                html += `<p><strong>类型:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
-            }
-            
-            if (eventData.school) {
-                const schoolMap = {
-                    'both': '两校联合',
-                    'fyhs': '宽柔中学',
-                    'kshs': '高雄中学'
-                };
-                html += `<p><strong>主办:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
-            }
-            
-            html += `<p><strong>创建者:</strong> ${eventData.authorName}</p>`;
-            
-            document.getElementById('event-detail-content').innerHTML = html;
-            
-            // Set up action buttons
-            const actions = document.getElementById('event-detail-actions');
-            actions.innerHTML = '';
-            
-            if (isAdmin) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.type = 'button';
-                deleteBtn.className = 'btn btn-outline';
-                deleteBtn.style.color = 'var(--danger)';
-                deleteBtn.style.borderColor = 'var(--danger)';
-                deleteBtn.textContent = '删除活动';
-                deleteBtn.onclick = () => {
-                    if (confirm('确定要删除这个活动吗？')) {
-                        deleteEvent(eventId);
-                        closeModal('eventDetail');
-                    }
-                };
-                actions.appendChild(deleteBtn);
-            }
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.type = 'button';
-            closeBtn.className = 'btn btn-outline';
-            closeBtn.textContent = '关闭';
-            closeBtn.onclick = () => closeModal('eventDetail');
-            actions.appendChild(closeBtn);
-            
-            openModal('eventDetail');
-        }
-        
-        // Helper Functions
-        async function deleteWallPost(postId) {
-            try {
-                // Remove from DOM
-                const postElement = document.querySelector(`[data-id="${postId}"]`);
-                if (postElement) {
-                    postElement.remove();
+            // Add delete event listener
+            newNote.querySelector('.delete-note').addEventListener('click', function() {
+                const noteId = this.closest('.padlet-note').getAttribute('data-id');
+                if (confirm('确定要删除这个贴文吗？')) {
+                    deleteWallPost(noteId);
                 }
+            });
+            
+            // Reinitialize drag and drop
+            initDragAndDrop();
+            
+            closeModal('add-note');
+            showAlert('贴文发布成功', 'success');
+            
+            // Update statistics
+            loadDashboardData();
+            if (isAdmin) loadAdminData();
+            
+        } catch (error) {
+            console.error('Error adding note:', error);
+            showAlert(`发布贴文失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleUpdateProfile(e) {
+        e.preventDefault();
+        
+        if (!currentUser) {
+            showAlert('请先登录', 'error');
+            return;
+        }
+        
+        const name = document.getElementById('edit-name').value;
+        const school = document.getElementById('edit-school').value;
+        const grade = document.getElementById('edit-grade').value;
+        const interests = document.getElementById('edit-interests').value.split(',').map(i => i.trim()).filter(i => i);
+        const bio = document.getElementById('edit-bio').value;
+        const avatarFile = document.getElementById('edit-avatar').files[0];
+        
+        try {
+            let avatarUrl = '';
+            
+            // Upload avatar if provided
+            if (avatarFile) {
+                const storageRef = storage.ref();
+                const avatarRef = storageRef.child(`avatars/${currentUser.uid}/avatar-${Date.now()}`);
+                await avatarRef.put(avatarFile);
+                avatarUrl = await avatarRef.getDownloadURL();
+            }
+            
+            // Update user data in Firestore
+            const updateData = {
+                name: name,
+                school: school,
+                grade: grade,
+                interests: interests,
+                bio: bio,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (avatarUrl) {
+                updateData.avatarUrl = avatarUrl;
+            }
+            
+            await db.collection('users').doc(currentUser.uid).update(updateData);
+            
+            // Update UI immediately
+            const userData = await loadUserData(currentUser.uid);
+            
+            showAlert('个人资料已更新', 'success');
+            
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            showAlert(`更新个人资料失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleChangePassword(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmNewPassword = document.getElementById('confirm-new-password').value;
+        
+        if (newPassword !== confirmNewPassword) {
+            showAlert('新密码与确认密码不一致', 'error');
+            return;
+        }
+        
+        if (!currentPassword) {
+            showAlert('请输入当前密码', 'error');
+            return;
+        }
+        
+        try {
+            // Reauthenticate user
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                currentUser.email, 
+                currentPassword
+            );
+            
+            await currentUser.reauthenticateWithCredential(credential);
+            
+            // Update password
+            await currentUser.updatePassword(newPassword);
+            
+            closeModal('changePassword');
+            showAlert('密码已成功更改', 'success');
+        } catch (error) {
+            console.error('Error changing password:', error);
+            showAlert(`更改密码失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleAddEvent(e) {
+        e.preventDefault();
+        
+        if (!currentUser) {
+            showAlert('请先登录', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('event-title').value;
+        const description = document.getElementById('event-description').value;
+        const date = document.getElementById('event-date').value;
+        const time = document.getElementById('event-time').value;
+        const type = document.getElementById('event-type').value;
+        const school = document.getElementById('event-school').value;
+        
+        if (!title || !date) {
+            showAlert('请填写标题和日期', 'error');
+            return;
+        }
+        
+        try {
+            // Create event object
+            const eventDate = new Date(date);
+            if (time) {
+                const [hours, minutes] = time.split(':');
+                eventDate.setHours(hours, minutes);
+            }
+            
+            const eventData = {
+                title: title,
+                description: description,
+                date: eventDate,
+                time: time || '',
+                type: type,
+                school: school,
+                authorId: currentUser.uid,
+                authorName: userName.textContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            const docRef = await db.collection('events').add(eventData);
+            
+            // Add to calendar immediately
+            const dateString = date;
+            const eventContainer = document.getElementById(`events-${dateString}`);
+            
+            if (eventContainer) {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'calendar-event';
+                eventElement.textContent = title;
+                eventElement.setAttribute('data-id', docRef.id);
+                eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
                 
-                // Check if wall is now empty
-                const wall = document.getElementById('padlet-wall');
-                if (wall && wall.children.length === 0) {
-                    wall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
-                    document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                eventContainer.appendChild(eventElement);
+            }
+            
+            eventForm.reset();
+            document.querySelector('[data-tab="view-calendar"]').click();
+            showAlert('活动已添加', 'success');
+            
+            // Update statistics
+            loadDashboardData();
+            if (isAdmin) loadAdminData();
+            
+        } catch (error) {
+            console.error('Error adding event:', error);
+            showAlert(`添加活动失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleAdminAddAnnouncement(e) {
+        e.preventDefault();
+        
+        if (!isAdmin) {
+            showAlert('您没有权限发布公告', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('admin-announcement-title').value;
+        const content = document.getElementById('admin-announcement-content').value;
+        
+        if (!title || !content) {
+            showAlert('请填写标题和内容', 'error');
+            return;
+        }
+        
+        try {
+            // Create announcement in Firestore
+            const announcementData = {
+                title: title,
+                content: content,
+                authorId: currentUser.uid,
+                authorName: userName.textContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await db.collection('announcements').add(announcementData);
+            
+            adminAnnouncementForm.reset();
+            showAlert('公告发布成功', 'success');
+            
+            // Reload announcements if on that page
+            if (currentPage === 'announcements') {
+                loadAnnouncements();
+            }
+            
+            // Update dashboard and admin data
+            loadDashboardData();
+            loadAdminData();
+        } catch (error) {
+            console.error('Error adding announcement:', error);
+            showAlert(`发布公告失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleAdminAddEvent(e) {
+        e.preventDefault();
+        
+        if (!isAdmin) {
+            showAlert('您没有权限创建活动', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('admin-event-title').value;
+        const date = document.getElementById('admin-event-date').value;
+        
+        if (!title || !date) {
+            showAlert('请填写标题和日期', 'error');
+            return;
+        }
+        
+        try {
+            // Create event object
+            const eventDate = new Date(date);
+            const eventData = {
+                title: title,
+                date: eventDate,
+                authorId: currentUser.uid,
+                authorName: userName.textContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            const docRef = await db.collection('events').add(eventData);
+            
+            // Add to calendar
+            const dateString = date;
+            const eventContainer = document.getElementById(`events-${dateString}`);
+            
+            if (eventContainer) {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'calendar-event';
+                eventElement.textContent = title;
+                eventElement.setAttribute('data-id', docRef.id);
+                eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
+                
+                eventContainer.appendChild(eventElement);
+            }
+            
+            adminEventForm.reset();
+            showAlert('活动已创建', 'success');
+            
+            // Reload calendar and update data
+            loadCalendarEvents();
+            loadDashboardData();
+            loadAdminData();
+        } catch (error) {
+            console.error('Error adding admin event:', error);
+            showAlert(`创建活动失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function saveAdminSettings() {
+        if (!isAdmin) {
+            showAlert('您没有权限更改系统设置', 'error');
+            return;
+        }
+        
+        const platformName = document.getElementById('platform-name').value;
+        const welcomeMessage = document.getElementById('welcome-message').value;
+        const maintenanceMode = document.getElementById('maintenance-mode').checked;
+        
+        try {
+            // Save settings to Firestore
+            await db.collection('settings').doc('platform').set({
+                platformName: platformName,
+                welcomeMessage: welcomeMessage,
+                maintenanceMode: maintenanceMode,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: currentUser.uid
+            }, { merge: true });
+            
+            // Update platform name in header
+            document.querySelector('.logo-text h1').textContent = platformName;
+            
+            // Update welcome message
+            const welcomeElement = document.getElementById('welcome-message');
+            if (welcomeElement) {
+                welcomeElement.textContent = welcomeMessage;
+            }
+            
+            showAlert('系统设置已保存', 'success');
+            
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            showAlert(`保存设置失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function showEventDetail(eventId, eventData) {
+        document.getElementById('event-detail-title').textContent = eventData.title;
+        
+        let html = `
+            <p><strong>描述:</strong> ${eventData.description || '无描述'}</p>
+            <p><strong>日期:</strong> ${formatDate(eventData.date?.toDate())}</p>
+        `;
+        
+        if (eventData.time) {
+            html += `<p><strong>时间:</strong> ${eventData.time}</p>`;
+        }
+        
+        if (eventData.type) {
+            const typeMap = {
+                'academic': '学术研讨',
+                'cultural': '文化交流',
+                'competition': '联合竞赛',
+                'language': '语言交换',
+                'other': '其他'
+            };
+            html += `<p><strong>类型:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
+        }
+        
+        if (eventData.school) {
+            const schoolMap = {
+                'both': '两校联合',
+                'fyhs': '宽柔中学',
+                'kshs': '高雄中学'
+            };
+            html += `<p><strong>主办:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
+        }
+        
+        html += `<p><strong>创建者:</strong> ${eventData.authorName}</p>`;
+        
+        document.getElementById('event-detail-content').innerHTML = html;
+        
+        // Set up action buttons
+        const actions = document.getElementById('event-detail-actions');
+        actions.innerHTML = '';
+        
+        if (isAdmin || currentUser?.uid === eventData.authorId) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-outline';
+            deleteBtn.style.color = 'var(--danger)';
+            deleteBtn.style.borderColor = 'var(--danger)';
+            deleteBtn.textContent = '删除活动';
+            deleteBtn.onclick = () => {
+                if (confirm('确定要删除这个活动吗？')) {
+                    deleteEvent(eventId);
+                    closeModal('eventDetail');
                 }
-                
-                showAlert('贴文已删除 (演示模式)', 'success');
-                
-            } catch (error) {
-                console.error('Error deleting post:', error);
-                showAlert(`删除贴文失败: ${error.message}`, 'error');
-            }
+            };
+            actions.appendChild(deleteBtn);
         }
         
-        async function deleteEvent(eventId) {
-            try {
-                // In demo mode, just show success
-                showAlert('活动已删除 (演示模式)', 'success');
-                
-                // Close modal if open
-                closeModal('eventDetail');
-                
-            } catch (error) {
-                console.error('Error deleting event:', error);
-                showAlert(`删除活动失败: ${error.message}`, 'error');
-            }
-        }
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn btn-outline';
+        closeBtn.textContent = '关闭';
+        closeBtn.onclick = () => closeModal('eventDetail');
+        actions.appendChild(closeBtn);
         
-        async function deleteUser(userId) {
-            if (userId.includes('demo') && userId.includes(currentUser?.uid)) {
-                showAlert('不能删除自己的账户', 'error');
+        openModal('eventDetail');
+    }
+    
+    // Helper Functions
+    async function deleteWallPost(postId) {
+        try {
+            // Get post data first to check permissions
+            const postDoc = await db.collection('wallPosts').doc(postId).get();
+            const postData = postDoc.data();
+            
+            if (!isAdmin && postData.authorId !== currentUser?.uid) {
+                showAlert('您没有权限删除此贴文', 'error');
                 return;
             }
             
-            if (confirm('确定要删除这个用户吗？此操作无法撤销！')) {
+            // Delete image from storage if exists
+            if (postData.imageUrl) {
                 try {
-                    // In demo mode, just show success
-                    showAlert('用户已删除 (演示模式)', 'success');
-                    
-                    // Reload user management if on that page
-                    if (currentPage === 'admin') {
-                        loadUserManagement();
-                        loadAdminData();
-                    }
-                } catch (error) {
-                    console.error('Error deleting user:', error);
-                    showAlert(`删除用户失败: ${error.message}`, 'error');
+                    const imageRef = storage.refFromURL(postData.imageUrl);
+                    await imageRef.delete();
+                } catch (storageError) {
+                    console.error('Error deleting image:', storageError);
                 }
             }
-        }
-        
-        async function deleteAccount() {
-            if (confirm('确定要永久删除您的账户吗？此操作无法撤销！')) {
-                try {
-                    // Demo mode - simulate account deletion
-                    if (typeof firebase === 'undefined') {
-                        currentUser = null;
-                        updateUIForGuest();
-                        showAlert('账户已成功删除 (演示模式)', 'success');
-                        return;
-                    }
-                    
-                    // Delete user data from Firestore
-                    await db.collection('users').doc(currentUser.uid).delete();
-                    
-                    // Delete user from Firebase Auth
-                    await currentUser.delete();
-                    
-                    showAlert('账户已成功删除', 'success');
-                } catch (error) {
-                    console.error('Error deleting account:', error);
-                    showAlert(`删除账户失败: ${error.message}`, 'error');
-                }
+            
+            // Delete from Firestore
+            await db.collection('wallPosts').doc(postId).delete();
+            
+            // Remove from DOM
+            const postElement = document.querySelector(`[data-id="${postId}"]`);
+            if (postElement) {
+                postElement.remove();
             }
+            
+            // Check if wall is now empty
+            const wall = document.getElementById('padlet-wall');
+            const remainingPosts = wall.querySelectorAll('.padlet-note').length;
+            
+            if (remainingPosts === 0) {
+                wall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
+            }
+            
+            showAlert('贴文已删除', 'success');
+            
+            // Update statistics
+            loadDashboardData();
+            if (isAdmin) loadAdminData();
+            
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            showAlert(`删除贴文失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function deleteEvent(eventId) {
+        try {
+            // Get event data first to check permissions
+            const eventDoc = await db.collection('events').doc(eventId).get();
+            const eventData = eventDoc.data();
+            
+            if (!isAdmin && eventData.authorId !== currentUser?.uid) {
+                showAlert('您没有权限删除此活动', 'error');
+                return;
+            }
+            
+            // Delete from Firestore
+            await db.collection('events').doc(eventId).delete();
+            
+            // Remove from calendar
+            const eventElement = document.querySelector(`[data-id="${eventId}"]`);
+            if (eventElement) {
+                eventElement.remove();
+            }
+            
+            showAlert('活动已删除', 'success');
+            
+            // Close modal if open
+            closeModal('eventDetail');
+            
+            // Update statistics
+            loadDashboardData();
+            if (isAdmin) loadAdminData();
+            
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            showAlert(`删除活动失败: ${error.message}`, 'error');
+        }
+    }
+    
+    async function deleteUser(userId) {
+        if (userId === currentUser?.uid) {
+            showAlert('不能删除自己的账户', 'error');
+            return;
         }
         
-        async function changeUserRole(userId, currentRole) {
+        if (confirm('确定要删除这个用户吗？此操作无法撤销！')) {
             try {
-                const newRole = currentRole === 'admin' ? 'student' : 'admin';
+                // Delete user from Firestore
+                await db.collection('users').doc(userId).delete();
                 
-                // In demo mode, just show success
-                showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'} (演示模式)`, 'success');
+                // In a production app, you would also:
+                // 1. Delete user's posts
+                // 2. Delete user's events
+                // 3. Delete user from Firebase Auth
+                // (This requires Cloud Functions for security)
                 
-                // Reload user management
+                showAlert('用户已删除', 'success');
+                
+                // Reload user management if on that page
                 if (currentPage === 'admin') {
                     loadUserManagement();
-                }
-                
-                // If current user changed their own role, update UI
-                if (userId.includes(currentUser?.uid)) {
-                    isAdmin = newRole === 'admin';
-                    userRole.textContent = isAdmin ? '管理员' : '学生';
-                    
-                    if (!isAdmin && currentPage === 'admin') {
-                        navigateTo('dashboard');
-                    }
+                    loadAdminData();
                 }
             } catch (error) {
-                console.error('Error changing user role:', error);
-                showAlert(`更改用户权限失败: ${error.message}`, 'error');
+                console.error('Error deleting user:', error);
+                showAlert(`删除用户失败: ${error.message}`, 'error');
             }
         }
-        
-        function formatDate(date) {
-            if (!date) return '未知日期';
+    }
+    
+    async function deleteAccount() {
+        if (confirm('确定要永久删除您的账户吗？此操作无法撤销！')) {
+            try {
+                // Delete user data from Firestore
+                await db.collection('users').doc(currentUser.uid).delete();
+                
+                // Delete user's posts
+                const userPosts = await db.collection('wallPosts')
+                    .where('authorId', '==', currentUser.uid)
+                    .get();
+                
+                const deletePromises = [];
+                userPosts.forEach(doc => {
+                    deletePromises.push(doc.ref.delete());
+                });
+                
+                // Delete user's events
+                const userEvents = await db.collection('events')
+                    .where('authorId', '==', currentUser.uid)
+                    .get();
+                
+                userEvents.forEach(doc => {
+                    deletePromises.push(doc.ref.delete());
+                });
+                
+                await Promise.all(deletePromises);
+                
+                // Delete user from Firebase Auth
+                await currentUser.delete();
+                
+                showAlert('账户已成功删除', 'success');
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                showAlert(`删除账户失败: ${error.message}`, 'error');
+            }
+        }
+    }
+    
+    async function changeUserRole(userId, currentRole) {
+        try {
+            const newRole = currentRole === 'admin' ? 'student' : 'admin';
             
-            if (typeof date === 'string') {
-                date = new Date(date);
+            await db.collection('users').doc(userId).update({
+                role: newRole,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'}`, 'success');
+            
+            // Reload user management
+            if (currentPage === 'admin') {
+                loadUserManagement();
             }
             
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('zh-CN', options);
-        }
-        
-        function isSameDay(date1, date2) {
-            return date1.getFullYear() === date2.getFullYear() &&
-                   date1.getMonth() === date2.getMonth() &&
-                   date1.getDate() === date2.getDate();
-        }
-        
-        function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alert-container');
-            const alertId = 'alert-' + Date.now();
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.id = alertId;
-            alertDiv.innerHTML = `
-                <span>${message}</span>
-                <button class="close-alert" onclick="document.getElementById('${alertId}').remove()">&times;</button>
-            `;
-            
-            alertContainer.appendChild(alertDiv);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (document.getElementById(alertId)) {
-                    document.getElementById(alertId).remove();
+            // If current user changed their own role, update UI
+            if (userId === currentUser?.uid) {
+                isAdmin = newRole === 'admin';
+                userRole.textContent = isAdmin ? '管理员' : '学生';
+                
+                if (!isAdmin && currentPage === 'admin') {
+                    navigateTo('dashboard');
                 }
-            }, 5000);
+            }
+        } catch (error) {
+            console.error('Error changing user role:', error);
+            showAlert(`更改用户权限失败: ${error.message}`, 'error');
+        }
+    }
+    
+    function formatDate(date) {
+        if (!date) return '未知日期';
+        
+        if (typeof date === 'string') {
+            date = new Date(date);
         }
         
-        // Make functions available globally for inline event handlers
-        window.changeUserRole = changeUserRole;
-        window.deleteWallPost = deleteWallPost;
-        window.deleteEvent = deleteEvent;
-        window.deleteUser = deleteUser;
-        window.showEventDetail = showEventDetail;
-    </script>
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('zh-CN', options);
+    }
+    
+    function isSameDay(date1, date2) {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+    }
+    
+    function showAlert(message, type = 'info') {
+        const alertContainer = document.getElementById('alert-container');
+        const alertId = 'alert-' + Date.now();
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.id = alertId;
+        alertDiv.innerHTML = `
+            <span>${message}</span>
+            <button class="close-alert" onclick="document.getElementById('${alertId}').remove()">&times;</button>
+        `;
+        
+        alertContainer.appendChild(alertDiv);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (document.getElementById(alertId)) {
+                document.getElementById(alertId).remove();
+            }
+        }, 5000);
+    }
+    
+    // Make functions available globally for inline event handlers
+    window.changeUserRole = changeUserRole;
+    window.deleteWallPost = deleteWallPost;
+    window.deleteEvent = deleteEvent;
+    window.deleteUser = deleteUser;
+    window.showEventDetail = showEventDetail;
+</script>
 </body>
 </html>
