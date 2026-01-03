@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宽柔中学-高雄中学线上交流平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #2c5aa0;
+            --primary-light: #4a7bc7;
+            --secondary: #d32f2f;
+            --secondary-light: #ff6659;
+            --accent: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            position: relative;
+        }
+        
+        .nav-links a {
+            display: block;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+            background-color: rgba(44, 90, 160, 0.05);
+        }
+        
+        .nav-links a.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-light);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(44, 90, 160, 0.1);
+        }
+        
+        .btn-small {
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 180px);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+        }
+        
+        /* Dashboard */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 1.2rem;
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .card-header h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .card-body {
+            padding: 1.2rem;
+        }
+        
+        /* Announcements */
+        .announcement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .announcement-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.2rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .announcement-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .announcement-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Padlet-like Wall */
+        .padlet-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            min-height: 500px;
+        }
+        
+        .padlet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .padlet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .padlet-note {
+            background-color: #fffacd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 150px;
+            word-break: break-word;
+        }
+        
+        .note-yellow { background-color: #fffacd; }
+        .note-blue { background-color: #d0e7ff; }
+        .note-green { background-color: #d4edda; }
+        .note-pink { background-color: #f8d7da; }
+        
+        .padlet-note textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+        }
+        
+        .note-actions {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .padlet-note:hover .note-actions {
+            opacity: 1;
+        }
+        
+        .note-btn {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--dark);
+        }
+        
+        .note-btn:hover {
+            background-color: white;
+        }
+        
+        .add-note-btn {
+            background-color: var(--light-gray);
+            border: 2px dashed var(--gray);
+            border-radius: var(--border-radius);
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-note-btn:hover {
+            background-color: rgba(44, 90, 160, 0.05);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Forms */
+        .form-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+        
+        .auth-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .auth-divider:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--light-gray);
+        }
+        
+        .auth-divider span {
+            background-color: white;
+            padding: 0 1rem;
+            color: var(--gray);
+        }
+        
+        .google-btn {
+            width: 100%;
+            background-color: white;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .google-btn:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .google-btn i {
+            color: #db4437;
+            font-size: 1.2rem;
+        }
+        
+        /* Activity Calendar */
+        .calendar-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: var(--light-gray);
+            border: 1px solid var(--light-gray);
+        }
+        
+        .calendar-day {
+            background-color: white;
+            padding: 0.8rem;
+            min-height: 100px;
+        }
+        
+        .calendar-day.header {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+            text-align: center;
+            padding: 0.5rem;
+            min-height: auto;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calendar-event {
+            background-color: rgba(44, 90, 160, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 0.3rem 0.5rem;
+            margin-bottom: 0.3rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+        
+        /* Profile */
+        .profile-header {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .profile-info h2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-info p {
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background-color: var(--light-gray);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-primary {
+            background-color: rgba(44, 90, 160, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: var(--primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .school-logos {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .school-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .school-logo i {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container, .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .nav-links a {
+                padding: 0.8rem 1rem;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .padlet-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .school-logos {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .close-alert {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>宽柔中学-高雄中学线上交流平台</h1>
+                    <p>Foon Yew High School - Kaohsiung Senior High School Online Exchange</p>
+                </div>
+            </div>
+            <div class="user-menu">
+                <div id="auth-buttons">
+                    <button id="login-btn" class="btn btn-outline">登录</button>
+                    <button id="register-btn" class="btn btn-primary">注册</button>
+                </div>
+                <div id="user-profile" style="display: none;">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">U</div>
+                        <div>
+                            <div id="user-name">用户</div>
+                            <div id="user-role" style="font-size: 0.8rem; opacity: 0.8;">学生</div>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="btn btn-small btn-outline">退出</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="nav-link active">首页</a></li>
+                <li><a href="#announcements" class="nav-link">公告</a></li>
+                <li><a href="#wall" class="nav-link">交流墙</a></li>
+                <li><a href="#calendar" class="nav-link">活动日历</a></li>
+                <li><a href="#profile" class="nav-link">个人中心</a></li>
+            </ul>
+            <div class="nav-right">
+                <div id="admin-menu" style="display: none;">
+                    <button id="admin-btn" class="btn btn-secondary btn-small">
+                        <i class="fas fa-cog"></i> 管理员
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Dashboard Page -->
+        <section id="dashboard-page" class="page active">
+            <div class="page-header">
+                <h2>欢迎来到线上交流平台</h2>
+                <p>促进宽柔中学与高雄中学的学术文化交流与合作</p>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bullhorn"></i> 最新公告</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="recent-announcements">
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> 近期活动</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="upcoming-events">
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> 交流统计</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="exchange-stats">
+                            <p>总参与人数: <strong id="total-participants">0</strong></p>
+                            <p>在线人数: <strong id="online-users">0</strong></p>
+                            <p>交流贴文: <strong id="total-posts">0</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <h2>特色交流项目</h2>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-graduation-cap"></i> 学术研讨</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>两校学生共同参与的线上学术研讨小组，涵盖科学、人文、艺术等领域。</p>
+                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">了解更多</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> 联合竞赛</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>定期举办的线上知识竞赛、辩论赛和创意比赛，展示学生才华。</p>
+                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">查看比赛</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-language"></i> 语言交换</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>华语、英语、马来语等多语言学习伙伴匹配系统，提升语言能力。</p>
+                        <button class="btn btn-primary btn-small" style="margin-top: 10px;">寻找语伴</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Announcements Page -->
+        <section id="announcements-page" class="page">
+            <div class="page-header">
+                <h2>公告栏</h2>
+                <p>查看两校交流活动的最新通知和重要信息</p>
+            </div>
+            
+            <div id="announcements-list" class="announcement-list">
+                <!-- Announcements will be loaded here -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>正在加载公告...</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Wall Page -->
+        <section id="wall-page" class="page">
+            <div class="page-header">
+                <h2>交流墙</h2>
+                <p>分享您的想法、作品或与交流伙伴互动</p>
+            </div>
+            
+            <div class="padlet-container">
+                <div class="padlet-header">
+                    <h3>两校交流互动墙</h3>
+                    <button id="add-note-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-plus"></i> 添加贴文
+                    </button>
+                </div>
+                <div id="padlet-wall" class="padlet-grid">
+                    <!-- Padlet notes will be loaded here -->
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>正在加载交流墙...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Calendar Page -->
+        <section id="calendar-page" class="page">
+            <div class="page-header">
+                <h2>活动日历</h2>
+                <p>查看所有线上交流活动和重要日期</p>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h3 id="current-month">2024年1月</h3>
+                    <div>
+                        <button id="prev-month" class="btn btn-outline btn-small"><i class="fas fa-chevron-left"></i></button>
+                        <button id="next-month" class="btn btn-outline btn-small"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div id="calendar" class="calendar-grid">
+                    <!-- Calendar will be generated by JavaScript -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Profile Page -->
+        <section id="profile-page" class="page">
+            <div class="page-header">
+                <h2>个人中心</h2>
+                <p>管理您的个人资料和交流活动记录</p>
+            </div>
+            
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">U</div>
+                <div class="profile-info">
+                    <h2 id="profile-name">用户名称</h2>
+                    <p id="profile-school">学校: 未设置</p>
+                    <p id="profile-grade">年级: 未设置</p>
+                    <div id="profile-interests">
+                        <span class="badge badge-primary">交流活动</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> 活动记录</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="activity-history">
+                            <p>暂无活动记录</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-certificate"></i> 成就徽章</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="achievement-badges">
+                            <p>暂无成就徽章</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cogs"></i> 账户设置</h3>
+                    </div>
+                    <div class="card-body">
+                        <button id="edit-profile-btn" class="btn btn-outline" style="margin-bottom: 10px;">编辑个人资料</button>
+                        <button id="change-password-btn" class="btn btn-outline" style="margin-bottom: 10px;">更改密码</button>
+                        <button id="notification-settings-btn" class="btn btn-outline">通知设置</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Admin Page -->
+        <section id="admin-page" class="page">
+            <div class="page-header">
+                <h2>管理员面板</h2>
+                <p>管理平台内容、用户和交流活动</p>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bullhorn"></i> 发布公告</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="announcement-form">
+                            <div class="form-group">
+                                <label for="announcement-title">公告标题</label>
+                                <input type="text" id="announcement-title" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="announcement-content">公告内容</label>
+                                <textarea id="announcement-content" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">发布公告</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users-cog"></i> 用户管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="user-management">
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> 数据分析</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="admin-stats">
+                            <p>平台统计:</p>
+                            <ul>
+                                <li>注册用户: <span id="admin-total-users">0</span></li>
+                                <li>今日活跃: <span id="admin-active-today">0</span></li>
+                                <li>总公告数: <span id="admin-total-announcements">0</span></li>
+                                <li>总贴文数: <span id="admin-total-posts">0</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <h3>内容管理</h3>
+            </div>
+            
+            <div class="padlet-container">
+                <div class="padlet-header">
+                    <h4>管理交流墙贴文</h4>
+                </div>
+                <div id="admin-wall-posts">
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="school-logos">
+                    <div class="school-logo">
+                        <i class="fas fa-school"></i>
+                        <div>马来西亚宽柔中学</div>
+                        <div>Foon Yew High School</div>
+                    </div>
+                    <div class="school-logo">
+                        <i class="fas fa-handshake"></i>
+                        <div>线上交流平台</div>
+                        <div>Online Exchange Platform</div>
+                    </div>
+                    <div class="school-logo">
+                        <i class="fas fa-school"></i>
+                        <div>台湾高雄高级中学</div>
+                        <div>Kaohsiung Senior High School</div>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#">关于我们</a>
+                    <a href="#">隐私政策</a>
+                    <a href="#">使用条款</a>
+                    <a href="#">联系我们</a>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2024 宽柔中学-高雄中学线上交流平台. 保留所有权利.
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modals -->
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>用户登录</h3>
+                <button class="modal-close" data-modal="login-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">电子邮箱</label>
+                        <input type="email" id="login-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">登录</button>
+                        <button type="button" class="btn btn-outline" data-modal="login-modal">取消</button>
+                    </div>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>或使用</span>
+                </div>
+                
+                <button id="google-login-btn" class="google-btn">
+                    <i class="fab fa-google"></i> Google账号登录
+                </button>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p>还没有账户？ <a href="#" id="switch-to-register">立即注册</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>用户注册</h3>
+                <button class="modal-close" data-modal="register-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">姓名</label>
+                        <input type="text" id="register-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">电子邮箱</label>
+                        <input type="email" id="register-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <input type="password" id="register-confirm-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-school">所属学校</label>
+                        <select id="register-school" class="form-control" required>
+                            <option value="">请选择学校</option>
+                            <option value="fyhs">马来西亚宽柔中学</option>
+                            <option value="kshs">台湾高雄高级中学</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-grade">年级</label>
+                        <input type="text" id="register-grade" class="form-control" placeholder="例如：高一、高二" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">注册</button>
+                        <button type="button" class="btn btn-outline" data-modal="register-modal">取消</button>
+                    </div>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>或使用</span>
+                </div>
+                
+                <button id="google-register-btn" class="google-btn">
+                    <i class="fab fa-google"></i> Google账号注册
+                </button>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p>已有账户？ <a href="#" id="switch-to-login">立即登录</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Note Modal -->
+    <div id="add-note-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加交流贴文</h3>
+                <button class="modal-close" data-modal="add-note-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="note-form">
+                    <div class="form-group">
+                        <label for="note-title">标题 (可选)</label>
+                        <input type="text" id="note-title" class="form-control" placeholder="为您的贴文添加一个标题">
+                    </div>
+                    <div class="form-group">
+                        <label for="note-content">内容</label>
+                        <textarea id="note-content" class="form-control" rows="5" placeholder="分享您的想法、作品或与交流伙伴互动..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="note-color">贴文颜色</label>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="note-color-option" data-color="yellow" style="background-color: #fffacd; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                            <div class="note-color-option" data-color="blue" style="background-color: #d0e7ff; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                            <div class="note-color-option" data-color="green" style="background-color: #d4edda; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                            <div class="note-color-option" data-color="pink" style="background-color: #f8d7da; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #ccc;"></div>
+                        </div>
+                        <input type="hidden" id="note-color-value" value="yellow">
+                    </div>
+                    <div class="form-group">
+                        <label for="note-image">上传图片 (可选)</label>
+                        <input type="file" id="note-image" class="form-control" accept="image/*">
+                        <small>支持JPG、PNG格式，最大5MB</small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">发布贴文</button>
+                        <button type="button" class="btn btn-outline" data-modal="add-note-modal">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Container -->
+    <div id="alert-container" style="position: fixed; top: 100px; right: 20px; z-index: 10000; max-width: 350px;"></div>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1FOM9GSgVTLd4p0JJEbFtrwHQlF751nM",
+            authDomain: "fyhs-kshs-online-exchange.firebaseapp.com",
+            projectId: "fyhs-kshs-online-exchange",
+            storageBucket: "fyhs-kshs-online-exchange.firebasestorage.app",
+            messagingSenderId: "67080755408",
+            appId: "1:67080755408:web:7e02b55ff12162f456a6d5",
+            measurementId: "G-BX3JHH3CDZ"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // DOM Elements
+        const pages = {
+            dashboard: document.getElementById('dashboard-page'),
+            announcements: document.getElementById('announcements-page'),
+            wall: document.getElementById('wall-page'),
+            calendar: document.getElementById('calendar-page'),
+            profile: document.getElementById('profile-page'),
+            admin: document.getElementById('admin-page')
+        };
+        
+        const navLinks = document.querySelectorAll('.nav-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userProfile = document.getElementById('user-profile');
+        const userName = document.getElementById('user-name');
+        const userRole = document.getElementById('user-role');
+        const userAvatar = document.getElementById('user-avatar');
+        const adminMenu = document.getElementById('admin-menu');
+        const adminBtn = document.getElementById('admin-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        
+        // Modals
+        const modals = {
+            login: document.getElementById('login-modal'),
+            register: document.getElementById('register-modal'),
+            addNote: document.getElementById('add-note-modal')
+        };
+        
+        // Forms
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const noteForm = document.getElementById('note-form');
+        const announcementForm = document.getElementById('announcement-form');
+        
+        // Current user state
+        let currentUser = null;
+        let isAdmin = false;
+        let currentPage = 'dashboard';
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initEventListeners();
+            initAuthStateListener();
+            generateCalendar();
+            loadDashboardData();
+        });
+        
+        // Event Listeners
+        function initEventListeners() {
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('href').substring(1);
+                    navigateTo(pageId);
+                });
+            });
+            
+            // Auth buttons
+            loginBtn.addEventListener('click', () => openModal('login'));
+            registerBtn.addEventListener('click', () => openModal('register'));
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Admin button
+            adminBtn.addEventListener('click', () => navigateTo('admin'));
+            
+            // Modal close buttons
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal');
+                    closeModal(modalId);
+                });
+            });
+            
+            // Switch between login and register modals
+            document.getElementById('switch-to-register').addEventListener('click', function(e) {
+                e.preventDefault();
+                closeModal('login');
+                openModal('register');
+            });
+            
+            document.getElementById('switch-to-login').addEventListener('click', function(e) {
+                e.preventDefault();
+                closeModal('register');
+                openModal('login');
+            });
+            
+            // Close modals when clicking outside
+            Object.values(modals).forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+            
+            // Form submissions
+            loginForm.addEventListener('submit', handleLogin);
+            registerForm.addEventListener('submit', handleRegister);
+            noteForm.addEventListener('submit', handleAddNote);
+            announcementForm.addEventListener('submit', handleAddAnnouncement);
+            
+            // Google login buttons
+            document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
+            document.getElementById('google-register-btn').addEventListener('click', handleGoogleLogin);
+            
+            // Add note button
+            addNoteBtn.addEventListener('click', () => openModal('add-note'));
+            
+            // Note color selection
+            document.querySelectorAll('.note-color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.note-color-option').forEach(opt => {
+                        opt.style.borderColor = '#ccc';
+                    });
+                    this.style.borderColor = '#2c5aa0';
+                    document.getElementById('note-color-value').value = this.getAttribute('data-color');
+                });
+            });
+            
+            // Calendar navigation
+            document.getElementById('prev-month').addEventListener('click', function() {
+                // Implement calendar navigation
+                showAlert('功能开发中', 'warning');
+            });
+            
+            document.getElementById('next-month').addEventListener('click', function() {
+                // Implement calendar navigation
+                showAlert('功能开发中', 'warning');
+            });
+            
+            // Profile buttons
+            document.getElementById('edit-profile-btn').addEventListener('click', function() {
+                showAlert('功能开发中', 'warning');
+            });
+        }
+        
+        // Navigation
+        function navigateTo(pageId) {
+            // Update active nav link
+            navLinks.forEach(link => {
+                if (link.getAttribute('href').substring(1) === pageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            
+            // Hide all pages
+            Object.values(pages).forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show target page
+            if (pages[pageId]) {
+                pages[pageId].classList.add('active');
+                currentPage = pageId;
+                
+                // Load page-specific data
+                switch(pageId) {
+                    case 'dashboard':
+                        loadDashboardData();
+                        break;
+                    case 'announcements':
+                        loadAnnouncements();
+                        break;
+                    case 'wall':
+                        loadWallPosts();
+                        break;
+                    case 'calendar':
+                        // Calendar already generated
+                        break;
+                    case 'admin':
+                        if (isAdmin) {
+                            loadAdminData();
+                        } else {
+                            navigateTo('dashboard');
+                            showAlert('您没有管理员权限', 'error');
+                        }
+                        break;
+                }
+            }
+        }
+        
+        // Modal controls
+        function openModal(modalId) {
+            if (modals[modalId]) {
+                modals[modalId].classList.add('active');
+            }
+        }
+        
+        function closeModal(modalId) {
+            if (modals[modalId]) {
+                modals[modalId].classList.remove('active');
+                
+                // Reset forms
+                if (modalId === 'login-modal') {
+                    loginForm.reset();
+                } else if (modalId === 'register-modal') {
+                    registerForm.reset();
+                } else if (modalId === 'add-note-modal') {
+                    noteForm.reset();
+                    document.querySelectorAll('.note-color-option')[0].click();
+                }
+            }
+        }
+        
+        // Authentication
+        function initAuthStateListener() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    updateUIForUser(user);
+                    loadUserData(user.uid);
+                } else {
+                    currentUser = null;
+                    updateUIForGuest();
+                }
+            });
+        }
+        
+        async function loadUserData(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    isAdmin = userData.role === 'admin';
+                    
+                    // Update UI based on role
+                    if (isAdmin) {
+                        adminMenu.style.display = 'block';
+                    } else {
+                        adminMenu.style.display = 'none';
+                        if (currentPage === 'admin') {
+                            navigateTo('dashboard');
+                        }
+                    }
+                    
+                    // Update user info
+                    userName.textContent = userData.name || user.email.split('@')[0];
+                    userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
+                    
+                    // Update avatar
+                    const firstChar = userName.textContent.charAt(0).toUpperCase();
+                    userAvatar.textContent = firstChar;
+                    document.getElementById('profile-avatar').textContent = firstChar;
+                    
+                    // Update profile page
+                    document.getElementById('profile-name').textContent = userData.name || '未设置';
+                    document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
+                    document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
+                    
+                    // Enable add note button for non-admin users
+                    if (!isAdmin) {
+                        addNoteBtn.disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        function updateUIForUser(user) {
+            authButtons.style.display = 'none';
+            userProfile.style.display = 'flex';
+            
+            // Enable navigation to all pages
+            navLinks.forEach(link => {
+                link.style.pointerEvents = 'auto';
+            });
+        }
+        
+        function updateUIForGuest() {
+            authButtons.style.display = 'block';
+            userProfile.style.display = 'none';
+            adminMenu.style.display = 'none';
+            
+            // Disable navigation to pages that require auth
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') !== '#dashboard') {
+                    link.style.pointerEvents = 'none';
+                    link.style.opacity = '0.6';
+                }
+            });
+            
+            // If on a restricted page, redirect to dashboard
+            if (currentPage !== 'dashboard') {
+                navigateTo('dashboard');
+            }
+            
+            // Disable add note button
+            addNoteBtn.disabled = true;
+        }
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal('login');
+                showAlert('登录成功', 'success');
+            } catch (error) {
+                showAlert(`登录失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const school = document.getElementById('register-school').value;
+            const grade = document.getElementById('register-grade').value;
+            
+            if (password !== confirmPassword) {
+                showAlert('两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            if (!school) {
+                showAlert('请选择所属学校', 'error');
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const userId = userCredential.user.uid;
+                
+                // Save additional user data to Firestore
+                await db.collection('users').doc(userId).set({
+                    name: name,
+                    email: email,
+                    school: school,
+                    grade: grade,
+                    role: 'student', // Default role
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeModal('register');
+                showAlert('注册成功！欢迎加入交流平台', 'success');
+            } catch (error) {
+                showAlert(`注册失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleGoogleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Check if user already exists in Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    // Create new user record
+                    await db.collection('users').doc(user.uid).set({
+                        name: user.displayName || user.email.split('@')[0],
+                        email: user.email,
+                        school: '', // User will need to complete profile
+                        grade: '',
+                        role: 'student',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                closeModal('login');
+                closeModal('register');
+                showAlert('Google账号登录成功', 'success');
+            } catch (error) {
+                showAlert(`Google登录失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleLogout() {
+            try {
+                await auth.signOut();
+                showAlert('已成功退出登录', 'success');
+            } catch (error) {
+                showAlert(`退出登录失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // Data Loading Functions
+        async function loadDashboardData() {
+            // Load recent announcements
+            try {
+                const announcementsSnapshot = await db.collection('announcements')
+                    .orderBy('createdAt', 'desc')
+                    .limit(3)
+                    .get();
+                
+                const recentAnnouncements = document.getElementById('recent-announcements');
+                if (announcementsSnapshot.empty) {
+                    recentAnnouncements.innerHTML = '<p>暂无公告</p>';
+                } else {
+                    let html = '';
+                    announcementsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        html += `
+                            <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                                <strong>${data.title}</strong>
+                                <p style="font-size: 0.9rem; margin-top: 5px;">${data.content.substring(0, 60)}${data.content.length > 60 ? '...' : ''}</p>
+                                <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
+                            </div>
+                        `;
+                    });
+                    recentAnnouncements.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+                document.getElementById('recent-announcements').innerHTML = '<p>加载公告时出错</p>';
+            }
+            
+            // Load upcoming events
+            const upcomingEvents = document.getElementById('upcoming-events');
+            upcomingEvents.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <strong>线上文化交流会</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">1月15日 14:00-16:00</p>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>学术研讨：人工智能应用</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">1月20日 10:00-12:00</p>
+                </div>
+                <div>
+                    <strong>语言交换伙伴匹配</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">1月25日 15:00-17:00</p>
+                </div>
+            `;
+            
+            // Update statistics (mock data for now)
+            document.getElementById('total-participants').textContent = '128';
+            document.getElementById('online-users').textContent = '24';
+            document.getElementById('total-posts').textContent = '56';
+        }
+        
+        async function loadAnnouncements() {
+            const announcementsList = document.getElementById('announcements-list');
+            announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
+            
+            try {
+                const announcementsSnapshot = await db.collection('announcements')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                if (announcementsSnapshot.empty) {
+                    announcementsList.innerHTML = '<div class="announcement-item"><p>暂无公告</p></div>';
+                } else {
+                    let html = '';
+                    announcementsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        html += `
+                            <div class="announcement-item">
+                                <h4>${data.title}</h4>
+                                <p>${data.content}</p>
+                                <div class="announcement-meta">
+                                    <span>发布者: ${data.authorName || '管理员'}</span>
+                                    <span>${formatDate(data.createdAt?.toDate())}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    announcementsList.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+                announcementsList.innerHTML = '<div class="announcement-item"><p>加载公告时出错</p></div>';
+            }
+        }
+        
+        async function loadWallPosts() {
+            const padletWall = document.getElementById('padlet-wall');
+            padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
+            
+            try {
+                const postsSnapshot = await db.collection('wallPosts')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                
+                if (postsSnapshot.empty) {
+                    padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                    document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                } else {
+                    let html = '';
+                    postsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const noteColorClass = `note-${data.color || 'yellow'}`;
+                        
+                        html += `
+                            <div class="padlet-note ${noteColorClass}" data-id="${doc.id}">
+                                ${data.title ? `<h4 style="margin-bottom: 8px;">${data.title}</h4>` : ''}
+                                <p>${data.content}</p>
+                                ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" style="max-width: 100%; margin-top: 10px; border-radius: 4px;">` : ''}
+                                <div class="note-meta" style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                                    作者: ${data.authorName}
+                                </div>
+                                ${isAdmin || currentUser?.uid === data.authorId ? `
+                                    <div class="note-actions">
+                                        <button class="note-btn delete-note" title="删除">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    // Add the "add note" button at the end
+                    html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                    padletWall.innerHTML = html;
+                    
+                    // Add event listeners
+                    document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
+                    
+                    // Add delete event listeners
+                    document.querySelectorAll('.delete-note').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const noteId = this.closest('.padlet-note').getAttribute('data-id');
+                            if (confirm('确定要删除这个贴文吗？')) {
+                                deleteWallPost(noteId);
+                            }
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading wall posts:', error);
+                padletWall.innerHTML = '<div class="add-note-btn"><p>加载贴文时出错</p></div>';
+            }
+        }
+        
+        async function loadAdminData() {
+            // Load admin statistics
+            try {
+                // Get user count
+                const usersSnapshot = await db.collection('users').get();
+                document.getElementById('admin-total-users').textContent = usersSnapshot.size;
+                
+                // Get announcements count
+                const announcementsSnapshot = await db.collection('announcements').get();
+                document.getElementById('admin-total-announcements').textContent = announcementsSnapshot.size;
+                
+                // Get posts count
+                const postsSnapshot = await db.collection('wallPosts').get();
+                document.getElementById('admin-total-posts').textContent = postsSnapshot.size;
+                
+                // Mock active users for now
+                document.getElementById('admin-active-today').textContent = Math.floor(Math.random() * 20) + 10;
+                
+                // Load user management
+                const userManagement = document.getElementById('user-management');
+                let userHtml = '<p>用户列表:</p><div style="max-height: 200px; overflow-y: auto;">';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    userHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
+                            <div>
+                                <strong>${user.name}</strong>
+                                <div style="font-size: 0.8rem; color: #666;">${user.email}</div>
+                                <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
+                            </div>
+                            <button class="btn btn-small btn-outline" style="font-size: 0.7rem;" onclick="changeUserRole('${doc.id}', '${user.role}')">
+                                ${user.role === 'admin' ? '撤销管理员' : '设为管理员'}
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                userHtml += '</div>';
+                userManagement.innerHTML = userHtml;
+                
+                // Load wall posts for management
+                const adminWallPosts = document.getElementById('admin-wall-posts');
+                let postsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+                
+                postsSnapshot.forEach(doc => {
+                    const post = doc.data();
+                    postsHtml += `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div>
+                                    <strong>${post.title || '无标题'}</strong>
+                                    <div style="font-size: 0.9rem;">${post.content.substring(0, 80)}${post.content.length > 80 ? '...' : ''}</div>
+                                    <div style="font-size: 0.8rem; color: #666;">作者: ${post.authorName} | ${formatDate(post.createdAt?.toDate())}</div>
+                                </div>
+                                <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none;" onclick="deleteWallPost('${doc.id}')">删除</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                postsHtml += '</div>';
+                adminWallPosts.innerHTML = postsHtml;
+                
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+                showAlert('加载管理员数据时出错', 'error');
+            }
+        }
+        
+        // Form Handlers
+        async function handleAddNote(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showAlert('请先登录', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('note-title').value;
+            const content = document.getElementById('note-content').value;
+            const color = document.getElementById('note-color-value').value;
+            const imageFile = document.getElementById('note-image').files[0];
+            
+            if (!content.trim()) {
+                showAlert('请填写贴文内容', 'error');
+                return;
+            }
+            
+            try {
+                let imageUrl = '';
+                
+                // Upload image if provided
+                if (imageFile) {
+                    const storageRef = storage.ref();
+                    const imageRef = storageRef.child(`wall-posts/${Date.now()}_${imageFile.name}`);
+                    await imageRef.put(imageFile);
+                    imageUrl = await imageRef.getDownloadURL();
+                }
+                
+                // Get user data
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const userData = userDoc.data();
+                
+                // Save post to Firestore
+                await db.collection('wallPosts').add({
+                    title: title,
+                    content: content,
+                    color: color,
+                    imageUrl: imageUrl,
+                    authorId: currentUser.uid,
+                    authorName: userData.name || currentUser.email.split('@')[0],
+                    authorSchool: userData.school || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeModal('add-note');
+                showAlert('贴文发布成功', 'success');
+                
+                // Reload wall posts
+                if (currentPage === 'wall') {
+                    loadWallPosts();
+                }
+            } catch (error) {
+                console.error('Error adding note:', error);
+                showAlert(`发布贴文失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleAddAnnouncement(e) {
+            e.preventDefault();
+            
+            if (!isAdmin) {
+                showAlert('您没有权限发布公告', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('announcement-title').value;
+            const content = document.getElementById('announcement-content').value;
+            
+            try {
+                await db.collection('announcements').add({
+                    title: title,
+                    content: content,
+                    authorId: currentUser.uid,
+                    authorName: userName.textContent,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                announcementForm.reset();
+                showAlert('公告发布成功', 'success');
+                
+                // Reload announcements
+                if (currentPage === 'announcements') {
+                    loadAnnouncements();
+                }
+                
+                // Update dashboard
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error adding announcement:', error);
+                showAlert(`发布公告失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // Helper Functions
+        async function deleteWallPost(postId) {
+            try {
+                await db.collection('wallPosts').doc(postId).delete();
+                showAlert('贴文已删除', 'success');
+                
+                // Reload wall posts
+                if (currentPage === 'wall') {
+                    loadWallPosts();
+                }
+                
+                // Reload admin data if on admin page
+                if (currentPage === 'admin') {
+                    loadAdminData();
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                showAlert(`删除贴文失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function changeUserRole(userId, currentRole) {
+            try {
+                const newRole = currentRole === 'admin' ? 'student' : 'admin';
+                await db.collection('users').doc(userId).update({
+                    role: newRole
+                });
+                
+                showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'}`, 'success');
+                
+                // Reload admin data
+                if (currentPage === 'admin') {
+                    loadAdminData();
+                }
+                
+                // If current user changed their own role, update UI
+                if (userId === currentUser?.uid) {
+                    isAdmin = newRole === 'admin';
+                    userRole.textContent = isAdmin ? '管理员' : '学生';
+                    
+                    if (!isAdmin && currentPage === 'admin') {
+                        navigateTo('dashboard');
+                    }
+                }
+            } catch (error) {
+                console.error('Error changing user role:', error);
+                showAlert(`更改用户权限失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar');
+            const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+            
+            // Create header
+            let html = '';
+            daysOfWeek.forEach(day => {
+                html += `<div class="calendar-day header">${day}</div>`;
+            });
+            
+            // Create days (mock data for now)
+            for (let i = 1; i <= 31; i++) {
+                let events = '';
+                if (i === 15) {
+                    events = '<div class="calendar-event">线上交流会</div>';
+                } else if (i === 20) {
+                    events = '<div class="calendar-event">学术研讨</div>';
+                } else if (i === 25) {
+                    events = '<div class="calendar-event">语言交换</div>';
+                }
+                
+                html += `
+                    <div class="calendar-day">
+                        <div class="day-number">${i}</div>
+                        ${events}
+                    </div>
+                `;
+            }
+            
+            calendar.innerHTML = html;
+        }
+        
+        function formatDate(date) {
+            if (!date) return '未知日期';
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('zh-CN', options);
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.id = alertId;
+            alertDiv.innerHTML = `
+                <span>${message}</span>
+                <button class="close-alert" onclick="document.getElementById('${alertId}').remove()">&times;</button>
+            `;
+            
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (document.getElementById(alertId)) {
+                    document.getElementById(alertId).remove();
+                }
+            }, 5000);
+        }
+        
+        // Make functions available globally for inline event handlers
+        window.changeUserRole = changeUserRole;
+        window.deleteWallPost = deleteWallPost;
+    </script>
+</body>
+</html>
