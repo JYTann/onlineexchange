@@ -7643,71 +7643,122 @@ async function loadPastEvents() {
         }
     }
     
-    async function loadAnnouncements() {
-        const announcementsList = document.getElementById('announcements-list');
-        
-        // 显示加载状态
-        announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading announcements...</p></div>';
-        
-        try {
+  async function loadAnnouncements() {
+    const announcementsList = document.getElementById('announcements-list');
+    
+    // Show loading
+    announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading announcements...</p></div>';
+    
+    try {
+        // Check if we have demo data
+        if (window.demoAnnouncements) {
+            let html = '';
+            window.demoAnnouncements.forEach((announcement, index) => {
+                const announcementId = 'announcement-' + index;
+                const canEdit = window.isAdmin || (currentUser && currentUser.email === announcement.authorEmail);
+                
+                html += `
+                    <div class="announcement-item" data-id="${announcementId}">
+                        <div class="announcement-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <h4>${announcement.title}</h4>
+                            ${canEdit ? `
+                                <div class="announcement-actions" style="display: flex; gap: 8px;">
+                                    <button class="btn btn-icon btn-small edit-announcement-btn" title="Edit" data-id="${announcementId}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-icon btn-small delete-announcement-btn" title="Delete" style="color: var(--danger);" data-id="${announcementId}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="announcement-content">${announcement.content}</div>
+                        <div class="announcement-meta">
+                            <span>By: ${announcement.authorName}</span>
+                            <span>${formatDate(announcement.createdAt)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            announcementsList.innerHTML = html;
+            
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.edit-announcement-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const announcementId = this.getAttribute('data-id');
+                    editAnnouncement(announcementId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-announcement-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const announcementId = this.getAttribute('data-id');
+                    deleteAnnouncement(announcementId);
+                });
+            });
+        } else if (db) {
+            // Similar logic for Firebase data
             const announcementsSnapshot = await db.collection('announcements')
                 .orderBy('createdAt', 'desc')
                 .get();
             
             if (announcementsSnapshot.empty) {
-    announcementsList.innerHTML = `
-        <div class="empty-state">
-            <i class="fas fa-bullhorn" style="font-size: 4rem; opacity: 0.3;"></i>
-            <p>No announcements available.</p>
-            ${isAdmin ? '<button class="btn btn-primary" id="empty-announcement-add-btn">Post the first announcement</button>' : ''}
-        </div>
-    `;
-} else {
+                announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>No announcements yet</p></div>';
+            } else {
                 let html = '';
                 announcementsSnapshot.forEach(doc => {
                     const data = doc.data();
-                    const canEdit = isAdmin || currentUser?.uid === data.authorId;
+                    const announcementId = doc.id;
+                    const canEdit = window.isAdmin || (currentUser && currentUser.uid === data.authorId);
                     
                     html += `
-                        <div class="announcement-item" data-id="${doc.id}">
-                            ${canEdit ? `
-                                <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px;">
-                                    <button class="btn btn-small btn-outline edit-announcement-btn" 
-                                            onclick="openEditAnnouncementModal('${doc.id}', ${JSON.stringify(data).replace(/'/g, "\\'")})">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button class="btn btn-small" 
-                                            style="background-color: var(--danger); color: white;"
-                                            onclick="openDeleteConfirmation('${doc.id}', 'announcement', '${data.title}')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </div>
-                            ` : ''}
-                            <h4>${data.title}</h4>
+                        <div class="announcement-item" data-id="${announcementId}">
+                            <div class="announcement-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h4>${data.title}</h4>
+                                ${canEdit ? `
+                                    <div class="announcement-actions" style="display: flex; gap: 8px;">
+                                        <button class="btn btn-icon btn-small edit-announcement-btn" title="Edit" data-id="${announcementId}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-icon btn-small delete-announcement-btn" title="Delete" style="color: var(--danger);" data-id="${announcementId}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
                             <div class="announcement-content">${data.content}</div>
                             <div class="announcement-meta">
-                                <span><i class="fas fa-user"></i> ${data.authorName || 'Administrator'}</span>
-                                <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
-                                ${data.updatedAt ? `<span><i class="fas fa-edit"></i> Edited at ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                                <span>By: ${data.authorName || 'Admin'}</span>
+                                <span>${formatDate(data.createdAt?.toDate())}</span>
                             </div>
                         </div>
                     `;
                 });
                 announcementsList.innerHTML = html;
+                
+                // Add event listeners
+                document.querySelectorAll('.edit-announcement-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const announcementId = this.getAttribute('data-id');
+                        editAnnouncement(announcementId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-announcement-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const announcementId = this.getAttribute('data-id');
+                        deleteAnnouncement(announcementId);
+                    });
+                });
             }
-        } catch (error) {
-            console.error('Error loading announcements:', error);
-            announcementsList.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
-                    <p>Failed to load announcement: ${error.message}</p>
-                    <button class="btn btn-outline" onclick="loadAnnouncements()">
-                        <i class="fas fa-redo"></i> Reload
-                    </button>
-                </div>
-            `;
+        } else {
+            announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>Cannot load announcements</p></div>';
         }
+    } catch (error) {
+        console.error('Error loading announcements:', error);
+        announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading announcements</p></div>';
     }
+}
 
        async function deleteWallPost(postId) {
     try {
