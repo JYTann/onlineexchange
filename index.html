@@ -4158,11 +4158,32 @@ async function undoChanges(type) {
 }
 
 // 显示编辑日志
+// 显示编辑日志
 async function displayEditLog(collection, docId) {
     const logContainer = document.getElementById(`${collection}-edit-log`);
     
     try {
-        const historySnapshot = await db.collection(`${collection}History`)
+        let historyCollection;
+        
+        // 根据类型确定正确的集合名称
+        switch(collection) {
+            case 'announcement':
+                historyCollection = 'announcementHistory';
+                break;
+            case 'note':
+                historyCollection = 'noteHistory'; // 使用您创建的集合
+                break;
+            case 'event':
+                historyCollection = 'eventHistory';
+                break;
+        }
+        
+        if (!historyCollection) {
+            logContainer.innerHTML = '<p>暂无编辑历史</p>';
+            return;
+        }
+        
+        const historySnapshot = await db.collection(historyCollection)
             .where('docId', '==', docId)
             .orderBy('editedAt', 'desc')
             .limit(5)
@@ -4179,7 +4200,7 @@ async function displayEditLog(collection, docId) {
             const history = doc.data();
             const date = history.editedAt?.toDate();
             html += `
-                <li style="margin-bottom: 5px;">
+                <li style="margin-bottom: 5px; font-size: 0.9rem;">
                     ${date ? formatDateTime(date) : '未知时间'} 
                     - 由 ${history.editedByName || '用户'} 编辑
                 </li>
@@ -4193,7 +4214,6 @@ async function displayEditLog(collection, docId) {
         logContainer.innerHTML = '<p>加载编辑历史失败</p>';
     }
 }
-
 // 记录编辑历史
 async function recordEditHistory(collection, docId, data) {
     try {
