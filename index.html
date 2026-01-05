@@ -5380,6 +5380,40 @@ document.addEventListener('click', function(e) {
         initLogoManagement();
     }
 
+       // 修复：通用模态框关闭处理
+function setupModalCloseHandlers() {
+    // 1. 处理 modal-close 按钮
+    document.addEventListener('click', function(e) {
+        const closeBtn = e.target.closest('.modal-close');
+        if (closeBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const modalId = closeBtn.getAttribute('data-modal');
+            closeModal(modalId);
+            return;
+        }
+        
+        // 2. 处理带有 data-modal 属性的取消按钮
+        if (e.target.matches('[data-modal]') && e.target.textContent.includes('Cancel')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const modalId = e.target.getAttribute('data-modal');
+            closeModal(modalId);
+            return;
+        }
+        
+        // 3. 处理模态框背景点击
+        if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
+            e.preventDefault();
+            closeModal(e.target.id);
+            return;
+        }
+    });
+}
+
+// 在 initEventListeners 中调用
+setupModalCloseHandlers();
+
        function openEditAnnouncementModal(announcementId, announcementData) {
         // 确保数据是对象
         if (typeof announcementData === 'string') {
@@ -7529,43 +7563,57 @@ async function loadPastEvents() {
     }
     
 function closeModal(modalId) {
-    // 支持传入事件对象或模态框ID
-    if (modalId.preventDefault) {
+    console.log('Closing modal:', modalId); // 调试信息
+    
+    // 支持直接传入ID或事件对象
+    if (modalId && modalId.preventDefault) {
         modalId.preventDefault();
         const target = modalId.target.closest('[data-modal]');
         modalId = target ? target.getAttribute('data-modal') : null;
     }
     
-    if (!modalId) return;
+    if (!modalId) {
+        console.error('No modal ID provided');
+        return;
+    }
     
-    const modal = document.getElementById(modalId) || modals[modalId];
-    if (modal) {
-        // 先重置表单，再隐藏模态框
-        const form = modal.querySelector('form');
-        if (form) {
-            form.reset();
+    let modal;
+    
+    // 查找模态框
+    if (typeof modalId === 'string') {
+        // 如果传入的是字符串ID
+        modal = document.getElementById(modalId);
+        if (!modal) {
+            // 尝试通过简写名称查找
+            const modalKey = modalId.replace('-modal', '');
+            modal = modals[modalKey];
         }
-        
-        // 移除active类
-        modal.classList.remove('active');
-        
-        // 恢复body滚动
-        document.body.style.overflow = 'auto';
-        
-        // 特殊处理编辑模态框
-        if (modalId === 'edit-note-modal') {
-            // 清除图片预览
-            const imagePreview = document.getElementById('edit-image-preview');
+    }
+    
+    if (!modal) {
+        console.error('Modal not found:', modalId);
+        return;
+    }
+    
+    // 关闭模态框
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    // 重置表单
+    const form = modal.querySelector('form');
+    if (form) {
+        form.reset();
+    }
+    
+    // 特殊处理 - 清除图片预览等
+    switch(modalId) {
+        case 'add-note-modal':
+        case 'edit-note-modal':
+            const imagePreview = document.getElementById('image-preview');
+            const editImagePreview = document.getElementById('edit-image-preview');
             if (imagePreview) imagePreview.style.display = 'none';
-            
-            // 重置当前图片显示
-            const currentImage = document.getElementById('current-note-image');
-            if (currentImage) currentImage.innerHTML = '';
-            
-            // 重置文件输入
-            const fileInput = document.getElementById('edit-note-image');
-            if (fileInput) fileInput.value = '';
-        }
+            if (editImagePreview) editImagePreview.style.display = 'none';
+            break;
     }
 }
     
