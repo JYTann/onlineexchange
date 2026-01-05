@@ -4052,7 +4052,36 @@ const CLOUDINARY_CONFIG = {
     };
     let selectedItems = new Set();
     let autoSaveTimer = null;
+
+       function initImageLazyLoading() {
+    const lazyImages = document.querySelectorAll('img.lazy-load');
     
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy-load');
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // 回退方案：直接加载所有图片
+        lazyImages.forEach(img => {
+            if (img.dataset.src) {
+                img.src = img.dataset.src;
+                img.classList.remove('lazy-load');
+            }
+        });
+    }
+}
+       
     // Initialize the application
    document.addEventListener('DOMContentLoaded', function() {
     // 修复登录按钮点击
@@ -4592,36 +4621,6 @@ document.addEventListener('click', function(e) {
         }
     }
 });
-
-        function initImageLazyLoading() {
-    const lazyImages = document.querySelectorAll('img.lazy-load');
-    
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy-load');
-                    }
-                    observer.unobserve(img);
-                }
-            });
-        });
-        
-        lazyImages.forEach(img => imageObserver.observe(img));
-    } else {
-        // 回退方案：直接加载所有图片
-        lazyImages.forEach(img => {
-            if (img.dataset.src) {
-                img.src = img.dataset.src;
-                img.classList.remove('lazy-load');
-            }
-        });
-    }
-}
-
         initLogoManagement();
     }
 
