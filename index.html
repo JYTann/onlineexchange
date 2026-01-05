@@ -5201,7 +5201,7 @@ function updateAddNoteButton() {
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="deleteWallPost('${postId}')">
+                                <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="safeDeleteWallPost('${postId}', true)">
                                     删除
                                 </button>
                             </div>
@@ -5239,9 +5239,9 @@ function updateAddNoteButton() {
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('${eventId}')">
-                                    删除
-                                </button>
+<button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('${eventId}', true)">
+    删除
+</button>
                             </div>
                         </div>
                     </div>
@@ -5806,40 +5806,59 @@ const eventData = {
         }
     }
     
-    async function deleteEvent(eventId) {
-        try {
-            // Get event data first to check permissions
-            const eventDoc = await db.collection('events').doc(eventId).get();
-            const eventData = eventDoc.data();
-            
+    async function deleteEvent(eventId, isFromAdmin = false) {
+    try {
+        // Get event data first
+        const eventDoc = await db.collection('events').doc(eventId).get();
+        
+        // 修复：检查文档是否存在
+        if (!eventDoc.exists) {
+            showAlert('活动不存在或已被删除', 'error');
+            return;
+        }
+        
+        const eventData = eventDoc.data();
+        
+        // 修复：检查 eventData 是否存在
+        if (!eventData) {
+            showAlert('无法读取活动数据', 'error');
+            return;
+        }
+        
+        // 修复：如果是管理面板调用，跳过权限检查
+        if (!isFromAdmin) {
             if (!isAdmin && eventData.authorId !== currentUser?.uid) {
                 showAlert('您没有权限删除此活动', 'error');
                 return;
             }
-            
-            // Delete from Firestore
-            await db.collection('events').doc(eventId).delete();
-            
-            // Remove from calendar
-            const eventElement = document.querySelector(`[data-id="${eventId}"]`);
-            if (eventElement) {
-                eventElement.remove();
-            }
-            
-            showAlert('活动已删除', 'success');
-            
-            // Close modal if open
-            closeModal('eventDetail');
-            
-            // Update statistics
-            loadDashboardData();
-            if (isAdmin) loadAdminData();
-            
-        } catch (error) {
-            console.error('Error deleting event:', error);
-            showAlert(`删除活动失败: ${error.message}`, 'error');
         }
+        
+        // Delete from Firestore
+        await db.collection('events').doc(eventId).delete();
+        
+        // Remove from calendar
+        const eventElement = document.querySelector(`[data-id="${eventId}"]`);
+        if (eventElement) {
+            eventElement.remove();
+        }
+        
+        // 修复：重新加载日历事件
+        loadCalendarEvents();
+        
+        showAlert('活动已删除', 'success');
+        
+        // Close modal if open
+        closeModal('eventDetail');
+        
+        // Update statistics
+        loadDashboardData();
+        if (isAdmin) loadAdminData();
+        
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        showAlert(`删除活动失败: ${error.message}`, 'error');
     }
+}
     
     async function deleteUser(userId) {
         if (userId === currentUser?.uid) {
