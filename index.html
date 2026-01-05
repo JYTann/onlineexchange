@@ -1383,7 +1383,43 @@ footer::before {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.95rem;
 }
+/* 在此之后添加Logo样式 */
+.logo-image-container {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    transition: var(--transition-smooth);
+    border: 2px solid transparent;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
 
+.logo-image-container:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-8px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+}
+
+.logo-preview {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-preview img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: contain;
+    border: 2px solid var(--light-gray);
+}
 /* 加载动画现代化设计 */
 .spinner {
     display: inline-block;
@@ -2728,6 +2764,40 @@ footer::before {
                         <label for="platform-name">平台名称</label>
                         <input type="text" id="platform-name" class="form-control" value="宽柔中学-高雄中学线上交流平台">
                     </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-header">
+                    <i class="fas fa-images"></i>
+                    <h3>学校Logo管理</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>宽柔中学Logo</label>
+                        <div class="file-upload" id="fyhs-logo-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>点击上传宽柔中学Logo</p>
+                            <p>建议尺寸：200x200px，PNG格式</p>
+                            <input type="file" id="fyhs-logo-input" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="fyhs-logo-preview" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>高雄中学Logo</label>
+                        <div class="file-upload" id="kshs-logo-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>点击上传高雄中学Logo</p>
+                            <p>建议尺寸：200x200px，PNG格式</p>
+                            <input type="file" id="kshs-logo-input" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="kshs-logo-preview" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="save-logos" class="btn btn-primary">保存Logo设置</button>
+                    </div>
+                </div>
+            </div>
                     
                     <div class="form-group">
                         <label for="welcome-message">欢迎消息</label>
@@ -2757,22 +2827,34 @@ footer::before {
         <div class="container">
             <div class="footer-content">
                 <div class="school-logos">
-                    <div class="school-logo">
-                        <i class="fas fa-school"></i>
-                        <div>马来西亚宽柔中学</div>
-                        <div>Foon Yew High School</div>
+                <div class="school-logo">
+                    <div class="logo-image-container">
+                        <img src="" id="fyhs-logo-img" alt="宽柔中学" 
+                             style="width: 120px; height: 120px; object-fit: contain; border-radius: 8px;">
                     </div>
-                    <div class="school-logo">
-                        <i class="fas fa-handshake"></i>
-                        <div>线上交流平台</div>
-                        <div>Online Exchange Platform</div>
-                    </div>
-                    <div class="school-logo">
-                        <i class="fas fa-school"></i>
-                        <div>台湾高雄高级中学</div>
-                        <div>Kaohsiung Senior High School</div>
-                    </div>
+                    <div style="font-weight: 600; color: #e53935; margin-top: 0.5rem;">马来西亚宽柔中学</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Foon Yew High School</div>
                 </div>
+                
+                <!-- 合作标志 -->
+                <div class="school-logo">
+                    <div class="logo-image-container" style="background: rgba(255, 255, 255, 0.1); padding: 20px;">
+                        <i class="fas fa-handshake" style="color: var(--accent); font-size: 3.5rem;"></i>
+                    </div>
+                    <div style="font-weight: 600; margin-top: 0.5rem;">线上交流平台</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Online Exchange Platform</div>
+                </div>
+                
+                <!-- 高雄中学 Logo -->
+                <div class="school-logo">
+                    <div class="logo-image-container">
+                        <img src="" id="kshs-logo-img" alt="高雄中学" 
+                             style="width: 120px; height: 120px; object-fit: contain; border-radius: 8px;">
+                    </div>
+                    <div style="font-weight: 600; color: #1565c0; margin-top: 0.5rem;">台湾高雄高级中学</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Kaohsiung Senior High School</div>
+                </div>
+            </div>
                 
                 <div class="footer-links">
                     <a href="#" id="about-link">关于我们</a>
@@ -2783,7 +2865,7 @@ footer::before {
             </div>
             
             <div class="copyright">
-                &copy; 2024 宽柔中学-高雄中学线上交流平台. 保留所有权利.
+                &copy; 2026 宽柔中学-高雄中学线上交流平台. 保留所有权利.
             </div>
         </div>
     </footer>
@@ -3711,6 +3793,8 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+        initLogoManagement();
     }
 
        function openEditAnnouncementModal(announcementId, announcementData) {
@@ -6255,6 +6339,151 @@ const eventData = {
             }
         }, 5000);
     }
+
+       // 在所有函数之后添加Logo管理功能
+function initLogoManagement() {
+    // Logo上传事件
+    if (document.getElementById('fyhs-logo-upload')) {
+        document.getElementById('fyhs-logo-upload').addEventListener('click', function() {
+            document.getElementById('fyhs-logo-input').click();
+        });
+        
+        document.getElementById('kshs-logo-upload').addEventListener('click', function() {
+            document.getElementById('kshs-logo-input').click();
+        });
+        
+        // Logo预览
+        document.getElementById('fyhs-logo-input').addEventListener('change', function(e) {
+            previewLogo(e, 'fyhs');
+        });
+        
+        document.getElementById('kshs-logo-input').addEventListener('change', function(e) {
+            previewLogo(e, 'kshs');
+        });
+        
+        // 保存Logo
+        document.getElementById('save-logos').addEventListener('click', saveSchoolLogos);
+    }
+    
+    // 加载现有Logo
+    loadSchoolLogos();
+}
+
+// 预览Logo
+function previewLogo(event, school) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.match('image.*')) {
+        showAlert('请选择图片文件', 'error');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB限制
+        showAlert('图片大小不能超过5MB', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const previewDiv = document.getElementById(`${school}-logo-preview`);
+        previewDiv.innerHTML = `
+            <div class="logo-preview">
+                <img src="${e.target.result}" alt="预览">
+                <div>
+                    <p>${file.name}</p>
+                    <p>${(file.size / 1024).toFixed(2)} KB</p>
+                </div>
+            </div>
+        `;
+    };
+    reader.readAsDataURL(file);
+}
+
+// 保存Logo到Firebase Storage
+async function saveSchoolLogos() {
+    if (!isAdmin) {
+        showAlert('需要管理员权限', 'error');
+        return;
+    }
+    
+    const fyhsFile = document.getElementById('fyhs-logo-input').files[0];
+    const kshsFile = document.getElementById('kshs-logo-input').files[0];
+    
+    if (!fyhsFile && !kshsFile) {
+        showAlert('请至少选择一个Logo文件', 'warning');
+        return;
+    }
+    
+    try {
+        showAlert('正在上传Logo...', 'info');
+        
+        // 上传宽柔中学Logo
+        if (fyhsFile) {
+            const storageRef = storage.ref();
+            const fyhsLogoRef = storageRef.child(`school-logos/fyhs-logo.${fyhsFile.name.split('.').pop()}`);
+            await fyhsLogoRef.put(fyhsFile);
+            const fyhsLogoUrl = await fyhsLogoRef.getDownloadURL();
+            
+            // 保存到Firestore
+            await db.collection('settings').doc('logos').set({
+                fyhsLogoUrl: fyhsLogoUrl,
+                fyhsLogoUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                fyhsLogoUpdatedBy: currentUser.uid
+            }, { merge: true });
+        }
+        
+        // 上传高雄中学Logo
+        if (kshsFile) {
+            const storageRef = storage.ref();
+            const kshsLogoRef = storageRef.child(`school-logos/kshs-logo.${kshsFile.name.split('.').pop()}`);
+            await kshsLogoRef.put(kshsFile);
+            const kshsLogoUrl = await kshsLogoRef.getDownloadURL();
+            
+            // 保存到Firestore
+            await db.collection('settings').doc('logos').set({
+                kshsLogoUrl: kshsLogoUrl,
+                kshsLogoUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                kshsLogoUpdatedBy: currentUser.uid
+            }, { merge: true });
+        }
+        
+        showAlert('Logo上传成功', 'success');
+        
+        // 刷新Logo显示
+        loadSchoolLogos();
+        
+    } catch (error) {
+        console.error('Error saving logos:', error);
+        showAlert(`Logo上传失败: ${error.message}`, 'error');
+    }
+}
+
+// 加载Logo
+async function loadSchoolLogos() {
+    try {
+        // 从Firestore获取Logo URL
+        const logosDoc = await db.collection('settings').doc('logos').get();
+        
+        if (logosDoc.exists) {
+            const logosData = logosDoc.data();
+            
+            // 设置宽柔中学Logo
+            if (logosData.fyhsLogoUrl) {
+                const fyhsImg = document.getElementById('fyhs-logo-img');
+                if (fyhsImg) fyhsImg.src = logosData.fyhsLogoUrl;
+            }
+            
+            // 设置高雄中学Logo
+            if (logosData.kshsLogoUrl) {
+                const kshsImg = document.getElementById('kshs-logo-img');
+                if (kshsImg) kshsImg.src = logosData.kshsLogoUrl;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading logos:', error);
+    }
+}
     
     // Make functions available globally for inline event handlers
     window.changeUserRole = changeUserRole;
