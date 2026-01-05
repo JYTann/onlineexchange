@@ -5014,6 +5014,31 @@ async function deleteLink(linkId) {
         
         // Admin button
         adminBtn.addEventListener('click', () => navigateTo('admin'));
+
+            const editNoteForm = document.getElementById('edit-note-form');
+    if (editNoteForm) {
+        editNoteForm.addEventListener('submit', handleEditNote);
+    }
+    
+    // 确保在DOM加载后绑定
+    document.addEventListener('DOMContentLoaded', function() {
+        // 绑定模态框表单提交
+        const editNoteForm = document.getElementById('edit-note-form');
+        if (editNoteForm) {
+            editNoteForm.addEventListener('submit', handleEditNote);
+        }
+        
+        // 绑定编辑按钮（事件委托）
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.edit-note')) {
+                e.preventDefault();
+                const noteId = e.target.closest('.edit-note').getAttribute('data-note-id');
+                if (noteId) {
+                    openEditNoteModalById(noteId);
+                }
+            }
+        });
+    });
         
         // Modal close buttons
         document.querySelectorAll('.modal-close').forEach(btn => {
@@ -5556,14 +5581,25 @@ async function compressImage(file, maxWidth = 1200, quality = 0.8) {
 
 // 打开编辑贴文模态框
 function openEditNoteModal(noteId, noteData) {
+    console.log('Opening edit modal for note:', noteId);
+    
+    // 确保模态框元素存在
+    const modal = document.getElementById('edit-note-modal');
+    if (!modal) {
+        console.error('Edit note modal not found');
+        return;
+    }
+    
+    // 填充表单
     document.getElementById('edit-note-id').value = noteId;
     document.getElementById('edit-note-title').value = noteData.title || '';
-    document.getElementById('edit-note-content').value = noteData.content;
+    document.getElementById('edit-note-content').value = noteData.content || '';
     document.getElementById('edit-note-color').value = noteData.color || 'yellow';
     
-    // 设置颜色选择
+    // 设置颜色选择器
+    const color = noteData.color || 'yellow';
     document.querySelectorAll('.note-color-option.edit').forEach(opt => {
-        opt.style.borderColor = opt.getAttribute('data-color') === (noteData.color || 'yellow') ? '#2c5aa0' : '#ccc';
+        opt.style.borderColor = opt.getAttribute('data-color') === color ? '#2c5aa0' : '#ccc';
     });
     
     // 显示当前图片
@@ -5578,20 +5614,17 @@ function openEditNoteModal(noteId, noteData) {
         document.getElementById('image-actions').style.display = 'none';
     }
     
-    // 保存初始状态
-    saveEditState('note', noteId, {
-        title: noteData.title || '',
-        content: noteData.content,
-        color: noteData.color || 'yellow',
-        imageUrl: noteData.imageUrl || ''
-    });
+    // 清除文件输入
+    const fileInput = document.getElementById('edit-note-image');
+    if (fileInput) fileInput.value = '';
     
-    // 显示编辑日志
-    displayEditLog('note', noteId);
+    // 清除图片预览
+    const imagePreview = document.getElementById('edit-image-preview');
+    if (imagePreview) imagePreview.style.display = 'none';
     
+    // 打开模态框
     openModal('edit-note-modal');
 }
-
 // 打开编辑活动模态框
 function openEditEventModal(eventId, eventData) {
     document.getElementById('edit-event-id').value = eventId;
@@ -5672,6 +5705,9 @@ async function handleEditAnnouncement(e) {
 // 处理编辑贴文
 async function handleEditNote(e) {
     e.preventDefault();
+    e.stopPropagation(); // 阻止事件冒泡
+    
+    console.log('Editing note...');
     
     const noteId = document.getElementById('edit-note-id').value;
     const title = document.getElementById('edit-note-title').value;
@@ -5680,7 +5716,19 @@ async function handleEditNote(e) {
     const imageFile = document.getElementById('edit-note-image').files[0];
     const removeImage = document.getElementById('current-note-image').innerHTML.includes('Will be deleted after saving');
     
+    // 验证输入
+    if (!content.trim()) {
+        showAlert('Please enter post content.', 'error');
+        return;
+    }
+    
     try {
+        // 显示加载状态
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+        
         let imageUrl = null;
         const updateData = {
             title: title || '',
@@ -5693,23 +5741,47 @@ async function handleEditNote(e) {
         
         // 处理图片
         if (imageFile) {
-            // 上传新图片
-            const storageRef = storage.ref();
-            const imageRef = storageRef.child(`wall-posts/${currentUser.uid}/${Date.now()}-${imageFile.name}`);
-            await imageRef.put(imageFile);
-            imageUrl = await imageRef.getDownloadURL();
-            updateData.imageUrl = imageUrl;
-            
-            // 删除旧图片
-            const oldNote = await db.collection('wallPosts').doc(noteId).get();
-            const oldData = oldNote.data();
-            if (oldData.imageUrl) {
+            try {
+                // 压缩并上传图片
+                const compressedFile = await compressImage(imageFile);
+                
+                // 尝试使用Cloudinary
+                let imageData;
                 try {
-                    const oldImageRef = storage.refFromURL(oldData.imageUrl);
-                    await oldImageRef.delete();
-                } catch (storageError) {
-                    console.error('Error deleting old image:', storageError);
+                    imageData = await uploadToCloudinary(compressedFile, 'wall-posts');
+                } catch (cloudinaryError) {
+                    console.log('Cloudinary failed, using Firebase Storage:', cloudinaryError);
+                    imageData = await uploadToFirebaseStorage(compressedFile, 'wall-posts');
                 }
+                
+                updateData.imageUrl = imageData.url;
+                updateData.imageData = {
+                    url: imageData.url,
+                    thumbnail: imageData.thumbnail || imageData.url,
+                    publicId: imageData.publicId || imageData.path,
+                    storageProvider: imageData.publicId ? 'cloudinary' : 'firebase'
+                };
+                
+                // 删除旧图片（如果有）
+                const oldNote = await db.collection('wallPosts').doc(noteId).get();
+                const oldData = oldNote.data();
+                if (oldData.imageUrl) {
+                    try {
+                        if (oldData.imageData?.storageProvider === 'cloudinary') {
+                            // Cloudinary图片需要Cloud Function删除
+                            console.log('Note: Cloudinary images should be deleted via Cloud Function');
+                        } else {
+                            const oldImageRef = storage.refFromURL(oldData.imageUrl);
+                            await oldImageRef.delete();
+                        }
+                    } catch (deleteError) {
+                        console.error('Error deleting old image:', deleteError);
+                    }
+                }
+                
+            } catch (uploadError) {
+                console.error('Error uploading image:', uploadError);
+                showAlert('Failed to upload image, saving text only.', 'warning');
             }
         } else if (removeImage) {
             // 删除现有图片
@@ -5717,39 +5789,60 @@ async function handleEditNote(e) {
             const oldData = oldNote.data();
             if (oldData.imageUrl) {
                 try {
-                    const oldImageRef = storage.refFromURL(oldData.imageUrl);
-                    await oldImageRef.delete();
-                } catch (storageError) {
-                    console.error('Error deleting image:', storageError);
+                    if (oldData.imageData?.storageProvider === 'cloudinary') {
+                        console.log('Note: Cloudinary images should be deleted via Cloud Function');
+                    } else {
+                        const oldImageRef = storage.refFromURL(oldData.imageUrl);
+                        await oldImageRef.delete();
+                    }
+                } catch (deleteError) {
+                    console.error('Error deleting image:', deleteError);
                 }
             }
             updateData.imageUrl = null;
+            updateData.imageData = null;
+        } else {
+            // 保留现有图片
+            const oldNote = await db.collection('wallPosts').doc(noteId).get();
+            const oldData = oldNote.data();
+            if (oldData.imageUrl) {
+                updateData.imageUrl = oldData.imageUrl;
+                updateData.imageData = oldData.imageData;
+            }
         }
         
         // 更新贴文
         await db.collection('wallPosts').doc(noteId).update(updateData);
         
-        // 记录编辑历史
-        await recordEditHistory('wallPosts', noteId, {
-            title: title || '',
-            content: content,
-            color: color,
-            imageUrl: imageUrl || null,
-            editedBy: currentUser.uid,
-            editedAt: new Date()
-        });
+        console.log('Note updated successfully');
         
+        // 恢复按钮状态
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // 关闭模态框
         closeModal('edit-note-modal');
+        
+        // 显示成功消息
         showAlert('Post updated successfully', 'success');
         
-        // 刷新页面数据
-        if (currentPage === 'wall') {
-            loadWallPosts();
-        }
+        // 刷新页面数据（使用延迟确保DOM稳定）
+        setTimeout(() => {
+            if (currentPage === 'wall') {
+                loadWallPosts();
+            }
+        }, 500);
         
     } catch (error) {
         console.error('Error updating note:', error);
         showAlert(`Failed to update post: ${error.message}`, 'error');
+        
+        // 恢复按钮状态
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Save Changes';
+            submitBtn.disabled = false;
+        }
     }
 }
 
@@ -6557,6 +6650,28 @@ function initCountdownPage() {
     
     console.log('Countdown page initialization complete');
 }
+
+       // 防抖函数
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 使用防抖的保存函数
+const debouncedSaveNote = debounce(handleEditNote, 1000);
+
+// 在表单提交时使用防抖
+document.getElementById('edit-note-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    debouncedSaveNote(e);
+});
 
 // 初始化倒计时标签页
 // 在 initCountdownTabs 函数中修复
@@ -7413,35 +7528,46 @@ async function loadPastEvents() {
         }
     }
     
-    function closeModal(modalId) {
-        // 支持传入事件对象或模态框ID
-        if (modalId.preventDefault) {
-            modalId.preventDefault();
-            const target = modalId.target.closest('[data-modal]');
-            modalId = target ? target.getAttribute('data-modal') : null;
+function closeModal(modalId) {
+    // 支持传入事件对象或模态框ID
+    if (modalId.preventDefault) {
+        modalId.preventDefault();
+        const target = modalId.target.closest('[data-modal]');
+        modalId = target ? target.getAttribute('data-modal') : null;
+    }
+    
+    if (!modalId) return;
+    
+    const modal = document.getElementById(modalId) || modals[modalId];
+    if (modal) {
+        // 先重置表单，再隐藏模态框
+        const form = modal.querySelector('form');
+        if (form) {
+            form.reset();
         }
         
-        if (!modalId) return;
+        // 移除active类
+        modal.classList.remove('active');
         
-        const modal = document.getElementById(modalId) || modals[modalId];
-        if (modal) {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+        // 恢复body滚动
+        document.body.style.overflow = 'auto';
+        
+        // 特殊处理编辑模态框
+        if (modalId === 'edit-note-modal') {
+            // 清除图片预览
+            const imagePreview = document.getElementById('edit-image-preview');
+            if (imagePreview) imagePreview.style.display = 'none';
             
-            // 重置表单
-            const form = modal.querySelector('form');
-            if (form) {
-                form.reset();
-            }
+            // 重置当前图片显示
+            const currentImage = document.getElementById('current-note-image');
+            if (currentImage) currentImage.innerHTML = '';
             
-            // 特殊处理
-            if (modalId === 'add-note-modal' || modalId === 'addNote') {
-                document.querySelectorAll('.note-color-option')[0]?.click();
-                const imagePreview = document.getElementById('image-preview');
-                if (imagePreview) imagePreview.style.display = 'none';
-            }
+            // 重置文件输入
+            const fileInput = document.getElementById('edit-note-image');
+            if (fileInput) fileInput.value = '';
         }
     }
+}
     
     // Authentication
     function initAuthStateListener() {
@@ -7962,12 +8088,21 @@ async function loadPastEvents() {
 }
 
     
- async function loadWallPosts() {
+async function loadWallPosts() {
+    console.log('Loading wall posts...');
+    
     const padletWall = document.getElementById('padlet-wall');
     
     // 添加元素存在性检查
     if (!padletWall) {
         console.error('padlet-wall element not found');
+        // 尝试重新查找
+        setTimeout(() => {
+            const retryElement = document.getElementById('padlet-wall');
+            if (retryElement) {
+                loadWallPosts();
+            }
+        }, 100);
         return;
     }
     
@@ -7981,8 +8116,8 @@ async function loadPastEvents() {
             .get();
         
         if (postsSnapshot.empty) {
-            // 确保元素仍然存在
-            if (padletWall) {
+            // 安全更新内容
+            if (padletWall && padletWall.parentNode) {
                 padletWall.innerHTML = `
                     <div class="add-note-btn" id="empty-wall-add-btn">
                         <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
@@ -7990,51 +8125,59 @@ async function loadPastEvents() {
                         <p style="font-size: 0.9rem; opacity: 0.7;">Share your thoughts...</p>
                     </div>
                 `;
+                
+                // 延迟绑定事件
+                setTimeout(() => {
+                    const emptyBtn = document.getElementById('empty-wall-add-btn');
+                    if (emptyBtn) {
+                        emptyBtn.onclick = () => {
+                            if (!currentUser) {
+                                showAlert('Please log in to add a post.', 'error');
+                                openModal('login');
+                                return;
+                            }
+                            openModal('add-note-modal');
+                        };
+                    }
+                }, 50);
             }
-            
-            // 修复事件绑定
-            setTimeout(() => {
-                const emptyBtn = document.getElementById('empty-wall-add-btn');
-                if (emptyBtn) {
-                    emptyBtn.onclick = () => {
-                        if (!currentUser) {
-                            showAlert('Please log in to add a post.', 'error');
-                            openModal('login');
-                            return;
-                        }
-                        openModal('add-note');
-                    };
-                }
-            }, 100);
         } else {
             let html = '';
+            let index = 0;
             postsSnapshot.forEach(doc => {
                 const data = doc.data();
                 const noteColorClass = `note-${data.color || 'yellow'}`;
                 const canEdit = isAdmin || currentUser?.uid === data.authorId;
+                const postId = doc.id;
+                
+                // 安全处理数据
+                const safeTitle = data.title ? escapeHTML(data.title) : '';
+                const safeContent = escapeHTML(data.content || '');
+                const safeAuthorName = escapeHTML(data.authorName || 'Anonymous User');
                 
                 html += `
-                    <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
+                    <div class="padlet-note ${noteColorClass} draggable" data-id="${postId}" draggable="true">
                         ${canEdit ? `
                             <div class="note-actions">
-                                <button class="note-btn edit-note" title="Edit" onclick="openEditNoteModal('${doc.id}', '${escapeHTML(JSON.stringify(data))}')">
+                                <button class="note-btn edit-note" title="Edit" data-note-id="${postId}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="note-btn delete-note" title="Delete" onclick="handleDeleteNote('${doc.id}')">
+                                <button class="note-btn delete-note" title="Delete" data-note-id="${postId}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         ` : ''}
-                        ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
-                        <div class="note-content">${escapeHTML(data.content)}</div>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="Post Image" class="note-image">` : ''}
+                        ${safeTitle ? `<div class="note-title">${safeTitle}</div>` : ''}
+                        <div class="note-content">${safeContent}</div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="Post Image" class="note-image" loading="lazy">` : ''}
                         <div class="note-meta">
-                            <span><i class="fas fa-user"></i> ${data.authorName || 'Anonymous User'}</span>
+                            <span><i class="fas fa-user"></i> ${safeAuthorName}</span>
                             <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
-                            ${data.updatedAt ? `<span><i class="fas fa-edit"></i> Edited at ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                            ${data.updatedAt ? `<span><i class="fas fa-edit"></i> Edited on ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
                         </div>
                     </div>
                 `;
+                index++;
             });
             
             // 添加"添加贴文"按钮
@@ -8046,12 +8189,13 @@ async function loadPastEvents() {
                 </div>
             `;
             
-            // 再次检查元素是否存在
-            if (padletWall) {
+            // 安全更新DOM
+            if (padletWall && padletWall.parentNode) {
                 padletWall.innerHTML = html;
                 
-                // 修复事件绑定
+                // 延迟绑定事件
                 setTimeout(() => {
+                    // 绑定添加按钮事件
                     const addBtn = document.getElementById('wall-add-btn');
                     if (addBtn) {
                         addBtn.onclick = () => {
@@ -8060,23 +8204,36 @@ async function loadPastEvents() {
                                 openModal('login');
                                 return;
                             }
-                            openModal('add-note');
+                            openModal('add-note-modal');
                         };
                     }
                     
+                    // 绑定编辑按钮事件
+                    document.querySelectorAll('.edit-note').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const noteId = this.getAttribute('data-note-id');
+                            if (noteId) {
+                                openEditNoteModalById(noteId);
+                            }
+                        });
+                    });
+                    
+                    // 绑定删除按钮事件
+                    document.querySelectorAll('.delete-note').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const noteId = this.getAttribute('data-note-id');
+                            if (noteId) {
+                                if (confirm('Are you sure you want to delete this post?')) {
+                                    deleteWallPost(noteId);
+                                }
+                            }
+                        });
+                    });
+                    
                     // 更新顶部的添加贴文按钮状态
-                    const topAddBtn = document.getElementById('add-note-btn');
-                    if (topAddBtn) {
-                        topAddBtn.disabled = !currentUser;
-                        if (currentUser) {
-                            topAddBtn.onclick = () => {
-                                openModal('add-note');
-                            };
-                        } else {
-                            topAddBtn.onclick = null;
-                        }
-                    }
-                }, 100);
+                    updateAddNoteButton();
+                    
+                }, 50);
                 
                 // 初始化拖拽功能
                 initDragAndDrop();
@@ -8085,15 +8242,14 @@ async function loadPastEvents() {
     } catch (error) {
         console.error('Error loading wall posts:', error);
         
-        // 确保元素存在
-        if (padletWall) {
+        // 安全显示错误
+        if (padletWall && padletWall.parentNode) {
             padletWall.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"></i>
-                    <p>Failed to load post</p>
-                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
-                    <button class="btn btn-outline" onclick="loadWallPosts()" style="margin-top: 1rem;">
-                        <i class="fas fa-redo"></i> Reload
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Error loading posts</p>
+                    <button class="btn btn-outline" onclick="safeReloadWallPosts()" style="margin-top: 1rem;">
+                        <i class="fas fa-redo"></i> Retry
                     </button>
                 </div>
             `;
@@ -8101,6 +8257,29 @@ async function loadPastEvents() {
     }
 }
 
+// 安全重新加载函数
+function safeReloadWallPosts() {
+    // 检查页面是否处于wall页面
+    if (document.getElementById('wall-page') && document.getElementById('wall-page').classList.contains('active')) {
+        loadWallPosts();
+    }
+}
+
+// 通过ID打开编辑模态框
+async function openEditNoteModalById(noteId) {
+    try {
+        const noteDoc = await db.collection('wallPosts').doc(noteId).get();
+        if (noteDoc.exists) {
+            const noteData = noteDoc.data();
+            openEditNoteModal(noteId, noteData);
+        } else {
+            showAlert('Post not found', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading note for editing:', error);
+        showAlert('Error loading post for editing', 'error');
+    }
+}
        function escapeHTML(text) {
     if (!text) return '';
     return text
