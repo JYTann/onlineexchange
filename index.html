@@ -2235,6 +2235,448 @@ footer::before {
 .card-stack:hover::after {
     transform: translate(10px, 10px);
 }
+
+        /* ==================== 倒计时页面样式 ==================== */
+
+.countdown-container {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    padding: 3rem;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: var(--gradient-primary);
+}
+
+.countdown-header {
+    margin-bottom: 2.5rem;
+}
+
+.countdown-header h3 {
+    font-size: 2.2rem;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+}
+
+.countdown-header p {
+    font-size: 1.1rem;
+    color: var(--gray);
+}
+
+/* 倒计时数字显示 */
+.countdown-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+    border-radius: var(--border-radius-lg);
+    border: 2px solid rgba(67, 97, 238, 0.1);
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-number {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    min-width: 110px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-number::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%);
+}
+
+.countdown-display:hover .countdown-number::before {
+    animation: shine 1.5s ease;
+}
+
+.countdown-label {
+    font-size: 1rem;
+    color: var(--gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.countdown-separator {
+    font-size: 3rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin-top: -1.5rem;
+}
+
+/* 倒计时信息卡片 */
+.countdown-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+}
+
+.info-card {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    border: var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+    transition: var(--transition-smooth);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.info-card i {
+    font-size: 2rem;
+    color: var(--primary);
+    width: 60px;
+    height: 60px;
+    background: rgba(67, 97, 238, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-card h4 {
+    font-size: 1rem;
+    color: var(--dark);
+    margin-bottom: 0.3rem;
+}
+
+.info-card p {
+    font-size: 0.95rem;
+    color: var(--gray);
+}
+
+/* 倒计时消息 */
+.countdown-message {
+    background: rgba(46, 204, 113, 0.1);
+    border: 2px solid var(--success);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    color: var(--success);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* 倒计时操作按钮 */
+.countdown-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2.5rem 0;
+}
+
+/* 过往活动 */
+.past-events {
+    background: rgba(248, 249, 250, 0.8);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.past-events h4 {
+    text-align: left;
+    color: var(--primary-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+}
+
+/* 颜色选择器 */
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: var(--transition-quick);
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.color-option.active {
+    border-color: var(--dark);
+    transform: scale(1.1);
+}
+
+/* 倒计时预览 */
+.countdown-preview {
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(247, 37, 133, 0.05));
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    border: 2px dashed var(--primary-light);
+}
+
+.preview-display {
+    margin-top: 1.5rem;
+}
+
+.preview-numbers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.preview-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    background: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius-md);
+    min-width: 80px;
+    box-shadow: var(--shadow-sm);
+}
+
+.preview-separator {
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin-top: -0.5rem;
+}
+
+.preview-labels {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    margin-left: 1rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+    font-weight: 600;
+}
+
+/* 统计卡片 */
+.countdown-stats {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    border: var(--glass-border);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.stat-card {
+    background: var(--gradient-glass);
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+/* 过往活动列表 */
+.event-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.history-item {
+    background: white;
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--primary);
+    transition: var(--transition-smooth);
+}
+
+.history-item:hover {
+    transform: translateX(10px);
+    box-shadow: var(--shadow-md);
+}
+
+.history-date {
+    font-weight: 600;
+    color: var(--primary-dark);
+    font-size: 1.1rem;
+}
+
+.history-title {
+    color: var(--dark);
+    margin-top: 0.3rem;
+}
+
+.history-status {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-completed {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--success);
+}
+
+.status-upcoming {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--info);
+}
+
+/* 响应式调整 */
+@media (max-width: 992px) {
+    .countdown-display {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .countdown-number {
+        font-size: 3rem;
+        min-width: 90px;
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .countdown-separator {
+        font-size: 2rem;
+        margin-top: -1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .countdown-container {
+        padding: 2rem;
+    }
+    
+    .countdown-number {
+        font-size: 2.5rem;
+        min-width: 80px;
+    }
+    
+    .countdown-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .countdown-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .countdown-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .countdown-number {
+        font-size: 2rem;
+        min-width: 70px;
+        padding: 0.6rem 1rem;
+    }
+    
+    .countdown-separator {
+        font-size: 1.5rem;
+    }
+    
+    .preview-number {
+        font-size: 2rem;
+        min-width: 60px;
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .preview-labels {
+        gap: 3.5rem;
+    }
+}
+
+/* 倒计时动画 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.countdown-number.updated {
+    animation: pulse 0.5s ease;
+}
+
+/* 紧急倒计时样式（当时间少于24小时） */
+.countdown-urgent .countdown-number {
+    color: var(--danger);
+    background: linear-gradient(135deg, #fff, #ffeaea);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.2);
+}
+
+.countdown-urgent .countdown-separator {
+    color: var(--danger);
+}
+
+/* 已完成倒计时样式 */
+.countdown-completed .countdown-display {
+    opacity: 0.5;
+}
+
+.countdown-completed .countdown-number {
+    color: var(--success);
+}
     </style>
 </head>
 <body>
@@ -2277,6 +2719,7 @@ footer::before {
                 <li><a href="#announcements" class="nav-link" data-page="announcements">公告</a></li>
                 <li><a href="#wall" class="nav-link" data-page="wall">交流墙</a></li>
                 <li><a href="#calendar" class="nav-link" data-page="calendar">活动日历</a></li>
+                <li><a href="#countdown" class="nav-link" data-page="countdown">交流会倒计时</a></li>
                 <li><a href="#profile" class="nav-link" data-page="profile">个人中心</a></li>
             </ul>
             <div class="nav-right">
@@ -2501,6 +2944,218 @@ footer::before {
                 </div>
             </div>
         </section>
+
+<!-- Countdown Page -->
+<section id="countdown-page" class="page">
+    <div class="page-header">
+        <h2>交流会倒计时</h2>
+        <p>倒计时显示和设置下一次交流活动时间</p>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" data-tab="countdown-view">倒计时显示</button>
+        <button class="tab" data-tab="countdown-admin" id="countdown-admin-tab">倒计时设置</button>
+    </div>
+    
+    <!-- 用户倒计时视图 -->
+    <div id="countdown-view" class="tab-content active">
+        <div class="countdown-container">
+            <div class="countdown-header">
+                <h3 id="countdown-event-title">下一次线上交流会</h3>
+                <p id="countdown-event-desc">宽柔中学与高雄中学的线上交流活动</p>
+            </div>
+            
+            <div class="countdown-display" id="countdown-display">
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="days">00</div>
+                    <div class="countdown-label">天</div>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="hours">00</div>
+                    <div class="countdown-label">小时</div>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="minutes">00</div>
+                    <div class="countdown-label">分钟</div>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="seconds">00</div>
+                    <div class="countdown-label">秒</div>
+                </div>
+            </div>
+            
+            <div class="countdown-info">
+                <div class="info-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <h4>活动时间</h4>
+                        <p id="event-date-time">未设置</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h4>活动形式</h4>
+                        <p id="event-platform">线上会议平台</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <h4>预计参与人数</h4>
+                        <p id="event-participants">0 人</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="countdown-message" id="countdown-message">
+                正在加载倒计时信息...
+            </div>
+            
+            <div class="countdown-actions">
+                <button class="btn btn-primary" id="set-reminder-btn">
+                    <i class="fas fa-bell"></i> 设置提醒
+                </button>
+                <button class="btn btn-outline" id="share-countdown-btn">
+                    <i class="fas fa-share-alt"></i> 分享倒计时
+                </button>
+                <button class="btn btn-outline" id="view-details-btn">
+                    <i class="fas fa-info-circle"></i> 查看活动详情
+                </button>
+            </div>
+            
+            <!-- 过往活动记录 -->
+            <div class="past-events" id="past-events-section">
+                <h4>过往交流活动</h4>
+                <div id="past-events-list">
+                    <!-- 过往活动将通过JS加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理员设置视图 -->
+    <div id="countdown-admin" class="tab-content">
+        <div class="form-container">
+            <h3>设置交流会倒计时</h3>
+            <p style="margin-bottom: 2rem; color: var(--gray);">设置下一次线上交流活动的时间和详情</p>
+            
+            <form id="countdown-settings-form">
+                <div class="form-group">
+                    <label for="countdown-event-name">活动名称 *</label>
+                    <input type="text" id="countdown-event-name" class="form-control" 
+                           placeholder="例如：第一届线上文化交流大会" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="countdown-event-description">活动描述</label>
+                    <textarea id="countdown-event-description" class="form-control" rows="3"
+                              placeholder="描述本次活动的内容和意义..."></textarea>
+                </div>
+                
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label for="countdown-event-date">活动日期 *</label>
+                        <input type="date" id="countdown-event-date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="countdown-event-time">活动时间 *</label>
+                        <input type="time" id="countdown-event-time" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="countdown-event-platform">活动平台</label>
+                    <select id="countdown-event-platform" class="form-control">
+                        <option value="zoom">Zoom 会议</option>
+                        <option value="google-meet">Google Meet</option>
+                        <option value="microsoft-teams">Microsoft Teams</option>
+                        <option value="other">其他平台</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="countdown-event-link">活动链接</label>
+                    <input type="url" id="countdown-event-link" class="form-control" 
+                           placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                </div>
+                
+                <div class="form-group">
+                    <label for="countdown-event-participants">预计参与人数</label>
+                    <input type="number" id="countdown-event-participants" class="form-control" 
+                           placeholder="例如：200" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="countdown-event-theme">活动主题颜色</label>
+                    <div style="display: flex; gap: 10px; margin-top: 8px;">
+                        <div class="color-option" data-color="#4361ee" style="background-color: #4361ee;"></div>
+                        <div class="color-option" data-color="#f72585" style="background-color: #f72585;"></div>
+                        <div class="color-option" data-color="#4cc9f0" style="background-color: #4cc9f0;"></div>
+                        <div class="color-option" data-color="#7209b7" style="background-color: #7209b7;"></div>
+                        <div class="color-option" data-color="#3a0ca3" style="background-color: #3a0ca3;"></div>
+                    </div>
+                    <input type="hidden" id="countdown-event-color" value="#4361ee">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存倒计时设置</button>
+                    <button type="button" class="btn btn-outline" id="test-countdown-btn">
+                        测试倒计时显示
+                    </button>
+                    <button type="button" class="btn btn-outline" id="clear-countdown-btn">
+                        清除倒计时
+                    </button>
+                </div>
+            </form>
+            
+            <!-- 倒计时预览 -->
+            <div class="countdown-preview" id="countdown-preview" style="margin-top: 3rem;">
+                <h4>倒计时预览</h4>
+                <div class="preview-display">
+                    <div class="preview-numbers">
+                        <span class="preview-number">00</span>
+                        <span class="preview-separator">:</span>
+                        <span class="preview-number">00</span>
+                        <span class="preview-separator">:</span>
+                        <span class="preview-number">00</span>
+                        <span class="preview-separator">:</span>
+                        <span class="preview-number">00</span>
+                    </div>
+                    <div class="preview-labels">
+                        <span>天</span>
+                        <span>小时</span>
+                        <span>分钟</span>
+                        <span>秒</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 倒计时状态统计 -->
+            <div class="countdown-stats" style="margin-top: 3rem;">
+                <h4>倒计时统计数据</h4>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-views">0</div>
+                        <div class="stat-label">累计查看次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="active-reminders">0</div>
+                        <div class="stat-label">活跃提醒设置</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="days-remaining">--</div>
+                        <div class="stat-label">剩余天数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
         
         <!-- Profile Page -->
         <section id="profile-page" class="page">
@@ -3297,7 +3952,8 @@ const firebaseConfig = {
         wall: document.getElementById('wall-page'),
         calendar: document.getElementById('calendar-page'),
         profile: document.getElementById('profile-page'),
-        admin: document.getElementById('admin-page')
+        admin: document.getElementById('admin-page'),
+        countdown: document.getElementById('countdown-page')
     };
     
     const navLinks = document.querySelectorAll('.nav-link');
@@ -3403,90 +4059,174 @@ const firebaseConfig = {
 });
     
     // Initialize Firebase collections with default data
-    async function initializeFirestore() {
-        try {
-            // Check if we need to create default data
-            const announcementsSnapshot = await db.collection('announcements').limit(1).get();
+   async function initializeFirestore() {
+    try {
+        // Check if we need to create default data
+        const announcementsSnapshot = await db.collection('announcements').limit(1).get();
+        
+        if (announcementsSnapshot.empty) {
+            // Create default announcements
+            const defaultAnnouncements = [
+                {
+                    title: '欢迎来到两校交流平台',
+                    content: '欢迎马来西亚宽柔中学和台湾高雄高级中学的同学们加入我们的线上交流平台！本平台旨在促进两校之间的文化交流与学术合作。',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                },
+                {
+                    title: '第一届线上辩论赛通知',
+                    content: '两校联合举办的线上辩论赛将于下月开始报名，主题为"科技发展对传统文化的影响"。请有兴趣参加的同学在本月底前联系各自学校的负责人。',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                },
+                {
+                    title: '语言交换伙伴匹配功能上线',
+                    content: '新的语言交换伙伴匹配系统已上线，请有兴趣的同学前往个人中心设置语言学习偏好。系统将根据您的兴趣和语言水平为您匹配交流伙伴。',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                }
+            ];
             
-            if (announcementsSnapshot.empty) {
-                // Create default announcements
-                const defaultAnnouncements = [
-                    {
-                        title: '欢迎来到两校交流平台',
-                        content: '欢迎马来西亚宽柔中学和台湾高雄高级中学的同学们加入我们的线上交流平台！本平台旨在促进两校之间的文化交流与学术合作。',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    },
-                    {
-                        title: '第一届线上辩论赛通知',
-                        content: '两校联合举办的线上辩论赛将于下月开始报名，主题为"科技发展对传统文化的影响"。请有兴趣参加的同学在本月底前联系各自学校的负责人。',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    },
-                    {
-                        title: '语言交换伙伴匹配功能上线',
-                        content: '新的语言交换伙伴匹配系统已上线，请有兴趣的同学前往个人中心设置语言学习偏好。系统将根据您的兴趣和语言水平为您匹配交流伙伴。',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    }
-                ];
-                
-                // Add default announcements
-                for (const announcement of defaultAnnouncements) {
-                    await db.collection('announcements').add(announcement);
-                }
-                
-                // Create default events
-                const defaultEvents = [
-                    {
-                        title: '线上辩论赛初赛',
-                        description: '两校联合辩论赛初赛，主题：科技发展对传统文化的影响',
-                        date: new Date(new Date().setDate(new Date().getDate() + 7)),
-                        time: '14:00',
-                        type: 'competition',
-                        school: 'both',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    },
-                    {
-                        title: '文化分享会：马来西亚节日',
-                        description: '由宽柔中学同学分享马来西亚传统节日与文化习俗',
-                        date: new Date(new Date().setDate(new Date().getDate() + 14)),
-                        time: '16:00',
-                        type: 'cultural',
-                        school: 'fyhs',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    },
-                    {
-                        title: '语言交换伙伴见面会',
-                        description: '线上语言交换伙伴首次见面交流活动',
-                        date: new Date(new Date().setDate(new Date().getDate() + 21)),
-                        time: '15:00',
-                        type: 'language',
-                        school: 'both',
-                        authorName: '平台管理员',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: 'system'
-                    }
-                ];
-                
-                // Add default events
-                for (const event of defaultEvents) {
-                    await db.collection('events').add(event);
-                }
-                
-                console.log('Default data created successfully');
+            // Add default announcements
+            for (const announcement of defaultAnnouncements) {
+                await db.collection('announcements').add(announcement);
             }
-        } catch (error) {
-            console.error('Error initializing Firestore:', error);
+            
+            // Create default events
+            const defaultEvents = [
+                {
+                    title: '线上辩论赛初赛',
+                    description: '两校联合辩论赛初赛，主题：科技发展对传统文化的影响',
+                    date: new Date(new Date().setDate(new Date().getDate() + 7)),
+                    time: '14:00',
+                    type: 'competition',
+                    school: 'both',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                },
+                {
+                    title: '文化分享会：马来西亚节日',
+                    description: '由宽柔中学同学分享马来西亚传统节日与文化习俗',
+                    date: new Date(new Date().setDate(new Date().getDate() + 14)),
+                    time: '16:00',
+                    type: 'cultural',
+                    school: 'fyhs',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                },
+                {
+                    title: '语言交换伙伴见面会',
+                    description: '线上语言交换伙伴首次见面交流活动',
+                    date: new Date(new Date().setDate(new Date().getDate() + 21)),
+                    time: '15:00',
+                    type: 'language',
+                    school: 'both',
+                    authorName: '平台管理员',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                }
+            ];
+            
+            // Add default events
+            for (const event of defaultEvents) {
+                await db.collection('events').add(event);
+            }
+            
+            // Create default countdown settings
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 30); // 30天后
+            
+            const defaultCountdown = {
+                eventName: '第一届线上文化交流大会',
+                eventDescription: '马来西亚宽柔中学与台湾高雄高级中学首届线上文化交流活动，包含学术分享、文化展示、互动交流等环节。',
+                eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
+                eventTime: '14:00',
+                eventPlatform: 'zoom',
+                eventLink: '',
+                participants: 200,
+                themeColor: '#4361ee',
+                views: 0,
+                reminders: 0,
+                isActive: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: 'system',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await db.collection('countdown').doc('current').set(defaultCountdown);
+            
+            // Create default past events in history
+            const pastEvents = [
+                {
+                    eventName: '平台启动仪式',
+                    eventDescription: '两校线上交流平台正式上线启动仪式',
+                    eventDate: firebase.firestore.Timestamp.fromDate(new Date(new Date().setDate(new Date().getDate() - 15))),
+                    eventTime: '10:00',
+                    eventPlatform: 'google-meet',
+                    participants: 150,
+                    themeColor: '#3a0ca3',
+                    isActive: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                },
+                {
+                    eventName: '教师交流座谈会',
+                    eventDescription: '两校教师教学经验分享与交流',
+                    eventDate: firebase.firestore.Timestamp.fromDate(new Date(new Date().setDate(new Date().getDate() - 7))),
+                    eventTime: '15:00',
+                    eventPlatform: 'microsoft-teams',
+                    participants: 80,
+                    themeColor: '#7209b7',
+                    isActive: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                }
+            ];
+            
+            // Add to history
+            for (const event of pastEvents) {
+                await db.collection('countdownHistory').add(event);
+            }
+            
+            console.log('Default data created successfully');
         }
+        
+        // 确保倒计时文档存在（即使已有其他数据）
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        if (!countdownDoc.exists) {
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 30);
+            
+            const defaultCountdown = {
+                eventName: '线上文化交流会',
+                eventDescription: '马来西亚宽柔中学与台湾高雄高级中学的线上文化交流活动',
+                eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
+                eventTime: '14:00',
+                eventPlatform: 'zoom',
+                eventLink: '',
+                participants: 150,
+                themeColor: '#4361ee',
+                views: 0,
+                reminders: 0,
+                isActive: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: 'system',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await db.collection('countdown').doc('current').set(defaultCountdown);
+            console.log('Default countdown created');
+        }
+        
+    } catch (error) {
+        console.error('Error initializing Firestore:', error);
     }
+}
     
     // Event Listeners
     function initEventListeners() {
@@ -4670,6 +5410,9 @@ function formatDateTime(date) {
             case 'calendar':
                 loadCalendarEvents();
                 break;
+            case 'countdown':
+                loadCountdownData();
+                break;
             case 'admin':
                 if (isAdmin) {
                     loadAdminData();
@@ -4681,6 +5424,689 @@ function formatDateTime(date) {
         }
     }
 }
+
+       // 初始化倒计时页面
+function initCountdownPage() {
+    // 添加倒计时页面到pages对象
+    pages['countdown'] = document.getElementById('countdown-page');
+    
+    // 初始化标签页
+    initCountdownTabs();
+    
+    // 初始化事件监听器
+    initCountdownEventListeners();
+    
+    // 加载倒计时数据
+    loadCountdownData();
+}
+
+// 初始化倒计时标签页
+function initCountdownTabs() {
+    const countdownTabs = document.querySelectorAll('#countdown-page .tab');
+    countdownTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // 更新活动标签
+            countdownTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 显示对应的内容
+            document.querySelectorAll('#countdown-page .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            
+            // 如果是管理员标签且用户不是管理员，跳转到查看标签
+            if (tabId === 'countdown-admin' && !isAdmin) {
+                document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
+                showAlert('需要管理员权限访问设置页面', 'error');
+            }
+        });
+    });
+}
+
+// 初始化倒计时事件监听器
+function initCountdownEventListeners() {
+    // 颜色选择器
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            this.classList.add('active');
+            document.getElementById('countdown-event-color').value = this.getAttribute('data-color');
+        });
+    });
+    
+    // 设置提醒按钮
+    document.getElementById('set-reminder-btn').addEventListener('click', setReminder);
+    
+    // 分享倒计时按钮
+    document.getElementById('share-countdown-btn').addEventListener('click', shareCountdown);
+    
+    // 查看详情按钮
+    document.getElementById('view-details-btn').addEventListener('click', viewEventDetails);
+    
+    // 管理员表单提交
+    document.getElementById('countdown-settings-form').addEventListener('submit', saveCountdownSettings);
+    
+    // 测试倒计时按钮
+    document.getElementById('test-countdown-btn').addEventListener('click', testCountdown);
+    
+    // 清除倒计时按钮
+    document.getElementById('clear-countdown-btn').addEventListener('click', clearCountdown);
+    
+    // 日期输入框默认值设置为明天
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formattedDate = tomorrow.toISOString().split('T')[0];
+    document.getElementById('countdown-event-date').value = formattedDate;
+    document.getElementById('countdown-event-date').min = formattedDate;
+}
+
+// 加载倒计时数据
+async function loadCountdownData() {
+    try {
+        // 获取倒计时设置
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        
+        if (countdownDoc.exists) {
+            const countdownData = countdownDoc.data();
+            updateCountdownDisplay(countdownData);
+            updateCountdownPreview(countdownData);
+            
+            // 如果是管理员页面，填充表单
+            if (isAdmin && document.getElementById('countdown-admin').classList.contains('active')) {
+                populateCountdownForm(countdownData);
+            }
+            
+            // 更新统计信息
+            updateCountdownStats();
+            
+            // 加载过往活动
+            loadPastEvents();
+            
+            // 开始倒计时
+            startCountdownTimer(countdownData);
+        } else {
+            // 创建默认倒计时
+            createDefaultCountdown();
+        }
+    } catch (error) {
+        console.error('Error loading countdown data:', error);
+        showCountdownMessage('加载倒计时数据时出错', 'error');
+    }
+}
+
+// 创建默认倒计时
+async function createDefaultCountdown() {
+    try {
+        // 设置默认时间（一周后）
+        const defaultDate = new Date();
+        defaultDate.setDate(defaultDate.getDate() + 7);
+        
+        const defaultCountdown = {
+            eventName: '线上文化交流会',
+            eventDescription: '马来西亚宽柔中学与台湾高雄高级中学的线上文化交流活动',
+            eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
+            eventTime: '14:00',
+            eventPlatform: 'zoom',
+            eventLink: '',
+            participants: 150,
+            themeColor: '#4361ee',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdBy: 'system',
+            views: 0,
+            reminders: 0,
+            isActive: true
+        };
+        
+        await db.collection('countdown').doc('current').set(defaultCountdown);
+        
+        // 更新显示
+        updateCountdownDisplay(defaultCountdown);
+        startCountdownTimer(defaultCountdown);
+        
+    } catch (error) {
+        console.error('Error creating default countdown:', error);
+    }
+}
+
+// 更新倒计时显示
+function updateCountdownDisplay(data) {
+    if (!data) return;
+    
+    // 更新标题和描述
+    document.getElementById('countdown-event-title').textContent = data.eventName || '下一次线上交流会';
+    document.getElementById('countdown-event-desc').textContent = data.eventDescription || '宽柔中学与高雄中学的线上交流活动';
+    
+    // 更新日期时间显示
+    const eventDate = data.eventDate?.toDate();
+    if (eventDate) {
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            weekday: 'long'
+        };
+        const dateStr = eventDate.toLocaleDateString('zh-CN', options);
+        const timeStr = data.eventTime || '14:00';
+        document.getElementById('event-date-time').textContent = `${dateStr} ${timeStr}`;
+    }
+    
+    // 更新平台
+    const platformMap = {
+        'zoom': 'Zoom 会议',
+        'google-meet': 'Google Meet',
+        'microsoft-teams': 'Microsoft Teams',
+        'other': '其他平台'
+    };
+    document.getElementById('event-platform').textContent = platformMap[data.eventPlatform] || data.eventPlatform || '线上会议平台';
+    
+    // 更新参与人数
+    document.getElementById('event-participants').textContent = `${data.participants || 0} 人`;
+    
+    // 更新主题颜色
+    if (data.themeColor) {
+        document.querySelectorAll('.countdown-number').forEach(el => {
+            el.style.color = data.themeColor;
+        });
+        document.querySelectorAll('.countdown-separator').forEach(el => {
+            el.style.color = data.themeColor;
+        });
+    }
+}
+
+// 开始倒计时计时器
+function startCountdownTimer(data) {
+    const eventDate = data.eventDate?.toDate();
+    if (!eventDate) return;
+    
+    // 设置时间
+    const timeStr = data.eventTime || '00:00';
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    eventDate.setHours(hours, minutes, 0, 0);
+    
+    // 更新倒计时显示
+    updateCountdownTime(eventDate);
+    
+    // 每秒更新一次
+    const timer = setInterval(() => {
+        updateCountdownTime(eventDate);
+    }, 1000);
+    
+    // 保存计时器引用以便清理
+    window.countdownTimer = timer;
+}
+
+// 更新倒计时时间
+function updateCountdownTime(targetDate) {
+    const now = new Date();
+    const diff = targetDate - now;
+    
+    // 检查是否已过期
+    if (diff <= 0) {
+        clearInterval(window.countdownTimer);
+        showCountdownMessage('交流会正在进行中！立即加入！', 'success');
+        document.getElementById('countdown-display').classList.add('countdown-completed');
+        document.querySelectorAll('.countdown-number').forEach(el => {
+            el.textContent = '00';
+        });
+        return;
+    }
+    
+    // 计算天、小时、分钟、秒
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    // 更新显示
+    document.getElementById('days').textContent = String(days).padStart(2, '0');
+    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    
+    // 添加动画效果
+    const numberElements = document.querySelectorAll('.countdown-number');
+    numberElements.forEach(el => {
+        el.classList.add('updated');
+        setTimeout(() => el.classList.remove('updated'), 500);
+    });
+    
+    // 如果少于24小时，添加紧急样式
+    if (days === 0 && hours < 24) {
+        document.getElementById('countdown-display').classList.add('countdown-urgent');
+        showCountdownMessage('交流会即将开始！请做好准备！', 'warning');
+    } else {
+        document.getElementById('countdown-display').classList.remove('countdown-urgent');
+        
+        // 根据剩余时间显示不同消息
+        if (days === 1) {
+            showCountdownMessage('交流会明天开始！请检查您的设备！', 'info');
+        } else if (days === 7) {
+            showCountdownMessage('交流会还有一周！', 'info');
+        } else if (days < 7) {
+            showCountdownMessage('交流会即将到来！', 'info');
+        } else {
+            showCountdownMessage('交流会正在筹备中...', 'info');
+        }
+    }
+    
+    // 更新剩余天数统计
+    document.getElementById('days-remaining').textContent = days;
+}
+
+// 显示倒计时消息
+function showCountdownMessage(message, type) {
+    const messageEl = document.getElementById('countdown-message');
+    if (!messageEl) return;
+    
+    messageEl.textContent = message;
+    messageEl.className = 'countdown-message';
+    
+    // 根据类型设置样式
+    switch(type) {
+        case 'success':
+            messageEl.style.background = 'rgba(46, 204, 113, 0.1)';
+            messageEl.style.borderColor = 'var(--success)';
+            messageEl.style.color = 'var(--success)';
+            break;
+        case 'warning':
+            messageEl.style.background = 'rgba(243, 156, 18, 0.1)';
+            messageEl.style.borderColor = 'var(--warning)';
+            messageEl.style.color = 'var(--warning)';
+            break;
+        case 'error':
+            messageEl.style.background = 'rgba(231, 76, 60, 0.1)';
+            messageEl.style.borderColor = 'var(--danger)';
+            messageEl.style.color = 'var(--danger)';
+            break;
+        default:
+            messageEl.style.background = 'rgba(52, 152, 219, 0.1)';
+            messageEl.style.borderColor = 'var(--info)';
+            messageEl.style.color = 'var(--info)';
+    }
+}
+
+// 填充倒计时表单（管理员）
+function populateCountdownForm(data) {
+    if (!data || !isAdmin) return;
+    
+    const eventDate = data.eventDate?.toDate();
+    
+    document.getElementById('countdown-event-name').value = data.eventName || '';
+    document.getElementById('countdown-event-description').value = data.eventDescription || '';
+    
+    if (eventDate) {
+        document.getElementById('countdown-event-date').value = eventDate.toISOString().split('T')[0];
+    }
+    
+    document.getElementById('countdown-event-time').value = data.eventTime || '14:00';
+    document.getElementById('countdown-event-platform').value = data.eventPlatform || 'zoom';
+    document.getElementById('countdown-event-link').value = data.eventLink || '';
+    document.getElementById('countdown-event-participants').value = data.participants || 150;
+    document.getElementById('countdown-event-color').value = data.themeColor || '#4361ee';
+    
+    // 设置颜色选择器
+    const color = data.themeColor || '#4361ee';
+    document.querySelectorAll('.color-option').forEach(option => {
+        if (option.getAttribute('data-color') === color) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+}
+
+// 保存倒计时设置（管理员）
+async function saveCountdownSettings(e) {
+    e.preventDefault();
+    
+    if (!isAdmin) {
+        showAlert('需要管理员权限保存设置', 'error');
+        return;
+    }
+    
+    const eventName = document.getElementById('countdown-event-name').value;
+    const eventDescription = document.getElementById('countdown-event-description').value;
+    const eventDate = document.getElementById('countdown-event-date').value;
+    const eventTime = document.getElementById('countdown-event-time').value;
+    const eventPlatform = document.getElementById('countdown-event-platform').value;
+    const eventLink = document.getElementById('countdown-event-link').value;
+    const participants = parseInt(document.getElementById('countdown-event-participants').value) || 0;
+    const themeColor = document.getElementById('countdown-event-color').value;
+    
+    if (!eventName || !eventDate || !eventTime) {
+        showAlert('请填写活动名称、日期和时间', 'error');
+        return;
+    }
+    
+    try {
+        // 创建日期对象
+        const targetDate = new Date(`${eventDate}T${eventTime}`);
+        
+        // 保存倒计时数据
+        const countdownData = {
+            eventName: eventName,
+            eventDescription: eventDescription,
+            eventDate: firebase.firestore.Timestamp.fromDate(targetDate),
+            eventTime: eventTime,
+            eventPlatform: eventPlatform,
+            eventLink: eventLink,
+            participants: participants,
+            themeColor: themeColor,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentUser.uid,
+            isActive: true
+        };
+        
+        // 保存当前倒计时设置
+        await db.collection('countdown').doc('current').set(countdownData, { merge: true });
+        
+        // 保存到历史记录
+        await db.collection('countdownHistory').add({
+            ...countdownData,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdBy: currentUser.uid
+        });
+        
+        showAlert('倒计时设置已保存', 'success');
+        
+        // 更新显示
+        updateCountdownDisplay(countdownData);
+        updateCountdownPreview(countdownData);
+        
+        // 重启倒计时计时器
+        if (window.countdownTimer) {
+            clearInterval(window.countdownTimer);
+        }
+        startCountdownTimer(countdownData);
+        
+        // 切换到查看页面
+        document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
+        
+    } catch (error) {
+        console.error('Error saving countdown settings:', error);
+        showAlert(`保存设置失败: ${error.message}`, 'error');
+    }
+}
+
+// 更新倒计时预览
+function updateCountdownPreview(data) {
+    if (!data) return;
+    
+    const eventDate = data.eventDate?.toDate();
+    if (eventDate) {
+        const now = new Date();
+        const diff = eventDate - now;
+        
+        if (diff > 0) {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.querySelectorAll('.preview-number')[0].textContent = String(days).padStart(2, '0');
+            document.querySelectorAll('.preview-number')[1].textContent = String(hours).padStart(2, '0');
+            document.querySelectorAll('.preview-number')[2].textContent = String(minutes).padStart(2, '0');
+            document.querySelectorAll('.preview-number')[3].textContent = '00';
+            
+            // 更新颜色
+            if (data.themeColor) {
+                document.querySelectorAll('.preview-number').forEach(el => {
+                    el.style.color = data.themeColor;
+                });
+                document.querySelectorAll('.preview-separator').forEach(el => {
+                    el.style.color = data.themeColor;
+                });
+            }
+        }
+    }
+}
+
+// 测试倒计时显示
+function testCountdown() {
+    const eventDate = new Date();
+    eventDate.setMinutes(eventDate.getMinutes() + 5); // 5分钟后
+    
+    const testData = {
+        eventDate: firebase.firestore.Timestamp.fromDate(eventDate),
+        eventTime: '测试时间',
+        themeColor: document.getElementById('countdown-event-color').value
+    };
+    
+    updateCountdownPreview(testData);
+    showAlert('测试倒计时已更新（设置为5分钟后）', 'info');
+}
+
+// 清除倒计时
+async function clearCountdown() {
+    if (!isAdmin) {
+        showAlert('需要管理员权限清除倒计时', 'error');
+        return;
+    }
+    
+    if (!confirm('确定要清除当前倒计时吗？')) {
+        return;
+    }
+    
+    try {
+        await db.collection('countdown').doc('current').update({
+            isActive: false,
+            clearedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            clearedBy: currentUser.uid
+        });
+        
+        showAlert('倒计时已清除', 'success');
+        
+        // 重新加载页面
+        document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
+        loadCountdownData();
+        
+    } catch (error) {
+        console.error('Error clearing countdown:', error);
+        showAlert(`清除倒计时失败: ${error.message}`, 'error');
+    }
+}
+
+// 设置提醒
+async function setReminder() {
+    if (!currentUser) {
+        showAlert('请先登录才能设置提醒', 'error');
+        openModal('login');
+        return;
+    }
+    
+    try {
+        // 获取当前倒计时信息
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        
+        if (!countdownDoc.exists || !countdownDoc.data().isActive) {
+            showAlert('当前没有活动的倒计时', 'warning');
+            return;
+        }
+        
+        const countdownData = countdownDoc.data();
+        const eventDate = countdownData.eventDate?.toDate();
+        
+        if (!eventDate) {
+            showAlert('活动时间未设置', 'error');
+            return;
+        }
+        
+        // 检查是否已设置提醒
+        const reminderCheck = await db.collection('reminders')
+            .where('userId', '==', currentUser.uid)
+            .where('eventId', '==', 'current')
+            .get();
+        
+        if (!reminderCheck.empty) {
+            showAlert('您已经设置过提醒了', 'info');
+            return;
+        }
+        
+        // 保存提醒设置
+        await db.collection('reminders').add({
+            userId: currentUser.uid,
+            userName: userName.textContent,
+            userEmail: currentUser.email,
+            eventId: 'current',
+            eventName: countdownData.eventName,
+            eventDate: countdownData.eventDate,
+            eventTime: countdownData.eventTime,
+            reminderTime: new Date(eventDate.getTime() - (24 * 60 * 60 * 1000)), // 提前24小时提醒
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            notified: false
+        });
+        
+        // 更新倒计时统计
+        await db.collection('countdown').doc('current').update({
+            reminders: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        showAlert('提醒设置成功！活动前一天会发送通知', 'success');
+        
+        // 更新统计显示
+        updateCountdownStats();
+        
+    } catch (error) {
+        console.error('Error setting reminder:', error);
+        showAlert(`设置提醒失败: ${error.message}`, 'error');
+    }
+}
+
+// 分享倒计时
+function shareCountdown() {
+    const eventTitle = document.getElementById('countdown-event-title').textContent;
+    const eventDate = document.getElementById('event-date-time').textContent;
+    const currentUrl = window.location.href.split('#')[0] + '#countdown';
+    
+    const shareText = `${eventTitle} 倒计时\n活动时间: ${eventDate}\n查看倒计时: ${currentUrl}`;
+    
+    // 复制到剪贴板
+    navigator.clipboard.writeText(shareText).then(() => {
+        showAlert('倒计时链接已复制到剪贴板！', 'success');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        
+        // 备用方法：显示分享对话框
+        const shareData = {
+            title: `${eventTitle} 倒计时`,
+            text: `活动时间: ${eventDate}`,
+            url: currentUrl
+        };
+        
+        if (navigator.share) {
+            navigator.share(shareData).catch(console.error);
+        } else {
+            showAlert('请手动复制链接', 'info');
+        }
+    });
+}
+
+// 查看活动详情
+function viewEventDetails() {
+    // 这里可以扩展显示更多活动详情
+    const eventTitle = document.getElementById('countdown-event-title').textContent;
+    const eventDate = document.getElementById('event-date-time').textContent;
+    const eventPlatform = document.getElementById('event-platform').textContent;
+    const participants = document.getElementById('event-participants').textContent;
+    
+    const details = `
+        <div style="text-align: left;">
+            <h4>${eventTitle}</h4>
+            <p><strong>活动时间:</strong> ${eventDate}</p>
+            <p><strong>活动平台:</strong> ${eventPlatform}</p>
+            <p><strong>预计参与:</strong> ${participants}</p>
+            <hr>
+            <p style="color: var(--gray);">更多详情将在活动临近时公布</p>
+        </div>
+    `;
+    
+    showAlert(details, 'info');
+}
+
+// 更新倒计时统计
+async function updateCountdownStats() {
+    try {
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        
+        if (countdownDoc.exists) {
+            const data = countdownDoc.data();
+            
+            // 更新查看次数
+            const newViews = (data.views || 0) + 1;
+            document.getElementById('total-views').textContent = newViews.toLocaleString();
+            
+            // 更新提醒数量
+            document.getElementById('active-reminders').textContent = (data.reminders || 0).toLocaleString();
+            
+            // 更新剩余天数
+            const eventDate = data.eventDate?.toDate();
+            if (eventDate) {
+                const now = new Date();
+                const diff = eventDate - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('days-remaining').textContent = days > 0 ? days : '已开始';
+            }
+            
+            // 更新查看次数到数据库（去重逻辑可以在云函数中实现）
+            await db.collection('countdown').doc('current').update({
+                views: firebase.firestore.FieldValue.increment(1)
+            });
+        }
+    } catch (error) {
+        console.error('Error updating countdown stats:', error);
+    }
+}
+
+// 加载过往活动
+async function loadPastEvents() {
+    try {
+        const pastEventsList = document.getElementById('past-events-list');
+        if (!pastEventsList) return;
+        
+        // 获取过往活动（最近5个）
+        const pastEventsSnapshot = await db.collection('countdownHistory')
+            .orderBy('createdAt', 'desc')
+            .limit(5)
+            .get();
+        
+        if (pastEventsSnapshot.empty) {
+            pastEventsList.innerHTML = '<p style="color: var(--gray); text-align: center;">暂无过往活动记录</p>';
+            return;
+        }
+        
+        let html = '<div class="event-history">';
+        
+        pastEventsSnapshot.forEach(doc => {
+            const event = doc.data();
+            const eventDate = event.eventDate?.toDate();
+            const now = new Date();
+            
+            html += `
+                <div class="history-item">
+                    <div>
+                        <div class="history-date">${formatDate(eventDate)}</div>
+                        <div class="history-title">${event.eventName}</div>
+                    </div>
+                    <div class="history-status ${eventDate > now ? 'status-upcoming' : 'status-completed'}">
+                        ${eventDate > now ? '即将开始' : '已完成'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        pastEventsList.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error loading past events:', error);
+        document.getElementById('past-events-section').style.display = 'none';
+    }
+}
+
     
     // Modal controls
     function openModal(modalId) {
@@ -5460,40 +6886,265 @@ function updateAddNoteButton() {
         }
     }
     
-    async function loadAdminData() {
-        try {
-            // Get total users count
-            const usersSnapshot = await db.collection('users').get();
-            const totalUsers = usersSnapshot.size;
+   async function loadAdminData() {
+    try {
+        // Get total users count
+        const usersSnapshot = await db.collection('users').get();
+        const totalUsers = usersSnapshot.size;
+        
+        // Get users active today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const activeUsersQuery = await db.collection('users')
+            .where('lastLogin', '>=', today)
+            .get();
+        
+        // Get total announcements count
+        const announcementsSnapshot = await db.collection('announcements').get();
+        
+        // Get total posts count
+        const postsSnapshot = await db.collection('wallPosts').get();
+        
+        // Get total events count
+        const eventsSnapshot = await db.collection('events').get();
+        
+        // 新增：获取倒计时统计数据
+        const countdownData = await getCountdownAdminStats();
+        
+        // Update admin statistics
+        document.getElementById('admin-total-users').textContent = totalUsers;
+        document.getElementById('admin-active-today').textContent = activeUsersQuery.size;
+        document.getElementById('admin-total-announcements').textContent = announcementsSnapshot.size;
+        document.getElementById('admin-total-posts').textContent = postsSnapshot.size;
+        document.getElementById('admin-total-events').textContent = eventsSnapshot.size;
+        
+        // 新增：更新倒计时统计数据（如果相关元素存在）
+        updateAdminCountdownStats(countdownData);
+        
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        showAlert('加载管理员数据时出错', 'error');
+    }
+}
+
+// 新增：获取倒计时管理员统计数据
+async function getCountdownAdminStats() {
+    try {
+        const stats = {
+            totalViews: 0,
+            activeReminders: 0,
+            daysRemaining: 0,
+            upcomingEvents: 0,
+            pastEvents: 0
+        };
+        
+        // 获取当前倒计时数据
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        if (countdownDoc.exists) {
+            const countdownData = countdownDoc.data();
+            stats.totalViews = countdownData.views || 0;
+            stats.activeReminders = countdownData.reminders || 0;
             
-            // Get users active today
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const activeUsersQuery = await db.collection('users')
-                .where('lastLogin', '>=', today)
-                .get();
+            // 计算剩余天数
+            const eventDate = countdownData.eventDate?.toDate();
+            if (eventDate) {
+                const now = new Date();
+                const diff = eventDate - now;
+                if (diff > 0) {
+                    stats.daysRemaining = Math.floor(diff / (1000 * 60 * 60 * 24));
+                }
+            }
+        }
+        
+        // 获取即将到来的活动数量（未来30天内）
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 30);
+        const upcomingSnapshot = await db.collection('countdownHistory')
+            .where('eventDate', '>=', firebase.firestore.Timestamp.fromDate(new Date()))
+            .where('eventDate', '<=', firebase.firestore.Timestamp.fromDate(futureDate))
+            .get();
+        stats.upcomingEvents = upcomingSnapshot.size;
+        
+        // 获取过往活动数量
+        const pastSnapshot = await db.collection('countdownHistory')
+            .where('eventDate', '<', firebase.firestore.Timestamp.fromDate(new Date()))
+            .get();
+        stats.pastEvents = pastSnapshot.size;
+        
+        return stats;
+        
+    } catch (error) {
+        console.error('Error getting countdown stats:', error);
+        return null;
+    }
+}
+
+// 新增：更新倒计时统计数据到管理员面板
+function updateAdminCountdownStats(stats) {
+    if (!stats) return;
+    
+    // 检查管理员面板是否有倒计时统计区域，如果没有则创建
+    let statsContainer = document.getElementById('admin-countdown-stats');
+    
+    if (!statsContainer && document.getElementById('admin-dashboard')) {
+        // 创建倒计时统计区域
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const dashboardCards = adminDashboard.querySelector('.dashboard-cards');
+        
+        if (dashboardCards) {
+            // 创建倒计时统计卡片
+            const countdownCard = document.createElement('div');
+            countdownCard.className = 'card';
+            countdownCard.id = 'countdown-stats-card';
+            countdownCard.innerHTML = `
+                <div class="card-header">
+                    <i class="fas fa-clock"></i>
+                    <h3>倒计时统计</h3>
+                </div>
+                <div class="card-body">
+                    <div id="admin-countdown-stats">
+                        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div class="stat-item">
+                                <div class="stat-label">累计查看次数</div>
+                                <div class="stat-value" id="admin-countdown-views">${stats.totalViews}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">活跃提醒设置</div>
+                                <div class="stat-value" id="admin-countdown-reminders">${stats.activeReminders}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">剩余天数</div>
+                                <div class="stat-value" id="admin-countdown-days">${stats.daysRemaining}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">活动总数</div>
+                                <div class="stat-value" id="admin-countdown-total">${stats.upcomingEvents + stats.pastEvents}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-small" style="margin-top: 1rem;" onclick="navigateTo('countdown')">
+                            管理倒计时设置
+                        </button>
+                    </div>
+                </div>
+            `;
             
-            // Get total announcements count
-            const announcementsSnapshot = await db.collection('announcements').get();
-            
-            // Get total posts count
-            const postsSnapshot = await db.collection('wallPosts').get();
-            
-            // Get total events count
-            const eventsSnapshot = await db.collection('events').get();
-            
-            // Update admin statistics
-            document.getElementById('admin-total-users').textContent = totalUsers;
-            document.getElementById('admin-active-today').textContent = activeUsersQuery.size;
-            document.getElementById('admin-total-announcements').textContent = announcementsSnapshot.size;
-            document.getElementById('admin-total-posts').textContent = postsSnapshot.size;
-            document.getElementById('admin-total-events').textContent = eventsSnapshot.size;
-            
-        } catch (error) {
-            console.error('Error loading admin data:', error);
-            showAlert('加载管理员数据时出错', 'error');
+            // 插入到现有卡片之后
+            dashboardCards.appendChild(countdownCard);
+            statsContainer = document.getElementById('admin-countdown-stats');
         }
     }
+    
+    // 更新统计数字
+    if (statsContainer) {
+        const elements = {
+            'admin-countdown-views': stats.totalViews,
+            'admin-countdown-reminders': stats.activeReminders,
+            'admin-countdown-days': stats.daysRemaining,
+            'admin-countdown-total': stats.upcomingEvents + stats.pastEvents
+        };
+        
+        for (const [id, value] of Object.entries(elements)) {
+            const element = document.getElementById(id);
+            if (element) {
+                // 添加数字动画效果
+                animateNumber(element, value);
+            }
+        }
+    }
+}
+
+// 新增：数字动画效果
+function animateNumber(element, targetValue) {
+    const currentValue = parseInt(element.textContent) || 0;
+    if (currentValue === targetValue) return;
+    
+    const duration = 1000; // 动画持续时间
+    const startTime = Date.now();
+    const startValue = currentValue;
+    
+    function update() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // 使用缓动函数
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(startValue + (targetValue - startValue) * easedProgress);
+        
+        element.textContent = current.toLocaleString();
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// 新增：在管理员面板的仪表板部分添加更多统计信息
+function enhanceAdminDashboard() {
+    // 当管理员页面加载时调用
+    if (currentPage === 'admin') {
+        setTimeout(() => {
+            updateAdminDashboardWithCountdown();
+        }, 1000);
+    }
+}
+
+// 新增：更新管理员面板
+async function updateAdminDashboardWithCountdown() {
+    try {
+        // 获取最新的倒计时信息
+        const countdownDoc = await db.collection('countdown').doc('current').get();
+        if (countdownDoc.exists) {
+            const countdownData = countdownDoc.data();
+            
+            // 在管理员面板顶部显示倒计时摘要
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const existingSummary = document.getElementById('countdown-summary');
+            
+            if (!existingSummary && adminDashboard) {
+                const eventDate = countdownData.eventDate?.toDate();
+                let dateStr = '';
+                if (eventDate) {
+                    dateStr = eventDate.toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        weekday: 'long'
+                    });
+                }
+                
+                const summary = document.createElement('div');
+                summary.id = 'countdown-summary';
+                summary.className = 'alert alert-info';
+                summary.style.margin = '1rem 0 2rem 0';
+                summary.style.padding = '1.5rem';
+                summary.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem 0;">当前活动倒计时</h4>
+                            <p style="margin: 0; color: var(--dark);">
+                                <strong>${countdownData.eventName || '线上交流会'}</strong> - 
+                                ${dateStr} ${countdownData.eventTime || '14:00'}
+                            </p>
+                        </div>
+                        <button class="btn btn-primary btn-small" onclick="navigateTo('countdown')">
+                            查看详情
+                        </button>
+                    </div>
+                `;
+                
+                // 插入到页面标题之后
+                const pageHeader = adminDashboard.querySelector('.page-header');
+                if (pageHeader) {
+                    pageHeader.parentNode.insertBefore(summary, pageHeader.nextSibling);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error updating admin dashboard:', error);
+    }
+}
     
     async function loadUserManagement() {
         const userManagement = document.getElementById('user-management');
