@@ -3827,43 +3827,94 @@ document.addEventListener('click', function(e) {
 
 
 // 打开编辑贴文模态框
+// 打开编辑贴文模态框 - 修复版本
 function openEditNoteModal(noteId, noteData) {
-    document.getElementById('edit-note-id').value = noteId;
-    document.getElementById('edit-note-title').value = noteData.title || '';
-    document.getElementById('edit-note-content').value = noteData.content;
-    document.getElementById('edit-note-color').value = noteData.color || 'yellow';
-    
-    // 设置颜色选择
-    document.querySelectorAll('.note-color-option.edit').forEach(opt => {
-        opt.style.borderColor = opt.getAttribute('data-color') === (noteData.color || 'yellow') ? '#2c5aa0' : '#ccc';
-    });
-    
-    // 显示当前图片
-    const currentImageDiv = document.getElementById('current-note-image');
-    if (noteData.imageUrl) {
-        currentImageDiv.innerHTML = `
-            <img src="${noteData.imageUrl}" alt="当前图片" style="max-width: 200px; border-radius: 5px;">
-        `;
-        document.getElementById('image-actions').style.display = 'block';
-    } else {
-        currentImageDiv.innerHTML = '<p>无图片</p>';
-        document.getElementById('image-actions').style.display = 'none';
+    // 如果noteData是字符串，尝试解析
+    if (typeof noteData === 'string') {
+        try {
+            // 先移除HTML转义字符
+            const cleanJson = noteData
+                .replace(/&quot;/g, '"')
+                .replace(/&#039;/g, "'")
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&');
+            noteData = JSON.parse(cleanJson);
+        } catch (e) {
+            console.error('Error parsing note data:', e, noteData);
+            
+            // 如果解析失败，尝试另一种方式获取数据
+            fetchNoteDataForEditing(noteId);
+            return;
+        }
     }
     
-    // 保存初始状态
-    saveEditState('note', noteId, {
-        title: noteData.title || '',
-        content: noteData.content,
-        color: noteData.color || 'yellow',
-        imageUrl: noteData.imageUrl || ''
-    });
-    
-    // 显示编辑日志
-    displayEditLog('note', noteId);
-    
-    openModal('edit-note-modal');
+    // 填充表单数据
+    if (noteData) {
+        document.getElementById('edit-note-id').value = noteId;
+        document.getElementById('edit-note-title').value = noteData.title || '';
+        document.getElementById('edit-note-content').value = noteData.content || '';
+        document.getElementById('edit-note-color').value = noteData.color || 'yellow';
+        
+        // 设置颜色选择器
+        document.querySelectorAll('.note-color-option.edit').forEach(opt => {
+            opt.style.borderColor = opt.getAttribute('data-color') === (noteData.color || 'yellow') ? '#2c5aa0' : '#ccc';
+        });
+        
+        // 显示当前图片
+        const currentImageDiv = document.getElementById('current-note-image');
+        if (noteData.imageUrl) {
+            currentImageDiv.innerHTML = `
+                <img src="${noteData.imageUrl}" alt="当前图片" 
+                     style="max-width: 200px; border-radius: 5px; border: 2px solid #eee;">
+                <p style="font-size: 0.8rem; margin-top: 5px; color: #666;">当前图片</p>
+            `;
+            document.getElementById('image-actions').style.display = 'block';
+        } else {
+            currentImageDiv.innerHTML = '<p style="color: #999; font-size: 0.9rem;">无图片</p>';
+            document.getElementById('image-actions').style.display = 'none';
+        }
+        
+        // 清除预览
+        document.getElementById('edit-image-preview').style.display = 'none';
+        document.getElementById('edit-note-image').value = '';
+        
+        // 保存初始状态用于撤销功能
+        saveEditState('note', noteId, {
+            title: noteData.title || '',
+            content: noteData.content || '',
+            color: noteData.color || 'yellow',
+            imageUrl: noteData.imageUrl || ''
+        });
+        
+        // 显示编辑日志
+        displayEditLog('note', noteId);
+        
+        // 打开模态框
+        openModal('edit-note-modal');
+    }
 }
 
+// 从服务器获取贴文数据
+async function fetchNoteDataForEditing(noteId) {
+    try {
+        showAlert('正在加载贴文数据...', 'info');
+        
+        const noteDoc = await db.collection('wallPosts').doc(noteId).get();
+        
+        if (noteDoc.exists) {
+            const noteData = noteDoc.data();
+            
+            // 直接调用编辑函数
+            openEditNoteModal(noteId, noteData);
+        } else {
+            showAlert('贴文不存在或已被删除', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching note data:', error);
+        showAlert(`加载贴文数据失败: ${error.message}`, 'error');
+    }
+}
 // 打开编辑活动模态框
 function openEditEventModal(eventId, eventData) {
     document.getElementById('edit-event-id').value = eventId;
@@ -4158,6 +4209,7 @@ async function undoChanges(type) {
 }
 
 // 显示编辑日志
+// 显示编辑日志 - 修复版
 async function displayEditLog(collection, docId) {
     const logContainer = document.getElementById(`${collection}-edit-log`);
     
@@ -4169,17 +4221,18 @@ async function displayEditLog(collection, docId) {
             .get();
         
         if (historySnapshot.empty) {
-            logContainer.innerHTML = '<p>暂无编辑历史</p>';
+            logContainer.innerHTML = '<p style="color: #999; font-size: 0.9rem;">暂无编辑历史</p>';
             return;
         }
         
-        let html = '<strong>编辑历史:</strong><ul style="margin-top: 10px; padding-left: 20px;">';
+        let html = '<strong style="display: block; margin-bottom: 10px;">编辑历史:</strong><ul style="margin: 0; padding-left: 20px; font-size: 0.9rem;">';
         
         historySnapshot.forEach(doc => {
             const history = doc.data();
-            const date = history.editedAt?.toDate();
+            const date = history.editedAt?.toDate ? history.editedAt.toDate() : new Date(history.editedAt);
+            
             html += `
-                <li style="margin-bottom: 5px;">
+                <li style="margin-bottom: 5px; color: #666;">
                     ${date ? formatDateTime(date) : '未知时间'} 
                     - 由 ${history.editedByName || '用户'} 编辑
                 </li>
@@ -4190,7 +4243,7 @@ async function displayEditLog(collection, docId) {
         logContainer.innerHTML = html;
     } catch (error) {
         console.error('Error loading edit history:', error);
-        logContainer.innerHTML = '<p>加载编辑历史失败</p>';
+        logContainer.innerHTML = '<p style="color: #dc3545; font-size: 0.9rem;">加载编辑历史失败</p>';
     }
 }
 
@@ -4294,20 +4347,31 @@ function setupBatchOperations() {
     const batchActions = document.getElementById('batch-actions');
     
     // 监听选择框变化
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('.item-checkbox')) {
-            const itemId = e.target.getAttribute('data-id');
-            const itemType = e.target.getAttribute('data-type');
+    // 添加事件委托处理贴文编辑
+document.addEventListener('click', function(e) {
+    // 处理编辑按钮
+    if (e.target.closest('.edit-note') || e.target.classList.contains('edit-note')) {
+        const button = e.target.closest('.edit-note') || e.target;
+        const noteElement = button.closest('.padlet-note');
+        
+        if (noteElement) {
+            const noteId = noteElement.getAttribute('data-id');
             
-            if (e.target.checked) {
-                selectedItems.add(`${itemType}_${itemId}`);
-            } else {
-                selectedItems.delete(`${itemType}_${itemId}`);
-            }
+            // 从元素获取数据
+            const noteData = {
+                title: noteElement.querySelector('.note-title')?.textContent || '',
+                content: noteElement.querySelector('.note-content')?.textContent || '',
+                color: noteElement.className.includes('note-yellow') ? 'yellow' : 
+                       noteElement.className.includes('note-blue') ? 'blue' : 
+                       noteElement.className.includes('note-green') ? 'green' : 
+                       noteElement.className.includes('note-pink') ? 'pink' : 'yellow',
+                imageUrl: noteElement.querySelector('.note-image')?.src || ''
+            };
             
-            updateBatchUI();
+            openEditNoteModal(noteId, noteData);
         }
-    });
+    }
+});
 }
 
 // 更新批量操作UI
@@ -5160,7 +5224,7 @@ function formatDateTime(date) {
                     <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
                         ${canEdit ? `
                             <div class="note-actions">
-                                <button class="note-btn edit-note" title="编辑" onclick="openEditNoteModal('${doc.id}', '${escapeHTML(JSON.stringify(data))}')">
+                                <button class="note-btn edit-note" title="编辑" onclick="openEditNoteModal('${doc.id}', ${JSON.stringify(data).replace(/'/g, "\\'")})">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="note-btn delete-note" title="删除" onclick="handleDeleteNote('${doc.id}')">
