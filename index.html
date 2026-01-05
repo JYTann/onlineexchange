@@ -6454,8 +6454,19 @@ function formatDateTime(date) {
     }
     
     // Navigation
-    function navigateTo(pageId) {
+ function navigateTo(pageId) {
     console.log('Navigate to page:', pageId);
+         // 清理旧的计时器
+    if (window.countdownTimer) {
+        clearInterval(window.countdownTimer);
+        window.countdownTimer = null;
+    }
+    
+    // 清理其他可能的计时器
+    if (window.wallTimer) {
+        clearInterval(window.wallTimer);
+        window.wallTimer = null;
+    }
     
     // 更新活动导航链接
     navLinks.forEach(link => {
@@ -6474,44 +6485,45 @@ function formatDateTime(date) {
     });
     
     // 显示目标页面
-    if (pages[pageId]) {
-        pages[pageId].classList.add('active');
+    const targetPage = pages[pageId];
+    if (targetPage) {
+        targetPage.classList.add('active');
         currentPage = pageId;
         
-        // 加载页面特定数据
-        switch(pageId) {
-            case 'dashboard':
-                loadDashboardData();
-                break;
-            case 'announcements':
-                loadAnnouncements();
-                break;
-            case 'wall':
-                loadWallPosts();
-                updateAddNoteButton();
-                break;
-            case 'calendar':
-                loadCalendarEvents();
-                break;
-            case 'countdown':
-                // 确保倒计时页面正确初始化
-                setTimeout(() => {
+        // 使用setTimeout确保DOM更新后再加载数据
+        setTimeout(() => {
+            // 加载页面特定数据
+            switch(pageId) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'announcements':
+                    loadAnnouncements();
+                    break;
+                case 'wall':
+                    // 确保页面完全显示后再加载贴文
+                    loadWallPosts();
+                    updateAddNoteButton();
+                    break;
+                case 'calendar':
+                    loadCalendarEvents();
+                    break;
+                case 'countdown':
                     initCountdownPage();
                     loadCountdownData();
-                }, 100);
-                break;
-            case 'admin':
-                if (isAdmin) {
-                    loadAdminData();
-                } else {
-                    navigateTo('dashboard');
-                    showAlert('You do not have administrator permissions.', 'error');
-                }
-                break;
-        }
+                    break;
+                case 'admin':
+                    if (isAdmin) {
+                        loadAdminData();
+                    } else {
+                        navigateTo('dashboard');
+                        showAlert('You do not have administrator permissions.', 'error');
+                    }
+                    break;
+            }
+        }, 100);
     }
 }
-
        // 初始化倒计时页面
 function initCountdownPage() {
     console.log('Initializing countdown page');
@@ -7950,8 +7962,14 @@ async function loadPastEvents() {
 }
 
     
-    async function loadWallPosts() {
+ async function loadWallPosts() {
     const padletWall = document.getElementById('padlet-wall');
+    
+    // 添加元素存在性检查
+    if (!padletWall) {
+        console.error('padlet-wall element not found');
+        return;
+    }
     
     // 显示加载状态
     padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading communication wall...</p></div>';
@@ -7963,15 +7981,18 @@ async function loadPastEvents() {
             .get();
         
         if (postsSnapshot.empty) {
-            padletWall.innerHTML = `
-                <div class="add-note-btn" id="empty-wall-add-btn">
-                    <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                    <p style="font-size: 1.2rem; font-weight: 600;">Add your first post</p>
-                    <p style="font-size: 0.9rem; opacity: 0.7;">Share your thoughts...</p>
-                </div>
-            `;
+            // 确保元素仍然存在
+            if (padletWall) {
+                padletWall.innerHTML = `
+                    <div class="add-note-btn" id="empty-wall-add-btn">
+                        <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p style="font-size: 1.2rem; font-weight: 600;">Add your first post</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Share your thoughts...</p>
+                    </div>
+                `;
+            }
             
-            // 修复：使用事件委托确保按钮点击响应
+            // 修复事件绑定
             setTimeout(() => {
                 const emptyBtn = document.getElementById('empty-wall-add-btn');
                 if (emptyBtn) {
@@ -7996,10 +8017,10 @@ async function loadPastEvents() {
                     <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
                         ${canEdit ? `
                             <div class="note-actions">
-                                <button class="note-btn edit-note" title="编辑" onclick="openEditNoteModal('${doc.id}', '${escapeHTML(JSON.stringify(data))}')">
+                                <button class="note-btn edit-note" title="Edit" onclick="openEditNoteModal('${doc.id}', '${escapeHTML(JSON.stringify(data))}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="note-btn delete-note" title="删除" onclick="handleDeleteNote('${doc.id}')">
+                                <button class="note-btn delete-note" title="Delete" onclick="handleDeleteNote('${doc.id}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -8010,7 +8031,7 @@ async function loadPastEvents() {
                         <div class="note-meta">
                             <span><i class="fas fa-user"></i> ${data.authorName || 'Anonymous User'}</span>
                             <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
-                            ${data.updatedAt ? `<span><i class="fas fa-edit"></i> 编辑于 ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                            ${data.updatedAt ? `<span><i class="fas fa-edit"></i> Edited at ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -8025,52 +8046,58 @@ async function loadPastEvents() {
                 </div>
             `;
             
-            padletWall.innerHTML = html;
-            
-            // 修复：确保按钮点击响应
-            setTimeout(() => {
-                const addBtn = document.getElementById('wall-add-btn');
-                if (addBtn) {
-                    addBtn.onclick = () => {
-                        if (!currentUser) {
-                            showAlert('Please log in to add a post.', 'error');
-                            openModal('login');
-                            return;
-                        }
-                        openModal('add-note');
-                    };
-                }
+            // 再次检查元素是否存在
+            if (padletWall) {
+                padletWall.innerHTML = html;
                 
-                // 更新顶部的添加贴文按钮状态
-                const topAddBtn = document.getElementById('add-note-btn');
-                if (topAddBtn) {
-                    topAddBtn.disabled = !currentUser;
-                    topAddBtn.onclick = () => {
-                        if (!currentUser) {
-                            showAlert('Please log in to add a post.', 'error');
-                            openModal('login');
-                            return;
+                // 修复事件绑定
+                setTimeout(() => {
+                    const addBtn = document.getElementById('wall-add-btn');
+                    if (addBtn) {
+                        addBtn.onclick = () => {
+                            if (!currentUser) {
+                                showAlert('Please log in to add a post.', 'error');
+                                openModal('login');
+                                return;
+                            }
+                            openModal('add-note');
+                        };
+                    }
+                    
+                    // 更新顶部的添加贴文按钮状态
+                    const topAddBtn = document.getElementById('add-note-btn');
+                    if (topAddBtn) {
+                        topAddBtn.disabled = !currentUser;
+                        if (currentUser) {
+                            topAddBtn.onclick = () => {
+                                openModal('add-note');
+                            };
+                        } else {
+                            topAddBtn.onclick = null;
                         }
-                        openModal('add-note');
-                    };
-                }
-            }, 100);
-            
-            // 初始化拖拽功能
-            initDragAndDrop();
+                    }
+                }, 100);
+                
+                // 初始化拖拽功能
+                initDragAndDrop();
+            }
         }
     } catch (error) {
         console.error('Error loading wall posts:', error);
-        padletWall.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"></i>
-                <p>加载贴文时出错</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
-                <button class="btn btn-outline" onclick="loadWallPosts()" style="margin-top: 1rem;">
-                    <i class="fas fa-redo"></i> Reload
-                </button>
-            </div>
-        `;
+        
+        // 确保元素存在
+        if (padletWall) {
+            padletWall.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <p>Failed to load post</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
+                    <button class="btn btn-outline" onclick="loadWallPosts()" style="margin-top: 1rem;">
+                        <i class="fas fa-redo"></i> Reload
+                    </button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -8098,7 +8125,9 @@ function updateAddNoteButton() {
         if (currentUser) {
             addNoteBtn.disabled = false;
             addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> Add Post';
-            addNoteBtn.onclick = () => openModal('add-note');
+            addNoteBtn.onclick = () => {
+                openModal('add-note-modal');
+            };
         } else {
             addNoteBtn.disabled = true;
             addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> Log in to add';
@@ -8106,8 +8135,6 @@ function updateAddNoteButton() {
         }
     }
 }
-
-       
        
     function initDragAndDrop() {
         const draggables = document.querySelectorAll('.draggable');
