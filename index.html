@@ -5044,7 +5044,60 @@ async function deleteLink(linkId) {
                 }
             });
         });
-        
+            // Edit announcement form submission
+    const editAnnouncementForm = document.getElementById('edit-announcement-form');
+    if (editAnnouncementForm) {
+        editAnnouncementForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const announcementId = document.getElementById('edit-announcement-id').value;
+            const title = document.getElementById('edit-announcement-title').value;
+            const content = document.getElementById('edit-announcement-content').value;
+            
+            if (!title || !content) {
+                showAlert('Please fill in title and content', 'error');
+                return;
+            }
+            
+            try {
+                if (window.demoAnnouncements) {
+                    // Update demo data
+                    const index = parseInt(announcementId.replace('announcement-', ''));
+                    if (window.demoAnnouncements[index]) {
+                        window.demoAnnouncements[index].title = title;
+                        window.demoAnnouncements[index].content = content;
+                        window.demoAnnouncements[index].updatedAt = new Date();
+                        
+                        // Reload announcements
+                        loadAnnouncements();
+                        
+                        // Close modal
+                        closeModal('edit-announcement-modal');
+                        
+                        showAlert('Announcement updated successfully (Demo mode)', 'success');
+                    }
+                } else if (db) {
+                    // Update in Firebase
+                    await db.collection('announcements').doc(announcementId).update({
+                        title: title,
+                        content: content,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Reload announcements
+                    loadAnnouncements();
+                    
+                    // Close modal
+                    closeModal('edit-announcement-modal');
+                    
+                    showAlert('Announcement updated successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error updating announcement:', error);
+                showAlert(`Error updating announcement: ${error.message}`, 'error');
+            }
+        });
+    }
         // Form submissions
         loginForm.addEventListener('submit', handleLogin);
         registerForm.addEventListener('submit', handleRegister);
@@ -5963,43 +6016,135 @@ async function confirmDelete() {
     }
 }
 
-// 删除公告
-async function deleteAnnouncement(announcementId) {
-    try {
-        const announcementDoc = await db.collection('announcements').doc(announcementId).get();
-        const announcementData = announcementDoc.data();
+       function editAnnouncement(announcementId) {
+    let announcement;
+    
+    // Find the announcement in demo data or Firebase
+    if (window.demoAnnouncements) {
+        // For demo data
+        const index = parseInt(announcementId.replace('announcement-', ''));
+        announcement = window.demoAnnouncements[index];
         
-        if (!isAdmin && announcementData.authorId !== currentUser?.uid) {
-            showAlert('You do not have permission to delete this announcement.', 'error');
-            return;
+        if (announcement) {
+            // Populate edit form
+            document.getElementById('edit-announcement-id').value = announcementId;
+            document.getElementById('edit-announcement-title').value = announcement.title;
+            document.getElementById('edit-announcement-content').value = announcement.content;
+            
+            // Show edit modal
+            openModal('edit-announcement-modal');
         }
-        
-        // 先保存到回收站
-        await db.collection('recycleBin').add({
-            originalCollection: 'announcements',
-            originalId: announcementId,
-            data: announcementData,
-            deletedBy: currentUser.uid,
-            deletedByName: userName.textContent,
-            deletedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        // 然后删除原文档
-        await db.collection('announcements').doc(announcementId).delete();
-        
-        // 刷新页面
-        if (currentPage === 'announcements') {
-            loadAnnouncements();
-        } else if (currentPage === 'dashboard') {
-            loadDashboardData();
-        }
-        
-    } catch (error) {
-        console.error('Error deleting announcement:', error);
-        throw error;
+    } else if (db) {
+        // For Firebase data
+        db.collection('announcements').doc(announcementId).get()
+            .then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    
+                    // Populate edit form
+                    document.getElementById('edit-announcement-id').value = announcementId;
+                    document.getElementById('edit-announcement-title').value = data.title;
+                    document.getElementById('edit-announcement-content').value = data.content;
+                    
+                    // Show edit modal
+                    openModal('edit-announcement-modal');
+                } else {
+                    showAlert('Announcement not found', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading announcement:', error);
+                showAlert('Error loading announcement', 'error');
+            });
     }
 }
 
+// Handle edit announcement form submission
+document.getElementById('edit-announcement-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const announcementId = document.getElementById('edit-announcement-id').value;
+    const title = document.getElementById('edit-announcement-title').value;
+    const content = document.getElementById('edit-announcement-content').value;
+    
+    if (!title || !content) {
+        showAlert('Please fill in title and content', 'error');
+        return;
+    }
+    
+    try {
+        if (window.demoAnnouncements) {
+            // Update demo data
+            const index = parseInt(announcementId.replace('announcement-', ''));
+            if (window.demoAnnouncements[index]) {
+                window.demoAnnouncements[index].title = title;
+                window.demoAnnouncements[index].content = content;
+                window.demoAnnouncements[index].updatedAt = new Date();
+                
+                // Reload announcements
+                loadAnnouncements();
+                
+                // Close modal
+                closeModal('edit-announcement-modal');
+                
+                showAlert('Announcement updated successfully (Demo mode)', 'success');
+            }
+        } else if (db) {
+            // Update in Firebase
+            await db.collection('announcements').doc(announcementId).update({
+                title: title,
+                content: content,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Reload announcements
+            loadAnnouncements();
+            
+            // Close modal
+            closeModal('edit-announcement-modal');
+            
+            showAlert('Announcement updated successfully', 'success');
+        }
+    } catch (error) {
+        console.error('Error updating announcement:', error);
+        showAlert(`Error updating announcement: ${error.message}`, 'error');
+    }
+});
+
+
+// 删除公告
+// Delete announcement function
+async function deleteAnnouncement(announcementId) {
+    if (!confirm('Are you sure you want to delete this announcement?')) {
+        return;
+    }
+    
+    try {
+        if (window.demoAnnouncements) {
+            // Delete from demo data
+            const index = parseInt(announcementId.replace('announcement-', ''));
+            if (window.demoAnnouncements[index]) {
+                window.demoAnnouncements.splice(index, 1);
+                
+                // Reload announcements
+                loadAnnouncements();
+                
+                showAlert('Announcement deleted successfully (Demo mode)', 'success');
+            }
+        } else if (db) {
+            // Delete from Firebase
+            await db.collection('announcements').doc(announcementId).delete();
+            
+            // Reload announcements
+            loadAnnouncements();
+            
+            showAlert('Announcement deleted successfully', 'success');
+        }
+    } catch (error) {
+        console.error('Error deleting announcement:', error);
+        showAlert(`Error deleting announcement: ${error.message}`, 'error');
+    }
+}
 // ==================== 新增：批量操作功能 ====================
 
 // 设置批量操作
