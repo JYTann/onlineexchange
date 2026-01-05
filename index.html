@@ -1657,6 +1657,100 @@ html {
     }
 }
 
+            /* 新增：修复登录/注册模态框样式 */
+    .auth-card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        padding: 3rem;
+        width: 100%;
+        max-width: 480px;
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: var(--gradient-primary);
+    }
+
+    .auth-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.8rem;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1.2rem;
+        border: 2px solid var(--light-gray);
+        border-radius: var(--border-radius-sm);
+        font-family: inherit;
+        font-size: 1.05rem;
+        transition: var(--transition);
+        background: rgba(249, 249, 249, 0.8);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(74, 111, 165, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* 修复取消按钮样式 */
+    .btn-outline {
+        background-color: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        box-shadow: none;
+        transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+        background-color: rgba(74, 111, 165, 0.1);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(74, 111, 165, 0.15);
+        color: var(--primary-dark);
+    }
+
+    /* 修复模态框关闭按钮 */
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 2.2rem;
+        cursor: pointer;
+        color: white;
+        transition: var(--transition);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .modal-close:hover {
+        transform: rotate(90deg);
+        background: rgba(255, 255, 255, 0.2);
+    }
         /* ==== 新增：编辑相关样式 ==== */
 .edit-mode {
     border: 2px solid var(--primary);
@@ -2915,18 +3009,32 @@ const firebaseConfig = {
     let autoSaveTimer = null;
     
     // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-        initEventListeners();
-        initAuthStateListener();
-        generateCalendar(currentCalendarDate);
-        loadDashboardData();
-        
-        // Initialize tabs
-        initTabs();
-        
-        // Initialize Firebase collections if needed
-        initializeFirestore();
-        setupBatchOperations();
+      document.addEventListener('DOMContentLoaded', function() {
+        // 确保 addNoteBtn 正确绑定事件
+        const addNoteBtn = document.getElementById('add-note-btn');
+        if (addNoteBtn) {
+            addNoteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentUser) {
+                    openModal('add-note-modal');
+                } else {
+                    showAlert('请先登录才能添加贴文', 'error');
+                    openModal('login-modal');
+                }
+            });
+        }
+
+        // 修复空墙的添加按钮
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('#empty-wall-add-btn') || e.target.closest('#wall-add-btn')) {
+                if (currentUser) {
+                    openModal('add-note-modal');
+                } else {
+                    showAlert('请先登录才能添加贴文', 'error');
+                    openModal('login-modal');
+                }
+            }
+        });
     });
     
     // Initialize Firebase collections with default data
@@ -3289,21 +3397,34 @@ const firebaseConfig = {
     }
 
        function openEditAnnouncementModal(announcementId, announcementData) {
-    document.getElementById('edit-announcement-id').value = announcementId;
-    document.getElementById('edit-announcement-title').value = announcementData.title;
-    document.getElementById('edit-announcement-content').value = announcementData.content;
-    
-    // 保存初始状态以便撤销
-    saveEditState('announcement', announcementId, {
-        title: announcementData.title,
-        content: announcementData.content
-    });
-    
-    // 显示编辑日志
-    displayEditLog('announcement', announcementId);
-    
-    openModal('edit-announcement-modal');
-}
+        // 确保数据是对象
+        if (typeof announcementData === 'string') {
+            try {
+                announcementData = JSON.parse(announcementData);
+            } catch (e) {
+                console.error('Error parsing announcement data:', e);
+                announcementData = {};
+            }
+        }
+        
+        // 填充表单
+        document.getElementById('edit-announcement-id').value = announcementId;
+        document.getElementById('edit-announcement-title').value = announcementData.title || '';
+        document.getElementById('edit-announcement-content').value = announcementData.content || '';
+        
+        // 保存初始状态
+        saveEditState('announcement', announcementId, {
+            title: announcementData.title || '',
+            content: announcementData.content || ''
+        });
+        
+        // 显示编辑日志
+        displayEditLog('announcement', announcementId);
+        
+        // 打开模态框
+        openModal('edit-announcement-modal');
+    }
+
 
 // 打开编辑贴文模态框
 function openEditNoteModal(noteId, noteData) {
@@ -3376,44 +3497,49 @@ function openEditEventModal(eventId, eventData) {
 
 // 处理编辑公告
 async function handleEditAnnouncement(e) {
-    e.preventDefault();
-    
-    const announcementId = document.getElementById('edit-announcement-id').value;
-    const title = document.getElementById('edit-announcement-title').value;
-    const content = document.getElementById('edit-announcement-content').value;
-    
-    try {
-        await db.collection('announcements').doc(announcementId).update({
-            title: title,
-            content: content,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedBy: currentUser.uid,
-            lastEdited: new Date()
-        });
+        e.preventDefault();
         
-        // 记录编辑历史
-        await recordEditHistory('announcements', announcementId, {
-            title: title,
-            content: content,
-            editedBy: currentUser.uid,
-            editedAt: new Date()
-        });
+        const announcementId = document.getElementById('edit-announcement-id').value;
+        const title = document.getElementById('edit-announcement-title').value;
+        const content = document.getElementById('edit-announcement-content').value;
         
-        closeModal('edit-announcement-modal');
-        showAlert('公告已更新', 'success');
-        
-        // 刷新页面数据
-        if (currentPage === 'announcements') {
-            loadAnnouncements();
-        } else if (currentPage === 'dashboard') {
-            loadDashboardData();
+        if (!title.trim() || !content.trim()) {
+            showAlert('请填写标题和内容', 'error');
+            return;
         }
         
-    } catch (error) {
-        console.error('Error updating announcement:', error);
-        showAlert(`更新公告失败: ${error.message}`, 'error');
+        try {
+            await db.collection('announcements').doc(announcementId).update({
+                title: title,
+                content: content,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: currentUser.uid
+            });
+            
+            // 记录编辑历史
+            await recordEditHistory('announcements', announcementId, {
+                title: title,
+                content: content,
+                editedBy: currentUser.uid,
+                editedAt: new Date()
+            });
+            
+            closeModal('edit-announcement-modal');
+            showAlert('公告已更新', 'success');
+            
+            // 刷新页面数据
+            if (currentPage === 'announcements') {
+                loadAnnouncements();
+            }
+            if (currentPage === 'dashboard') {
+                loadDashboardData();
+            }
+            
+        } catch (error) {
+            console.error('Error updating announcement:', error);
+            showAlert(`更新公告失败: ${error.message}`, 'error');
+        }
     }
-}
 
 // 处理编辑贴文
 async function handleEditNote(e) {
@@ -4087,59 +4213,92 @@ function formatDateTime(date) {
         
         // Show target page
         if (pages[pageId]) {
-            pages[pageId].classList.add('active');
-            currentPage = pageId;
+        pages[pageId].classList.add('active');
+        currentPage = pageId;
+        
+        // 加载页面特定数据
+        switch(pageId) {
+            case 'dashboard':
+                loadDashboardData();
+                break;
+            case 'announcements':
+                loadAnnouncements();
+                break;
+            case 'wall':
+                loadWallPosts();
+                // 确保添加按钮状态正确
+                updateAddNoteButton();
+                break;
+            case 'calendar':
+                loadCalendarEvents();
+                break;
+            case 'admin':
+                if (isAdmin) {
+                    loadAdminData();
+                } else {
+                    navigateTo('dashboard');
+                    showAlert('您没有管理员权限', 'error');
+                }
+                break;
+        }
+    }
+}
+    
+    // Modal controls
+    function openModal(modalId) {
+        let modal;
+        
+        if (typeof modalId === 'string') {
+            modal = document.getElementById(modalId) || modals[modalId];
+        } else if (modalId.target) {
+            // 处理点击事件
+            modalId.preventDefault();
+            modal = document.getElementById(modalId.target.getAttribute('data-target'));
+        }
+        
+        if (modal) {
+            // 关闭所有其他模态框
+            document.querySelectorAll('.modal.active').forEach(m => {
+                m.classList.remove('active');
+            });
             
-            // Load page-specific data
-            switch(pageId) {
-                case 'dashboard':
-                    loadDashboardData();
-                    break;
-                case 'announcements':
-                    loadAnnouncements();
-                    break;
-                case 'wall':
-                    loadWallPosts();
-                    break;
-                case 'calendar':
-                    loadCalendarEvents();
-                    break;
-                case 'admin':
-                    if (isAdmin) {
-                        loadAdminData();
-                    } else {
-                        navigateTo('dashboard');
-                        showAlert('您没有管理员权限', 'error');
-                    }
-                    break;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // 自动聚焦到第一个输入框
+            const firstInput = modal.querySelector('input, textarea, select');
+            if (firstInput) {
+                setTimeout(() => firstInput.focus(), 100);
             }
         }
     }
     
-    // Modal controls
-    function openModal(modalId) {
-        if (modals[modalId]) {
-            modals[modalId].classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-    
     function closeModal(modalId) {
-        if (modals[modalId]) {
-            modals[modalId].classList.remove('active');
+        // 支持传入事件对象或模态框ID
+        if (modalId.preventDefault) {
+            modalId.preventDefault();
+            const target = modalId.target.closest('[data-modal]');
+            modalId = target ? target.getAttribute('data-modal') : null;
+        }
+        
+        if (!modalId) return;
+        
+        const modal = document.getElementById(modalId) || modals[modalId];
+        if (modal) {
+            modal.classList.remove('active');
             document.body.style.overflow = 'auto';
             
-            // Reset forms
-            if (modalId === 'login-modal') {
-                loginForm.reset();
-            } else if (modalId === 'register-modal') {
-                registerForm.reset();
-            } else if (modalId === 'add-note-modal') {
-                noteForm.reset();
-                document.querySelectorAll('.note-color-option')[0].click();
-                document.getElementById('image-preview').style.display = 'none';
-            } else if (modalId === 'change-password-modal') {
-                changePasswordForm.reset();
+            // 重置表单
+            const form = modal.querySelector('form');
+            if (form) {
+                form.reset();
+            }
+            
+            // 特殊处理
+            if (modalId === 'add-note-modal' || modalId === 'addNote') {
+                document.querySelectorAll('.note-color-option')[0]?.click();
+                const imagePreview = document.getElementById('image-preview');
+                if (imagePreview) imagePreview.style.display = 'none';
             }
         }
     }
@@ -4235,38 +4394,50 @@ function formatDateTime(date) {
         }
     }
     
-    function updateUIForUser(user) {
-        authButtons.style.display = 'none';
-        userProfile.style.display = 'flex';
-        
-        // Enable navigation to all pages
-        navLinks.forEach(link => {
-            link.style.pointerEvents = 'auto';
-            link.style.opacity = '1';
-        });
+     function updateUIForUser(user) {
+    authButtons.style.display = 'none';
+    userProfile.style.display = 'flex';
+    
+    // 启用所有导航链接
+    navLinks.forEach(link => {
+        link.style.pointerEvents = 'auto';
+        link.style.opacity = '1';
+    });
+    
+    // 确保添加贴文按钮可用
+    updateAddNoteButton();
+    
+    // 更新用户信息
+    if (user.displayName || user.email) {
+        const name = user.displayName || user.email.split('@')[0];
+        userName.textContent = name;
+        const firstChar = name.charAt(0).toUpperCase();
+        userAvatar.textContent = firstChar;
+        document.getElementById('profile-avatar').textContent = firstChar;
     }
+}
     
     function updateUIForGuest() {
-        authButtons.style.display = 'block';
-        userProfile.style.display = 'none';
-        adminMenu.style.display = 'none';
-        
-        // Disable navigation to pages that require auth
-        navLinks.forEach(link => {
-            if (link.getAttribute('data-page') !== 'dashboard') {
-                link.style.pointerEvents = 'none';
-                link.style.opacity = '0.6';
-            }
-        });
-        
-        // If on a restricted page, redirect to dashboard
-        if (currentPage !== 'dashboard') {
-            navigateTo('dashboard');
+    authButtons.style.display = 'block';
+    userProfile.style.display = 'none';
+    adminMenu.style.display = 'none';
+    
+    // 禁用需要登录的导航链接
+    navLinks.forEach(link => {
+        if (link.getAttribute('data-page') !== 'dashboard') {
+            link.style.pointerEvents = 'none';
+            link.style.opacity = '0.6';
         }
-        
-        // Disable add note button
-        addNoteBtn.disabled = true;
+    });
+    
+    // 禁用添加贴文按钮
+    updateAddNoteButton();
+    
+    // 如果在受限页面，重定向到首页
+    if (currentPage !== 'dashboard') {
+        navigateTo('dashboard');
     }
+}
     
     async function handleLogin(e) {
         e.preventDefault();
@@ -4478,8 +4649,8 @@ function formatDateTime(date) {
     
     async function loadAnnouncements() {
         const announcementsList = document.getElementById('announcements-list');
-        const canEdit = isAdmin || currentUser?.uid === data.authorId;
-        // Show loading
+        
+        // 显示加载状态
         announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
         
         try {
@@ -4488,117 +4659,220 @@ function formatDateTime(date) {
                 .get();
             
             if (announcementsSnapshot.empty) {
-                announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>暂无公告</p></div>';
+                announcementsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bullhorn" style="font-size: 4rem; opacity: 0.3;"></i>
+                        <p>暂无公告</p>
+                        ${isAdmin ? '<button class="btn btn-primary" onclick="document.getElementById(\'add-event-tab\')?.click()">发布第一个公告</button>' : ''}
+                    </div>
+                `;
             } else {
                 let html = '';
                 announcementsSnapshot.forEach(doc => {
                     const data = doc.data();
-                        html += `
-        <div class="announcement-item" data-id="${doc.id}">
-            ${canEdit ? `
-                <div class="item-checkbox" style="position: absolute; top: 15px; right: 60px;">
-                    <input type="checkbox" class="item-checkbox" data-id="${doc.id}" data-type="announcement">
-                </div>
-                <button class="quick-edit-btn edit-announcement" data-id="${doc.id}" title="编辑公告">
-                    <i class="fas fa-edit"></i>
-                </button>
-            ` : ''}
-            <h4>${data.title}</h4>
-            <div class="announcement-content">${data.content}</div>
-            <div class="announcement-meta">
-                <span>发布者: ${data.authorName || '管理员'}</span>
-                <span>${formatDate(data.createdAt?.toDate())}</span>
-                ${data.lastEdited ? `<span>最后编辑: ${formatDate(data.lastEdited?.toDate())}</span>` : ''}
-            </div>
-            ${canEdit ? `
-                <div class="edit-actions">
-                    <button class="btn btn-small btn-outline edit-announcement-btn" data-id="${doc.id}">
-                        <i class="fas fa-edit"></i> 编辑
-                    </button>
-                    <button class="btn btn-small" style="background-color: var(--danger); color: white;" 
-                            onclick="openDeleteConfirmation('${doc.id}', 'announcement', '${data.title}')">
-                        <i class="fas fa-trash"></i> 删除
-                    </button>
-                </div>
-            ` : ''}
-        </div>
-    `;
+                    const canEdit = isAdmin || currentUser?.uid === data.authorId;
+                    
+                    html += `
+                        <div class="announcement-item" data-id="${doc.id}">
+                            ${canEdit ? `
+                                <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px;">
+                                    <button class="btn btn-small btn-outline edit-announcement-btn" 
+                                            onclick="openEditAnnouncementModal('${doc.id}', ${JSON.stringify(data).replace(/'/g, "\\'")})">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </button>
+                                    <button class="btn btn-small" 
+                                            style="background-color: var(--danger); color: white;"
+                                            onclick="openDeleteConfirmation('${doc.id}', 'announcement', '${data.title}')">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </div>
+                            ` : ''}
+                            <h4>${data.title}</h4>
+                            <div class="announcement-content">${data.content}</div>
+                            <div class="announcement-meta">
+                                <span><i class="fas fa-user"></i> ${data.authorName || '管理员'}</span>
+                                <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
+                                ${data.updatedAt ? `<span><i class="fas fa-edit"></i> 编辑于 ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
                 });
                 announcementsList.innerHTML = html;
             }
         } catch (error) {
             console.error('Error loading announcements:', error);
-            announcementsList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载公告时出错</p></div>';
+            announcementsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <p>加载公告时出错: ${error.message}</p>
+                    <button class="btn btn-outline" onclick="loadAnnouncements()">
+                        <i class="fas fa-redo"></i> 重新加载
+                    </button>
+                </div>
+            `;
         }
     }
+
     
     async function loadWallPosts() {
-        const padletWall = document.getElementById('padlet-wall');
+    const padletWall = document.getElementById('padlet-wall');
+    
+    // 显示加载状态
+    padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
+    
+    try {
+        const postsSnapshot = await db.collection('wallPosts')
+            .orderBy('createdAt', 'desc')
+            .limit(20)
+            .get();
         
-        // Show loading
-        padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
-        
-        try {
-            const postsSnapshot = await db.collection('wallPosts')
-                .orderBy('createdAt', 'desc')
-                .limit(20)
-                .get();
+        if (postsSnapshot.empty) {
+            padletWall.innerHTML = `
+                <div class="add-note-btn" id="empty-wall-add-btn">
+                    <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p style="font-size: 1.2rem; font-weight: 600;">添加第一个贴文</p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">开始分享您的想法</p>
+                </div>
+            `;
             
-            if (postsSnapshot.empty) {
-                padletWall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
-                document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
-            } else {
-                let html = '';
-                postsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const noteColorClass = `note-${data.color || 'yellow'}`;
-                    
-                    html += `
-                        <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
-                            ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
-                            <div class="note-content">${data.content}</div>
-                            ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
-                            <div class="note-meta">
-                                <span>作者: ${data.authorName}</span>
-                                <span>${formatDate(data.createdAt?.toDate())}</span>
-                            </div>
-                            ${isAdmin || currentUser?.uid === data.authorId ? `
-                                <div class="note-actions">
-                                    <button class="note-btn delete-note" title="删除">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-                
-                // Add the "add note" button at the end
-                html += '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
-                padletWall.innerHTML = html;
-                
-                // Add event listeners
-                document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
-                
-                // Add delete event listeners
-                document.querySelectorAll('.delete-note').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const noteId = this.closest('.padlet-note').getAttribute('data-id');
-                        if (confirm('确定要删除这个贴文吗？')) {
-                            deleteWallPost(noteId);
+            // 修复：使用事件委托确保按钮点击响应
+            setTimeout(() => {
+                const emptyBtn = document.getElementById('empty-wall-add-btn');
+                if (emptyBtn) {
+                    emptyBtn.onclick = () => {
+                        if (!currentUser) {
+                            showAlert('请先登录才能添加贴文', 'error');
+                            openModal('login');
+                            return;
                         }
-                    });
-                });
+                        openModal('add-note');
+                    };
+                }
+            }, 100);
+        } else {
+            let html = '';
+            postsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const noteColorClass = `note-${data.color || 'yellow'}`;
+                const canEdit = isAdmin || currentUser?.uid === data.authorId;
                 
-                // Add drag and drop functionality
-                initDragAndDrop();
-            }
-        } catch (error) {
-            console.error('Error loading wall posts:', error);
-            padletWall.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载贴文时出错</p></div>';
+                html += `
+                    <div class="padlet-note ${noteColorClass} draggable" data-id="${doc.id}" draggable="true">
+                        ${canEdit ? `
+                            <div class="note-actions">
+                                <button class="note-btn edit-note" title="编辑" onclick="openEditNoteModal('${doc.id}', '${escapeHTML(JSON.stringify(data))}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="note-btn delete-note" title="删除" onclick="handleDeleteNote('${doc.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                        ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
+                        <div class="note-content">${escapeHTML(data.content)}</div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                        <div class="note-meta">
+                            <span><i class="fas fa-user"></i> ${data.authorName || '匿名用户'}</span>
+                            <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
+                            ${data.updatedAt ? `<span><i class="fas fa-edit"></i> 编辑于 ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 添加"添加贴文"按钮
+            html += `
+                <div class="add-note-btn" id="wall-add-btn">
+                    <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p style="font-size: 1.2rem; font-weight: 600;">添加贴文</p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">分享您的想法</p>
+                </div>
+            `;
+            
+            padletWall.innerHTML = html;
+            
+            // 修复：确保按钮点击响应
+            setTimeout(() => {
+                const addBtn = document.getElementById('wall-add-btn');
+                if (addBtn) {
+                    addBtn.onclick = () => {
+                        if (!currentUser) {
+                            showAlert('请先登录才能添加贴文', 'error');
+                            openModal('login');
+                            return;
+                        }
+                        openModal('add-note');
+                    };
+                }
+                
+                // 更新顶部的添加贴文按钮状态
+                const topAddBtn = document.getElementById('add-note-btn');
+                if (topAddBtn) {
+                    topAddBtn.disabled = !currentUser;
+                    topAddBtn.onclick = () => {
+                        if (!currentUser) {
+                            showAlert('请先登录才能添加贴文', 'error');
+                            openModal('login');
+                            return;
+                        }
+                        openModal('add-note');
+                    };
+                }
+            }, 100);
+            
+            // 初始化拖拽功能
+            initDragAndDrop();
+        }
+    } catch (error) {
+        console.error('Error loading wall posts:', error);
+        padletWall.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                <p>加载贴文时出错</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
+                <button class="btn btn-outline" onclick="loadWallPosts()" style="margin-top: 1rem;">
+                    <i class="fas fa-redo"></i> 重新加载
+                </button>
+            </div>
+        `;
+    }
+}
+
+       function escapeHTML(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+       // 处理删除贴文
+function handleDeleteNote(noteId) {
+    if (confirm('确定要删除这个贴文吗？删除后无法恢复。')) {
+        deleteWallPost(noteId);
+    }
+}
+
+// 修复：确保添加贴文按钮始终可用
+function updateAddNoteButton() {
+    const addNoteBtn = document.getElementById('add-note-btn');
+    if (addNoteBtn) {
+        if (currentUser) {
+            addNoteBtn.disabled = false;
+            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> 添加贴文';
+            addNoteBtn.onclick = () => openModal('add-note');
+        } else {
+            addNoteBtn.disabled = true;
+            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> 登录后添加';
+            addNoteBtn.onclick = null;
         }
     }
-    
+}
+
+       
+       
     function initDragAndDrop() {
         const draggables = document.querySelectorAll('.draggable');
         const container = document.getElementById('padlet-wall');
@@ -5138,8 +5412,13 @@ function formatDateTime(date) {
         }
         
         try {
-            // Create event object
+            // 修复日期问题：使用本地时区
             const eventDate = new Date(date);
+            
+            // 重要：避免时区转换问题
+            // 将日期调整为本地时区
+            eventDate.setMinutes(eventDate.getMinutes() - eventDate.getTimezoneOffset());
+            
             if (time) {
                 const [hours, minutes] = time.split(':');
                 eventDate.setHours(hours, minutes);
@@ -5148,7 +5427,7 @@ function formatDateTime(date) {
             const eventData = {
                 title: title,
                 description: description,
-                date: eventDate,
+                date: eventDate,  // 使用调整后的日期
                 time: time || '',
                 type: type,
                 school: school,
@@ -5159,8 +5438,8 @@ function formatDateTime(date) {
             
             const docRef = await db.collection('events').add(eventData);
             
-            // Add to calendar immediately
-            const dateString = date;
+            // 修复：使用本地日期字符串显示
+            const dateString = eventDate.toISOString().split('T')[0];
             const eventContainer = document.getElementById(`events-${dateString}`);
             
             if (eventContainer) {
@@ -5177,7 +5456,6 @@ function formatDateTime(date) {
             document.querySelector('[data-tab="view-calendar"]').click();
             showAlert('活动已添加', 'success');
             
-            // Update statistics
             loadDashboardData();
             if (isAdmin) loadAdminData();
             
@@ -5328,10 +5606,25 @@ function formatDateTime(date) {
     async function showEventDetail(eventId, eventData) {
         document.getElementById('event-detail-title').textContent = eventData.title;
         
+        // 修复：正确处理日期对象
+        let eventDate;
+        if (eventData.date && typeof eventData.date.toDate === 'function') {
+            eventDate = eventData.date.toDate();
+        } else if (eventData.date instanceof Date) {
+            eventDate = eventData.date;
+        } else if (eventData.date) {
+            eventDate = new Date(eventData.date);
+        }
+        
         let html = `
             <p><strong>描述:</strong> ${eventData.description || '无描述'}</p>
-            <p><strong>日期:</strong> ${formatDate(eventData.date?.toDate())}</p>
         `;
+        
+        if (eventDate) {
+            // 修复：使用本地时区显示日期
+            const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
+            html += `<p><strong>日期:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
+        }
         
         if (eventData.time) {
             html += `<p><strong>时间:</strong> ${eventData.time}</p>`;
@@ -5357,11 +5650,10 @@ function formatDateTime(date) {
             html += `<p><strong>主办:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
         }
         
-        html += `<p><strong>创建者:</strong> ${eventData.authorName}</p>`;
+        html += `<p><strong>创建者:</strong> ${eventData.authorName || '未知用户'}</p>`;
         
         document.getElementById('event-detail-content').innerHTML = html;
         
-        // Set up action buttons
         const actions = document.getElementById('event-detail-actions');
         actions.innerHTML = '';
         
@@ -5379,6 +5671,16 @@ function formatDateTime(date) {
                 }
             };
             actions.appendChild(deleteBtn);
+            
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'btn btn-primary';
+            editBtn.textContent = '编辑活动';
+            editBtn.onclick = () => {
+                closeModal('eventDetail');
+                openEditEventModal(eventId, eventData);
+            };
+            actions.appendChild(editBtn);
         }
         
         const closeBtn = document.createElement('button');
@@ -5627,6 +5929,283 @@ function formatDateTime(date) {
 window.openEditAnnouncementModal = openEditAnnouncementModal;
 window.openEditNoteModal = openEditNoteModal;
 window.openEditEventModal = openEditEventModal;
+
+       const achievementSystem = {
+        badges: {
+            firstPost: {
+                id: 'firstPost',
+                name: '初次分享',
+                description: '发表第一个贴文',
+                icon: 'fas fa-feather-alt',
+                color: '#4a6fa5',
+                condition: (userData) => userData.postCount >= 1
+            },
+            activeParticipant: {
+                id: 'activeParticipant',
+                name: '活跃参与者',
+                description: '参与5个以上活动',
+                icon: 'fas fa-users',
+                color: '#27ae60',
+                condition: (userData) => userData.eventParticipation >= 5
+            },
+            popularAuthor: {
+                id: 'popularAuthor',
+                name: '热门作者',
+                description: '获得10个以上点赞',
+                icon: 'fas fa-fire',
+                color: '#e74c3c',
+                condition: (userData) => userData.likesReceived >= 10
+            },
+            languageExpert: {
+                id: 'languageExpert',
+                name: '语言专家',
+                description: '参与语言交换活动',
+                icon: 'fas fa-language',
+                color: '#9b59b6',
+                condition: (userData) => userData.languageExchangeParticipation >= 1
+            },
+            cultureAmbassador: {
+                id: 'cultureAmbassador',
+                name: '文化大使',
+                description: '分享文化相关贴文',
+                icon: 'fas fa-handshake',
+                color: '#f39c12',
+                condition: (userData) => userData.culturePosts >= 3
+            }
+        },
+
+        async getUserAchievements(userId) {
+            try {
+                const achievementsSnapshot = await db.collection('userAchievements')
+                    .where('userId', '==', userId)
+                    .get();
+                
+                const achievements = [];
+                achievementsSnapshot.forEach(doc => {
+                    achievements.push(doc.data());
+                });
+                
+                return achievements;
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+                return [];
+            }
+        },
+
+        async checkAndAwardBadges(userId, userData) {
+            try {
+                const userAchievements = await this.getUserAchievements(userId);
+                const awardedBadges = userAchievements.map(ach => ach.badgeId);
+                
+                const badgesToAward = [];
+                
+                // 检查每个徽章条件
+                for (const [badgeId, badge] of Object.entries(this.badges)) {
+                    if (!awardedBadges.includes(badgeId) && badge.condition(userData)) {
+                        badgesToAward.push({
+                            badgeId: badgeId,
+                            ...badge
+                        });
+                    }
+                }
+                
+                // 颁发新徽章
+                for (const badge of badgesToAward) {
+                    await this.awardBadge(userId, badge);
+                }
+                
+                return badgesToAward;
+            } catch (error) {
+                console.error('Error checking badges:', error);
+                return [];
+            }
+        },
+
+        async awardBadge(userId, badge) {
+            try {
+                const achievementData = {
+                    userId: userId,
+                    badgeId: badge.id,
+                    badgeName: badge.name,
+                    badgeDescription: badge.description,
+                    badgeIcon: badge.icon,
+                    badgeColor: badge.color,
+                    awardedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    notified: false
+                };
+                
+                await db.collection('userAchievements').add(achievementData);
+                
+                // 发送通知
+                showAlert(`恭喜获得徽章: ${badge.name} - ${badge.description}`, 'success');
+                
+                return true;
+            } catch (error) {
+                console.error('Error awarding badge:', error);
+                return false;
+            }
+        }
+    };
+
+    // 更新用户数据时检查徽章
+    async function updateUserAchievements(userId) {
+        try {
+            // 获取用户数据
+            const userStats = await getUserStats(userId);
+            
+            // 检查并颁发徽章
+            const newBadges = await achievementSystem.checkAndAwardBadges(userId, userStats);
+            
+            // 如果有新徽章，刷新显示
+            if (newBadges.length > 0) {
+                await loadUserAchievements(userId);
+            }
+            
+            return newBadges;
+        } catch (error) {
+            console.error('Error updating achievements:', error);
+            return [];
+        }
+    }
+
+    // 获取用户统计数据
+    async function getUserStats(userId) {
+        try {
+            const userData = {
+                postCount: 0,
+                eventParticipation: 0,
+                likesReceived: 0,
+                languageExchangeParticipation: 0,
+                culturePosts: 0
+            };
+            
+            // 获取用户贴文数量
+            const postsQuery = await db.collection('wallPosts')
+                .where('authorId', '==', userId)
+                .get();
+            userData.postCount = postsQuery.size;
+            
+            // 获取参与的活动数量（简化的示例）
+            // 在实际应用中，您需要跟踪用户参与的活动
+            
+            // 获取点赞数量（需要在贴文中添加点赞字段）
+            
+            return userData;
+        } catch (error) {
+            console.error('Error getting user stats:', error);
+            return {};
+        }
+    }
+
+    // 加载用户成就徽章
+    async function loadUserAchievements(userId) {
+        const achievementBadges = document.getElementById('achievement-badges');
+        
+        if (!achievementBadges) return;
+        
+        try {
+            const achievements = await achievementSystem.getUserAchievements(userId);
+            
+            if (achievements.length === 0) {
+                achievementBadges.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-trophy" style="font-size: 4rem; color: var(--warning); opacity: 0.5;"></i>
+                        <p style="font-size: 1.2rem; margin-top: 1rem;">暂无成就徽章</p>
+                        <p style="opacity: 0.7; margin-top: 0.5rem;">参与更多交流活动以解锁成就</p>
+                        <div style="margin-top: 2rem; text-align: left;">
+                            <h4 style="color: var(--primary); margin-bottom: 1rem;">如何获得徽章？</h4>
+                            <ul style="text-align: left; padding-left: 1.5rem;">
+                                <li>发表第一个贴文 - <span class="badge" style="background-color: #4a6fa5; color: white;">初次分享</span></li>
+                                <li>参与5个活动 - <span class="badge" style="background-color: #27ae60; color: white;">活跃参与者</span></li>
+                                <li>获得10个点赞 - <span class="badge" style="background-color: #e74c3c; color: white;">热门作者</span></li>
+                                <li>参与语言交换 - <span class="badge" style="background-color: #9b59b6; color: white;">语言专家</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                let html = '<div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;">';
+                
+                achievements.forEach(achievement => {
+                    html += `
+                        <div class="achievement-badge" style="
+                            background: linear-gradient(135deg, ${achievement.badgeColor}20, ${achievement.badgeColor}40);
+                            border: 3px solid ${achievement.badgeColor};
+                            border-radius: 20px;
+                            padding: 1.5rem;
+                            text-align: center;
+                            width: 180px;
+                            transition: var(--transition);
+                            cursor: pointer;
+                        " 
+                        onclick="showAchievementDetail('${achievement.badgeId}')"
+                        onmouseover="this.style.transform='translateY(-10px) scale(1.05)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)';"
+                        onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none';">
+                            <i class="${achievement.badgeIcon}" style="font-size: 3rem; color: ${achievement.badgeColor}; margin-bottom: 1rem;"></i>
+                            <h4 style="color: ${achievement.badgeColor}; margin-bottom: 0.5rem;">${achievement.badgeName}</h4>
+                            <p style="font-size: 0.9rem; color: var(--dark); opacity: 0.8;">${achievement.badgeDescription}</p>
+                            <p style="font-size: 0.8rem; color: var(--gray); margin-top: 0.5rem;">
+                                ${formatDate(achievement.awardedAt?.toDate())}
+                            </p>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                
+                achievementBadges.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('Error loading achievements:', error);
+            achievementBadges.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>加载成就徽章时出错</p>
+                </div>
+            `;
+        }
+    }
+
+    // 显示成就详情
+    function showAchievementDetail(badgeId) {
+        const badge = achievementSystem.badges[badgeId];
+        if (!badge) return;
+        
+        showAlert(`成就: ${badge.name}<br>${badge.description}`, 'info');
+    }
+
+    // 在用户登录时加载成就
+    async function loadUserData(userId) {
+        try {
+            const userDoc = await db.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                updateUserUI(userData);
+                
+                // 加载成就徽章
+                await loadUserAchievements(userId);
+                
+                // 检查新徽章
+                await updateUserAchievements(userId);
+            } else {
+                // 创建用户文档
+                await db.collection('users').doc(userId).set({
+                    name: currentUser.displayName || currentUser.email.split('@')[0],
+                    email: currentUser.email,
+                    school: '',
+                    grade: '',
+                    role: 'student',
+                    interests: [],
+                    bio: '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    achievements: []
+                });
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    }
 </script>
 </body>
 </html>
