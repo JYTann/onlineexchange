@@ -701,6 +701,172 @@ main {
     overflow: hidden;
 }
 
+        /* 添加在现有的CSS中，例如在.padlet-container样式后面 */
+
+/* Exchange Links Container */
+.exchange-links-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.exchange-links-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.exchange-links-header h3 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.4rem;
+}
+
+/* Link Item */
+.link-item {
+    margin-bottom: 2rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: white;
+}
+
+.link-item:last-child {
+    margin-bottom: 0;
+}
+
+.link-header {
+    padding: 1.2rem 1.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.link-header h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+}
+
+.link-header p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 0.95rem;
+}
+
+.link-content {
+    padding: 0;
+}
+
+.link-iframe-container {
+    width: 100%;
+    height: 600px; /* 可以根据需要调整高度 */
+    position: relative;
+    background-color: #f5f5f5;
+}
+
+.link-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+.link-footer {
+    padding: 0.8rem 1.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--light-gray);
+    font-size: 0.85rem;
+    color: var(--gray);
+}
+
+/* 管理员链接管理区域 */
+.links-management {
+    display: none;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-top: 1.5rem;
+}
+
+.links-management.active {
+    display: block;
+}
+
+/* 链接管理表单 */
+.link-form-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border: 1px solid var(--light-gray);
+}
+
+/* 现有链接列表 */
+.existing-links-list {
+    margin-top: 2rem;
+}
+
+.existing-links-list h4 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.link-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.8rem;
+}
+
+.link-list-item-info h5 {
+    margin: 0 0 0.3rem 0;
+    color: var(--primary);
+}
+
+.link-list-item-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.link-list-item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .link-iframe-container {
+        height: 400px;
+    }
+    
+    .exchange-links-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .link-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .link-list-item-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
 .padlet-container::before {
     content: '';
     position: absolute;
@@ -2896,6 +3062,61 @@ footer::before {
                 <h2>Exchange Wall</h2>
                 <p>Share your thoughts, works, or interact with exchange partners</p>
             </div>
+
+                <!-- 添加：Exchange Links Section -->
+    <div class="exchange-links-container">
+        <div class="exchange-links-header">
+            <h3>Exchange Resource Links</h3>
+            <div id="admin-link-controls" style="display: none;">
+                <button id="manage-links-btn" class="btn btn-primary btn-small">
+                    <i class="fas fa-cog"></i> Manage Links
+                </button>
+            </div>
+        </div>
+        
+        <!-- 链接将在这里直接显示为嵌入式内容 -->
+        <div id="exchange-links-display">
+            <!-- 第一个Padlet链接 -->
+            <div class="link-item">
+                <div class="link-header">
+                    <h4>School Culture Exchange 2026</h4>
+                    <p>Padlet for sharing and discussing school culture between FYHS and KSHS</p>
+                </div>
+                <div class="link-content">
+                    <div class="link-iframe-container">
+                        <iframe 
+                            src="https://padlet.com/jb220202/fyhs-kshs-exchange-online-2026-school-culture-22-1-26-canbxnwed0c3x8d2" 
+                            class="link-iframe"
+                            allow="camera;microphone;display-capture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="link-footer">
+                    <span>Added by: Admin | Date: 2026-01-05</span>
+                </div>
+            </div>
+            
+            <!-- 第二个Padlet链接 -->
+            <div class="link-item">
+                <div class="link-header">
+                    <h4>Self Introduction Exchange</h4>
+                    <p>Students introduce themselves to their exchange partners</p>
+                </div>
+                <div class="link-content">
+                    <div class="link-iframe-container">
+                        <iframe 
+                            src="https://padlet.com/jb220202/self-introduction-fyhs-kshs-exchange-online-202-m6gvpozj5zaesseb" 
+                            class="link-iframe"
+                            allow="camera;microphone;display-capture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="link-footer">
+                    <span>Added by: Admin | Date: 2026-01-05</span>
+                </div>
+            </div>
             
             <div class="padlet-container">
                 <div class="padlet-header">
@@ -4118,6 +4339,8 @@ const CLOUDINARY_CONFIG = {
         });
     }
 
+       
+
     // 修复空墙的添加按钮
     document.addEventListener('click', function(e) {
         if (e.target.closest('#empty-wall-add-btn') || e.target.closest('#wall-add-btn')) {
@@ -4134,6 +4357,7 @@ const CLOUDINARY_CONFIG = {
         initImageLazyLoading();
     }, 500);
     // 初始化其他功能
+       initExchangeLinks();
     initEventListeners();
     initAuthStateListener();
     initTabs();
@@ -4146,6 +4370,448 @@ const CLOUDINARY_CONFIG = {
     // 新增：初始化Firestore默认数据
     initializeFirestore();
 });
+
+       let exchangeLinks = [
+    {
+        id: 'link-1',
+        title: 'School Culture Exchange 2026',
+        url: 'https://padlet.com/jb220202/fyhs-kshs-exchange-online-2026-school-culture-22-1-26-canbxnwed0c3x8d2',
+        description: 'Padlet for sharing and discussing school culture between FYHS and KSHS',
+        createdAt: new Date('2026-01-05'),
+        createdBy: 'Admin'
+    },
+    {
+        id: 'link-2',
+        title: 'Self Introduction Exchange',
+        url: 'https://padlet.com/jb220202/self-introduction-fyhs-kshs-exchange-online-202-m6gvpozj5zaesseb',
+        description: 'Students introduce themselves to their exchange partners',
+        createdAt: new Date('2026-01-05'),
+        createdBy: 'Admin'
+    }
+];
+
+// 初始化Exchange Links功能
+function initExchangeLinks() {
+    // 加载现有链接
+    renderExchangeLinks();
+    
+    // 设置管理员控制按钮
+    const manageLinksBtn = document.getElementById('manage-links-btn');
+    if (manageLinksBtn) {
+        manageLinksBtn.addEventListener('click', toggleLinksManagement);
+    }
+    
+    // 设置添加链接表单
+    const addLinkForm = document.getElementById('add-link-form');
+    if (addLinkForm) {
+        addLinkForm.addEventListener('submit', handleAddLink);
+    }
+    
+    // 设置编辑链接表单
+    const editLinkForm = document.getElementById('edit-link-form');
+    if (editLinkForm) {
+        editLinkForm.addEventListener('submit', handleEditLink);
+    }
+}
+
+// 渲染Exchange Links
+function renderExchangeLinks() {
+    const linksDisplay = document.getElementById('exchange-links-display');
+    if (!linksDisplay) return;
+    
+    if (exchangeLinks.length === 0) {
+        linksDisplay.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-link"></i>
+                <p>No exchange links available yet</p>
+                ${window.isAdmin ? '<p>Click "Manage Links" to add new links</p>' : ''}
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    exchangeLinks.forEach(link => {
+        html += `
+            <div class="link-item" data-link-id="${link.id}">
+                <div class="link-header">
+                    <h4>${link.title}</h4>
+                    ${link.description ? `<p>${link.description}</p>` : ''}
+                    ${window.isAdmin ? `
+                        <div class="link-actions" style="margin-top: 10px;">
+                            <button class="btn btn-small btn-outline edit-link-btn" data-link-id="${link.id}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-small btn-outline delete-link-btn" data-link-id="${link.id}" style="color: var(--danger); border-color: var(--danger); margin-left: 5px;">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="link-content">
+                    <div class="link-iframe-container">
+                        <iframe 
+                            src="${link.url}" 
+                            class="link-iframe"
+                            allow="camera;microphone;display-capture"
+                            loading="lazy"
+                            title="${link.title}">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="link-footer">
+                    <span>Added by: ${link.createdBy} | Date: ${formatDate(link.createdAt)}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    linksDisplay.innerHTML = html;
+    
+    // 添加事件监听器
+    if (window.isAdmin) {
+        document.querySelectorAll('.edit-link-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const linkId = this.getAttribute('data-link-id');
+                editLink(linkId);
+            });
+        });
+        
+        document.querySelectorAll('.delete-link-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const linkId = this.getAttribute('data-link-id');
+                deleteLink(linkId);
+            });
+        });
+    }
+}
+
+// 切换链接管理界面
+function toggleLinksManagement() {
+    const managementSection = document.getElementById('links-management');
+    if (managementSection) {
+        managementSection.classList.toggle('active');
+        renderLinksManagement();
+    } else {
+        // 创建管理界面
+        createLinksManagementUI();
+    }
+}
+
+// 创建链接管理UI
+function createLinksManagementUI() {
+    const linksContainer = document.querySelector('.exchange-links-container');
+    
+    const managementHTML = `
+        <div id="links-management" class="links-management active">
+            <h4>Manage Exchange Links</h4>
+            
+            <!-- 添加新链接表单 -->
+            <div class="link-form-container">
+                <h5>Add New Link</h5>
+                <form id="add-link-form">
+                    <div class="form-group">
+                        <label for="new-link-title">Link Title *</label>
+                        <input type="text" id="new-link-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-link-url">Link URL *</label>
+                        <input type="url" id="new-link-url" class="form-control" required placeholder="https://padlet.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-link-description">Description</label>
+                        <textarea id="new-link-description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Link</button>
+                        <button type="button" class="btn btn-outline" id="cancel-add-link">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- 现有链接列表 -->
+            <div class="existing-links-list">
+                <h5>Existing Links</h5>
+                <div id="links-list">
+                    <!-- 链接列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    `;
+    
+    linksContainer.insertAdjacentHTML('beforeend', managementHTML);
+    
+    // 设置事件监听器
+    document.getElementById('add-link-form').addEventListener('submit', handleAddLink);
+    document.getElementById('cancel-add-link').addEventListener('click', toggleLinksManagement);
+    
+    // 渲染链接列表
+    renderLinksList();
+}
+
+// 渲染链接列表（用于管理界面）
+function renderLinksList() {
+    const linksList = document.getElementById('links-list');
+    if (!linksList) return;
+    
+    if (exchangeLinks.length === 0) {
+        linksList.innerHTML = '<p>No links added yet</p>';
+        return;
+    }
+    
+    let html = '';
+    exchangeLinks.forEach(link => {
+        html += `
+            <div class="link-list-item" data-link-id="${link.id}">
+                <div class="link-list-item-info">
+                    <h5>${link.title}</h5>
+                    <p>${link.url.substring(0, 50)}...</p>
+                    <small>Added: ${formatDate(link.createdAt)}</small>
+                </div>
+                <div class="link-list-item-actions">
+                    <button class="btn btn-small edit-link-in-list" data-link-id="${link.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-small delete-link-in-list" data-link-id="${link.id}" style="color: var(--danger);">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    linksList.innerHTML = html;
+    
+    // 添加事件监听器
+    document.querySelectorAll('.edit-link-in-list').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const linkId = this.getAttribute('data-link-id');
+            editLink(linkId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-link-in-list').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const linkId = this.getAttribute('data-link-id');
+            deleteLink(linkId);
+        });
+    });
+}
+
+// 处理添加链接
+async function handleAddLink(e) {
+    e.preventDefault();
+    
+    if (!window.isAdmin) {
+        showAlert('Only administrators can add links', 'error');
+        return;
+    }
+    
+    const title = document.getElementById('new-link-title').value;
+    const url = document.getElementById('new-link-url').value;
+    const description = document.getElementById('new-link-description').value;
+    
+    if (!title || !url) {
+        showAlert('Please fill in title and URL', 'error');
+        return;
+    }
+    
+    try {
+        // 验证URL格式
+        try {
+            new URL(url);
+        } catch (err) {
+            showAlert('Please enter a valid URL', 'error');
+            return;
+        }
+        
+        const newLink = {
+            id: 'link-' + Date.now(),
+            title: title,
+            url: url,
+            description: description,
+            createdAt: new Date(),
+            createdBy: window.currentUser ? window.currentUser.displayName || window.currentUser.email : 'Admin'
+        };
+        
+        // 在实际应用中，这里应该保存到数据库
+        // 现在先添加到本地数组
+        exchangeLinks.push(newLink);
+        
+        // 更新UI
+        renderExchangeLinks();
+        renderLinksList();
+        
+        // 重置表单
+        e.target.reset();
+        
+        showAlert('Link added successfully', 'success');
+        
+    } catch (error) {
+        console.error('Error adding link:', error);
+        showAlert(`Failed to add link: ${error.message}`, 'error');
+    }
+}
+
+// 编辑链接
+function editLink(linkId) {
+    const link = exchangeLinks.find(l => l.id === linkId);
+    if (!link) return;
+    
+    // 创建或显示编辑模态框
+    if (!document.getElementById('edit-link-modal')) {
+        createEditLinkModal();
+    }
+    
+    // 填充表单数据
+    document.getElementById('edit-link-id').value = link.id;
+    document.getElementById('edit-link-title').value = link.title;
+    document.getElementById('edit-link-url').value = link.url;
+    document.getElementById('edit-link-description').value = link.description || '';
+    
+    // 显示模态框
+    openModal('edit-link-modal');
+}
+
+// 创建编辑链接模态框
+function createEditLinkModal() {
+    const modalHTML = `
+        <div id="edit-link-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Exchange Link</h3>
+                    <button class="modal-close" data-modal="edit-link-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-link-form">
+                        <input type="hidden" id="edit-link-id">
+                        <div class="form-group">
+                            <label for="edit-link-title">Link Title</label>
+                            <input type="text" id="edit-link-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-link-url">Link URL</label>
+                            <input type="url" id="edit-link-url" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-link-description">Description</label>
+                            <textarea id="edit-link-description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-outline" data-modal="edit-link-modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // 设置关闭按钮事件
+    document.querySelector('#edit-link-modal .modal-close').addEventListener('click', function() {
+        closeModal('edit-link-modal');
+    });
+    
+    // 设置表单提交事件
+    document.getElementById('edit-link-form').addEventListener('submit', handleEditLink);
+    
+    // 设置点击外部关闭
+    document.getElementById('edit-link-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal('edit-link-modal');
+        }
+    });
+}
+
+// 处理编辑链接
+async function handleEditLink(e) {
+    e.preventDefault();
+    
+    if (!window.isAdmin) {
+        showAlert('Only administrators can edit links', 'error');
+        return;
+    }
+    
+    const linkId = document.getElementById('edit-link-id').value;
+    const title = document.getElementById('edit-link-title').value;
+    const url = document.getElementById('edit-link-url').value;
+    const description = document.getElementById('edit-link-description').value;
+    
+    if (!title || !url) {
+        showAlert('Please fill in title and URL', 'error');
+        return;
+    }
+    
+    try {
+        // 验证URL格式
+        try {
+            new URL(url);
+        } catch (err) {
+            showAlert('Please enter a valid URL', 'error');
+            return;
+        }
+        
+        // 查找并更新链接
+        const linkIndex = exchangeLinks.findIndex(l => l.id === linkId);
+        if (linkIndex !== -1) {
+            exchangeLinks[linkIndex] = {
+                ...exchangeLinks[linkIndex],
+                title: title,
+                url: url,
+                description: description,
+                updatedAt: new Date()
+            };
+            
+            // 更新UI
+            renderExchangeLinks();
+            renderLinksList();
+            
+            // 关闭模态框
+            closeModal('edit-link-modal');
+            
+            showAlert('Link updated successfully', 'success');
+        } else {
+            showAlert('Link not found', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error updating link:', error);
+        showAlert(`Failed to update link: ${error.message}`, 'error');
+    }
+}
+
+// 删除链接
+async function deleteLink(linkId) {
+    if (!window.isAdmin) {
+        showAlert('Only administrators can delete links', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this link? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // 从数组中删除
+        exchangeLinks = exchangeLinks.filter(l => l.id !== linkId);
+        
+        // 更新UI
+        renderExchangeLinks();
+        
+        // 如果管理界面已打开，也更新它
+        if (document.getElementById('links-list')) {
+            renderLinksList();
+        }
+        
+        showAlert('Link deleted successfully', 'success');
+        
+    } catch (error) {
+        console.error('Error deleting link:', error);
+        showAlert(`Failed to delete link: ${error.message}`, 'error');
+    }
+}
     
     // Initialize Firebase collections with default data
    async function initializeFirestore() {
@@ -6692,7 +7358,20 @@ async function loadPastEvents() {
         document.getElementById('edit-grade').value = userData.grade || '';
         document.getElementById('edit-interests').value = userData.interests ? userData.interests.join(', ') : '';
         document.getElementById('edit-bio').value = userData.bio || '';
-        
+
+            isAdmin = userData.role === 'admin';
+    window.isAdmin = isAdmin; // 设为全局变量
+    
+    // 显示/隐藏管理员控制按钮
+    const adminLinkControls = document.getElementById('admin-link-controls');
+    if (adminLinkControls) {
+        adminLinkControls.style.display = isAdmin ? 'block' : 'none';
+    }
+    
+    // 重新渲染链接（显示/隐藏编辑按钮）
+    if (currentPage === 'wall') {
+        renderExchangeLinks();
+    }
         // Enable add note button for non-admin users
         if (!isAdmin) {
             addNoteBtn.disabled = false;
