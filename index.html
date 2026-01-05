@@ -5930,7 +5930,7 @@ async function saveCountdownSettings(e) {
         // 显示加载状态
         const submitBtn = document.querySelector('#countdown-settings-form button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
         // 处理日期时间
@@ -6552,9 +6552,9 @@ async function loadPastEvents() {
             });
             
             closeModal('register');
-            showAlert('注册成功！欢迎加入交流平台', 'success');
+            showAlert('Registration successful! Welcome to the communication platform.', 'success');
         } catch (error) {
-            showAlert(`注册失败: ${error.message}`, 'error');
+            showAlert(`Register failed: ${error.message}`, 'error');
         }
     }
     
@@ -6784,8 +6784,8 @@ async function loadPastEvents() {
             padletWall.innerHTML = `
                 <div class="add-note-btn" id="empty-wall-add-btn">
                     <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                    <p style="font-size: 1.2rem; font-weight: 600;">添加第一个贴文</p>
-                    <p style="font-size: 0.9rem; opacity: 0.7;">开始分享您的想法</p>
+                    <p style="font-size: 1.2rem; font-weight: 600;">Add your first post</p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">Share your thoughts...</p>
                 </div>
             `;
             
@@ -6795,7 +6795,7 @@ async function loadPastEvents() {
                 if (emptyBtn) {
                     emptyBtn.onclick = () => {
                         if (!currentUser) {
-                            showAlert('请先登录才能添加贴文', 'error');
+                            showAlert('Please log in to add a post.', 'error');
                             openModal('login');
                             return;
                         }
@@ -6824,9 +6824,9 @@ async function loadPastEvents() {
                         ` : ''}
                         ${data.title ? `<div class="note-title">${data.title}</div>` : ''}
                         <div class="note-content">${escapeHTML(data.content)}</div>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="Post Image" class="note-image">` : ''}
                         <div class="note-meta">
-                            <span><i class="fas fa-user"></i> ${data.authorName || '匿名用户'}</span>
+                            <span><i class="fas fa-user"></i> ${data.authorName || 'Anonymous User'}</span>
                             <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
                             ${data.updatedAt ? `<span><i class="fas fa-edit"></i> 编辑于 ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
                         </div>
@@ -6838,8 +6838,8 @@ async function loadPastEvents() {
             html += `
                 <div class="add-note-btn" id="wall-add-btn">
                     <i class="fas fa-plus-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                    <p style="font-size: 1.2rem; font-weight: 600;">添加贴文</p>
-                    <p style="font-size: 0.9rem; opacity: 0.7;">分享您的想法</p>
+                    <p style="font-size: 1.2rem; font-weight: 600;">Add Post</p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">Share your thoughts...</p>
                 </div>
             `;
             
@@ -6851,7 +6851,7 @@ async function loadPastEvents() {
                 if (addBtn) {
                     addBtn.onclick = () => {
                         if (!currentUser) {
-                            showAlert('请先登录才能添加贴文', 'error');
+                            showAlert('Please log in to add a post.', 'error');
                             openModal('login');
                             return;
                         }
@@ -6865,7 +6865,7 @@ async function loadPastEvents() {
                     topAddBtn.disabled = !currentUser;
                     topAddBtn.onclick = () => {
                         if (!currentUser) {
-                            showAlert('请先登录才能添加贴文', 'error');
+                            showAlert('Please log in to add a post.', 'error');
                             openModal('login');
                             return;
                         }
@@ -6885,7 +6885,7 @@ async function loadPastEvents() {
                 <p>加载贴文时出错</p>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
                 <button class="btn btn-outline" onclick="loadWallPosts()" style="margin-top: 1rem;">
-                    <i class="fas fa-redo"></i> 重新加载
+                    <i class="fas fa-redo"></i> Reload
                 </button>
             </div>
         `;
@@ -6904,7 +6904,7 @@ async function loadPastEvents() {
 
        // 处理删除贴文
 function handleDeleteNote(noteId) {
-    if (confirm('确定要删除这个贴文吗？删除后无法恢复。')) {
+    if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
         deleteWallPost(noteId);
     }
 }
@@ -6915,11 +6915,11 @@ function updateAddNoteButton() {
     if (addNoteBtn) {
         if (currentUser) {
             addNoteBtn.disabled = false;
-            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> 添加贴文';
+            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> Add Post';
             addNoteBtn.onclick = () => openModal('add-note');
         } else {
             addNoteBtn.disabled = true;
-            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> 登录后添加';
+            addNoteBtn.innerHTML = '<i class="fas fa-plus"></i> Log in to add';
             addNoteBtn.onclick = null;
         }
     }
@@ -6975,13 +6975,13 @@ function updateAddNoteButton() {
         const calendar = document.getElementById('calendar');
         if (!calendar) return;
         
-        const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         
         // Update month display
-        const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         const monthDisplay = document.getElementById('current-month');
         if (monthDisplay) {
-            monthDisplay.textContent = `${date.getFullYear()}年${monthNames[date.getMonth()]}`;
+            monthDisplay.textContent = `${date.getFullYear()} ${monthNames[date.getMonth()]}`;
         }
         
         // Get first day of month
@@ -7195,24 +7195,24 @@ function updateAdminCountdownStats(stats) {
                     <div id="admin-countdown-stats">
                         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                             <div class="stat-item">
-                                <div class="stat-label">累计查看次数</div>
+                                <div class="stat-label">Total Views</div>
                                 <div class="stat-value" id="admin-countdown-views">${stats.totalViews}</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">活跃提醒设置</div>
+                                <div class="stat-label">Activity Reminders</div>
                                 <div class="stat-value" id="admin-countdown-reminders">${stats.activeReminders}</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">剩余天数</div>
+                                <div class="stat-label">Days Remaining</div>
                                 <div class="stat-value" id="admin-countdown-days">${stats.daysRemaining}</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">活动总数</div>
+                                <div class="stat-label">Total Activities</div>
                                 <div class="stat-value" id="admin-countdown-total">${stats.upcomingEvents + stats.pastEvents}</div>
                             </div>
                         </div>
                         <button class="btn btn-outline btn-small" style="margin-top: 1rem;" onclick="navigateTo('countdown')">
-                            管理倒计时设置
+                            Manage Countdown Settings
                         </button>
                     </div>
                 </div>
@@ -7312,14 +7312,14 @@ async function updateAdminDashboardWithCountdown() {
                 summary.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h4 style="margin: 0 0 0.5rem 0;">当前活动倒计时</h4>
+                            <h4 style="margin: 0 0 0.5rem 0;">Current Event Countdown</h4>
                             <p style="margin: 0; color: var(--dark);">
-                                <strong>${countdownData.eventName || '线上交流会'}</strong> - 
+                                <strong>${countdownData.eventName || 'Online Exchange Meeting'}</strong> - 
                                 ${dateStr} ${countdownData.eventTime || '14:00'}
                             </p>
                         </div>
                         <button class="btn btn-primary btn-small" onclick="navigateTo('countdown')">
-                            查看详情
+                            View Details
                         </button>
                     </div>
                 `;
@@ -7365,19 +7365,19 @@ async function updateAdminDashboardWithCountdown() {
                     <tr>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.name}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? '宽柔中学' : user.school === 'kshs' ? '高雄中学' : user.school || '未设置'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? 'Foon Yew High School' : user.school === 'kshs' ? 'Kaohsiung Senior High School' : user.school || '未设置'}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
                             <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
                             ${userId !== currentUser?.uid ? `
                                 <button class="btn btn-small btn-outline" onclick="changeUserRole('${userId}', '${user.role}')" style="margin-right: 5px;">
-                                    ${user.role === 'admin' ? '撤销管理员' : '设为管理员'}
+                                    ${user.role === 'admin' ? 'Remove Administrator' : 'Set as Admin'}
                                 </button>
                                 <button class="btn btn-small btn-outline" onclick="deleteUser('${userId}')" style="color: var(--danger); border-color: var(--danger);">
-                                    删除
+                                    Delete
                                 </button>
-                            ` : '<span>当前用户</span>'}
+                            ` : '<span>Current User</span>'}
                         </td>
                     </tr>
                 `;
@@ -7388,14 +7388,14 @@ async function updateAdminDashboardWithCountdown() {
             
         } catch (error) {
             console.error('Error loading user management:', error);
-            userManagement.innerHTML = '<p>加载用户数据时出错</p>';
+            userManagement.innerHTML = '<p>Error loading user data.</p>';
         }
     }
     
     async function loadAdminContent() {
         // Load wall posts for management
         const adminWallPosts = document.getElementById('admin-wall-posts');
-        adminWallPosts.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载贴文...</p></div>';
+        adminWallPosts.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading posts...</p></div>';
         
         try {
             const postsSnapshot = await db.collection('wallPosts')
@@ -7413,15 +7413,15 @@ async function updateAdminDashboardWithCountdown() {
                     <div style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div style="flex: 1;">
-                                <strong>${post.title || '无标题'}</strong>
+                                <strong>${post.title || 'No Title'}</strong>
                                 <div style="font-size: 0.95rem; margin: 8px 0; color: #555;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
                                 <div style="font-size: 0.85rem; color: #666;">
-                                    作者: ${post.authorName} | ${formatDate(post.createdAt?.toDate())}
+                                    Author: ${post.authorName} | ${formatDate(post.createdAt?.toDate())}
                                 </div>
                             </div>
                             <div>
                                 <button class="btn btn-small" style="background-color: #dc3545; color: white; border: none; margin-left: 5px;" onclick="safeDeleteWallPost('${postId}', true)">
-                                    删除
+                                    Delete
                                 </button>
                             </div>
                         </div>
@@ -7434,7 +7434,7 @@ async function updateAdminDashboardWithCountdown() {
             
             // Load events for management
             const adminEvents = document.getElementById('admin-events');
-            adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载活动...</p></div>';
+            adminEvents.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading activities...</p></div>';
             
             const eventsSnapshot = await db.collection('events')
                 .orderBy('date', 'desc')
@@ -7459,7 +7459,7 @@ async function updateAdminDashboardWithCountdown() {
                             </div>
                             <div>
 <button class="btn btn-small btn-outline" style="margin-left: 5px;" onclick="deleteEvent('${eventId}', true)">
-    删除
+    Delete
 </button>
                             </div>
                         </div>
@@ -7472,8 +7472,8 @@ async function updateAdminDashboardWithCountdown() {
             
         } catch (error) {
             console.error('Error loading admin content:', error);
-            adminWallPosts.innerHTML = '<p>加载贴文时出错</p>';
-            adminEvents.innerHTML = '<p>加载活动时出错</p>';
+            adminWallPosts.innerHTML = '<p>Something went wrong while loading posts. Please try again.</p>';
+            adminEvents.innerHTML = '<p>Something went wrong while loading events. Please try again.</p>';
         }
     }
     
@@ -7482,7 +7482,7 @@ async function updateAdminDashboardWithCountdown() {
         e.preventDefault();
         
         if (!currentUser) {
-            showAlert('请先登录', 'error');
+            showAlert('Please login first', 'error');
             return;
         }
         
@@ -7492,7 +7492,7 @@ async function updateAdminDashboardWithCountdown() {
         const imageFile = document.getElementById('note-image').files[0];
         
         if (!content.trim()) {
-            showAlert('请填写贴文内容', 'error');
+            showAlert('Please enter post content.', 'error');
             return;
         }
         
@@ -7529,13 +7529,13 @@ async function updateAdminDashboardWithCountdown() {
                 <div class="padlet-note ${noteColorClass} draggable" data-id="${docRef.id}" draggable="true">
                     ${title ? `<div class="note-title">${title}</div>` : ''}
                     <div class="note-content">${content}</div>
-                    ${imageUrl ? `<img src="${imageUrl}" alt="贴文图片" class="note-image">` : ''}
+                    ${imageUrl ? `<img src="${imageUrl}" alt="Post Image" class="note-image">` : ''}
                     <div class="note-meta">
-                        <span>作者: ${userName.textContent}</span>
-                        <span>刚刚</span>
+                        <span>Author: ${userName.textContent}</span>
+                        <span>Just Now</span>
                     </div>
                     <div class="note-actions">
-                        <button class="note-btn delete-note" title="删除">
+                        <button class="note-btn delete-note" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -7550,7 +7550,7 @@ async function updateAdminDashboardWithCountdown() {
             if (addNoteBtn && addNoteBtn.parentNode) {
                 addNoteBtn.parentNode.insertBefore(newNote, addNoteBtn);
             } else if (wall) {
-                wall.innerHTML = noteHtml + '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>添加贴文</p></div>';
+                wall.innerHTML = noteHtml + '<div class="add-note-btn" id="wall-add-btn"><i class="fas fa-plus"></i><p>Add Post</p></div>';
                 
                 // Re-add event listeners
                 document.getElementById('wall-add-btn').addEventListener('click', () => openModal('add-note'));
@@ -7562,7 +7562,7 @@ async function updateAdminDashboardWithCountdown() {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
             const noteId = newNote.getAttribute('data-id');
-            if (confirm('确定要删除这个贴文吗？')) {
+            if (confirm('Are you sure you want to delete this post?')) {
                 deleteWallPost(noteId);
             }
         });
@@ -7573,7 +7573,7 @@ async function updateAdminDashboardWithCountdown() {
             initDragAndDrop();
             
             closeModal('add-note');
-            showAlert('贴文发布成功', 'success');
+            showAlert('Post published successfully!', 'success');
             
             // Update statistics
             loadDashboardData();
@@ -7581,7 +7581,7 @@ async function updateAdminDashboardWithCountdown() {
             
         } catch (error) {
             console.error('Error adding note:', error);
-            showAlert(`发布贴文失败: ${error.message}`, 'error');
+            showAlert(`Failed to publish post: ${error.message}`, 'error');
         }
     }
     
@@ -7589,7 +7589,7 @@ async function updateAdminDashboardWithCountdown() {
         e.preventDefault();
         
         if (!currentUser) {
-            showAlert('请先登录', 'error');
+            showAlert('Please login first', 'error');
             return;
         }
         
@@ -7630,11 +7630,11 @@ async function updateAdminDashboardWithCountdown() {
             // Update UI immediately
             const userData = await loadUserData(currentUser.uid);
             
-            showAlert('个人资料已更新', 'success');
+            showAlert('Profile updated successfully!', 'success');
             
         } catch (error) {
             console.error('Error updating profile:', error);
-            showAlert(`更新个人资料失败: ${error.message}`, 'error');
+            showAlert(`Failed to update profile: ${error.message}`, 'error');
         }
     }
     
@@ -7646,12 +7646,12 @@ async function updateAdminDashboardWithCountdown() {
         const confirmNewPassword = document.getElementById('confirm-new-password').value;
         
         if (newPassword !== confirmNewPassword) {
-            showAlert('新密码与确认密码不一致', 'error');
+            showAlert('The new password and confirmation password must be the same.', 'error');
             return;
         }
         
         if (!currentPassword) {
-            showAlert('请输入当前密码', 'error');
+            showAlert('Please enter your current password.', 'error');
             return;
         }
         
@@ -7668,10 +7668,10 @@ async function updateAdminDashboardWithCountdown() {
             await currentUser.updatePassword(newPassword);
             
             closeModal('changePassword');
-            showAlert('密码已成功更改', 'success');
+            showAlert('Password changed successfully!', 'success');
         } catch (error) {
             console.error('Error changing password:', error);
-            showAlert(`更改密码失败: ${error.message}`, 'error');
+            showAlert(`Failed to change password: ${error.message}`, 'error');
         }
     }
     
@@ -7679,7 +7679,7 @@ async function updateAdminDashboardWithCountdown() {
         e.preventDefault();
         
         if (!currentUser) {
-            showAlert('请先登录', 'error');
+            showAlert('Please login first', 'error');
             return;
         }
         
@@ -7691,7 +7691,7 @@ async function updateAdminDashboardWithCountdown() {
         const school = document.getElementById('event-school').value;
         
         if (!title || !date) {
-            showAlert('请填写标题和日期', 'error');
+            showAlert('Please enter the title and date.', 'error');
             return;
         }
         
@@ -7741,7 +7741,7 @@ const eventData = {
             
         } catch (error) {
             console.error('Error adding event:', error);
-            showAlert(`添加活动失败: ${error.message}`, 'error');
+            showAlert(`Failed to add the post: ${error.message}`, 'error');
         }
     }
     
@@ -7749,7 +7749,7 @@ const eventData = {
         e.preventDefault();
         
         if (!isAdmin) {
-            showAlert('您没有权限发布公告', 'error');
+            showAlert('You do not have permission to post announcements.', 'error');
             return;
         }
         
@@ -7757,7 +7757,7 @@ const eventData = {
         const content = document.getElementById('admin-announcement-content').value;
         
         if (!title || !content) {
-            showAlert('请填写标题和内容', 'error');
+            showAlert('Please enter the title and content.', 'error');
             return;
         }
         
@@ -7774,7 +7774,7 @@ const eventData = {
             await db.collection('announcements').add(announcementData);
             
             adminAnnouncementForm.reset();
-            showAlert('公告发布成功', 'success');
+            showAlert('Announcement published successfully!', 'success');
             
             // Reload announcements if on that page
             if (currentPage === 'announcements') {
@@ -7786,7 +7786,7 @@ const eventData = {
             loadAdminData();
         } catch (error) {
             console.error('Error adding announcement:', error);
-            showAlert(`发布公告失败: ${error.message}`, 'error');
+            showAlert(`Failed to publish announcement: ${error.message}`, 'error');
         }
     }
     
@@ -7794,7 +7794,7 @@ const eventData = {
         e.preventDefault();
         
         if (!isAdmin) {
-            showAlert('您没有权限创建活动', 'error');
+            showAlert('You do not have permission to create events.', 'error');
             return;
         }
         
@@ -7802,7 +7802,7 @@ const eventData = {
         const date = document.getElementById('admin-event-date').value;
         
         if (!title || !date) {
-            showAlert('请填写标题和日期', 'error');
+            showAlert('Please enter the title and date', 'error');
             return;
         }
         
@@ -7842,13 +7842,13 @@ const eventData = {
             loadAdminData();
         } catch (error) {
             console.error('Error adding admin event:', error);
-            showAlert(`创建活动失败: ${error.message}`, 'error');
+            showAlert(`Failed to create events: ${error.message}`, 'error');
         }
     }
     
     async function saveAdminSettings() {
         if (!isAdmin) {
-            showAlert('您没有权限更改系统设置', 'error');
+            showAlert('You do not have permission to change system settings.', 'error');
             return;
         }
         
@@ -7875,11 +7875,11 @@ const eventData = {
                 welcomeElement.textContent = welcomeMessage;
             }
             
-            showAlert('系统设置已保存', 'success');
+            showAlert('System settings saved successfully!', 'success');
             
         } catch (error) {
             console.error('Error saving settings:', error);
-            showAlert(`保存设置失败: ${error.message}`, 'error');
+            showAlert(`Failed to save settings: ${error.message}`, 'error');
         }
     }
     
@@ -7897,13 +7897,13 @@ const eventData = {
         }
         
         let html = `
-            <p><strong>描述:</strong> ${eventData.description || '无描述'}</p>
+            <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
         `;
         
         if (eventDate) {
             // 修复：使用本地时区显示日期
             const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
-            html += `<p><strong>日期:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
+            html += `<p><strong>Date:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
         }
         
         if (eventData.time) {
@@ -7912,25 +7912,25 @@ const eventData = {
         
         if (eventData.type) {
             const typeMap = {
-                'academic': '学术研讨',
-                'cultural': '文化交流',
-                'competition': '联合竞赛',
-                'language': '语言交换',
-                'other': '其他'
+                'academic': 'Academic Seminar',
+                'cultural': 'Cultural Exchange',
+                'competition': 'Joint Competition',
+                'language': 'Language Exchange',
+                'other': 'Other'
             };
             html += `<p><strong>类型:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
         }
         
         if (eventData.school) {
             const schoolMap = {
-                'both': '两校联合',
-                'fyhs': '宽柔中学',
-                'kshs': '高雄中学'
+                'both': 'Joint by Both Schools',
+                'fyhs': 'Foon Yew High School',
+                'kshs': 'Kaohsiung Senior High School'
             };
-            html += `<p><strong>主办:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
+            html += `<p><strong>Organizer:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
         }
         
-        html += `<p><strong>创建者:</strong> ${eventData.authorName || '未知用户'}</p>`;
+        html += `<p><strong>Creator:</strong> ${eventData.authorName || 'Unknown User'}</p>`;
         
         document.getElementById('event-detail-content').innerHTML = html;
         
@@ -7943,9 +7943,9 @@ const eventData = {
             deleteBtn.className = 'btn btn-outline';
             deleteBtn.style.color = 'var(--danger)';
             deleteBtn.style.borderColor = 'var(--danger)';
-            deleteBtn.textContent = '删除活动';
+            deleteBtn.textContent = 'Delete Events';
             deleteBtn.onclick = () => {
-                if (confirm('确定要删除这个活动吗？')) {
+                if (confirm('Are you sure you want to delete this event?？')) {
                     deleteEvent(eventId);
                     closeModal('eventDetail');
                 }
@@ -7955,7 +7955,7 @@ const eventData = {
             const editBtn = document.createElement('button');
             editBtn.type = 'button';
             editBtn.className = 'btn btn-primary';
-            editBtn.textContent = '编辑活动';
+            editBtn.textContent = 'Edit Events';
             editBtn.onclick = () => {
                 closeModal('eventDetail');
                 openEditEventModal(eventId, eventData);
@@ -7966,7 +7966,7 @@ const eventData = {
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.className = 'btn btn-outline';
-        closeBtn.textContent = '关闭';
+        closeBtn.textContent = 'Close';
         closeBtn.onclick = () => closeModal('eventDetail');
         actions.appendChild(closeBtn);
         
@@ -7981,7 +7981,7 @@ const eventData = {
             const postData = postDoc.data();
             
             if (!isAdmin && postData.authorId !== currentUser?.uid) {
-                showAlert('您没有权限删除此贴文', 'error');
+                showAlert('You do not have permission to delete this post.', 'error');
                 return;
             }
             
@@ -8009,11 +8009,11 @@ const eventData = {
             const remainingPosts = wall.querySelectorAll('.padlet-note').length;
             
             if (remainingPosts === 0) {
-                wall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>添加第一个贴文</p></div>';
+                wall.innerHTML = '<div class="add-note-btn" id="empty-wall-add-btn"><i class="fas fa-plus"></i><p>Create your first post</p></div>';
                 document.getElementById('empty-wall-add-btn').addEventListener('click', () => openModal('add-note'));
             }
             
-            showAlert('贴文已删除', 'success');
+            showAlert('Post deleted successfully.', 'success');
             
             // Update statistics
             loadDashboardData();
@@ -8021,7 +8021,7 @@ const eventData = {
             
         } catch (error) {
             console.error('Error deleting post:', error);
-            showAlert(`删除贴文失败: ${error.message}`, 'error');
+            showAlert(`Failed to delete post: ${error.message}`, 'error');
         }
     }
     
@@ -8032,7 +8032,7 @@ const eventData = {
         
         // 修复：检查文档是否存在
         if (!eventDoc.exists) {
-            showAlert('活动不存在或已被删除', 'error');
+            showAlert('Event not found or has been deleted.', 'error');
             return;
         }
         
@@ -8040,14 +8040,14 @@ const eventData = {
         
         // 修复：检查 eventData 是否存在
         if (!eventData) {
-            showAlert('无法读取活动数据', 'error');
+            showAlert('Error loading event data.', 'error');
             return;
         }
         
         // 修复：如果是管理面板调用，跳过权限检查
         if (!isFromAdmin) {
             if (!isAdmin && eventData.authorId !== currentUser?.uid) {
-                showAlert('您没有权限删除此活动', 'error');
+                showAlert('You do not have permission to delete this event.', 'error');
                 return;
             }
         }
@@ -8064,7 +8064,7 @@ const eventData = {
         // 修复：重新加载日历事件
         loadCalendarEvents();
         
-        showAlert('活动已删除', 'success');
+        showAlert('Event deleted successfully.', 'success');
         
         // Close modal if open
         closeModal('eventDetail');
@@ -8075,17 +8075,17 @@ const eventData = {
         
     } catch (error) {
         console.error('Error deleting event:', error);
-        showAlert(`删除活动失败: ${error.message}`, 'error');
+        showAlert(`Failed to delete events: ${error.message}`, 'error');
     }
 }
     
     async function deleteUser(userId) {
         if (userId === currentUser?.uid) {
-            showAlert('不能删除自己的账户', 'error');
+            showAlert('You cannot delete your own account.', 'error');
             return;
         }
         
-        if (confirm('确定要删除这个用户吗？此操作无法撤销！')) {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
             try {
                 // Delete user from Firestore
                 await db.collection('users').doc(userId).delete();
@@ -8096,7 +8096,7 @@ const eventData = {
                 // 3. Delete user from Firebase Auth
                 // (This requires Cloud Functions for security)
                 
-                showAlert('用户已删除', 'success');
+                showAlert('User deleted successfully.', 'success');
                 
                 // Reload user management if on that page
                 if (currentPage === 'admin') {
@@ -8105,13 +8105,13 @@ const eventData = {
                 }
             } catch (error) {
                 console.error('Error deleting user:', error);
-                showAlert(`删除用户失败: ${error.message}`, 'error');
+                showAlert(`Failed to delete user: ${error.message}`, 'error');
             }
         }
     }
     
     async function deleteAccount() {
-        if (confirm('确定要永久删除您的账户吗？此操作无法撤销！')) {
+        if (confirm('Are you sure you want to permanently delete your account? This action cannot be undone.')) {
             try {
                 // Delete user data from Firestore
                 await db.collection('users').doc(currentUser.uid).delete();
@@ -8140,10 +8140,10 @@ const eventData = {
                 // Delete user from Firebase Auth
                 await currentUser.delete();
                 
-                showAlert('账户已成功删除', 'success');
+                showAlert('Account deleted successfully.', 'success');
             } catch (error) {
                 console.error('Error deleting account:', error);
-                showAlert(`删除账户失败: ${error.message}`, 'error');
+                showAlert(`Failed to delete account: ${error.message}`, 'error');
             }
         }
     }
@@ -8157,7 +8157,7 @@ const eventData = {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            showAlert(`用户权限已更新为${newRole === 'admin' ? '管理员' : '学生'}`, 'success');
+            showAlert(`User permissions updated to${newRole === 'admin' ? 'Administrator' : 'Student'}`, 'success');
             
             // Reload user management
             if (currentPage === 'admin') {
@@ -8167,7 +8167,7 @@ const eventData = {
             // If current user changed their own role, update UI
             if (userId === currentUser?.uid) {
                 isAdmin = newRole === 'admin';
-                userRole.textContent = isAdmin ? '管理员' : '学生';
+                userRole.textContent = isAdmin ? 'Administrator' : 'Student';
                 
                 if (!isAdmin && currentPage === 'admin') {
                     navigateTo('dashboard');
@@ -8175,12 +8175,12 @@ const eventData = {
             }
         } catch (error) {
             console.error('Error changing user role:', error);
-            showAlert(`更改用户权限失败: ${error.message}`, 'error');
+            showAlert(`Failed to change user role: ${error.message}`, 'error');
         }
     }
     
     function formatDate(date) {
-        if (!date) return '未知日期';
+        if (!date) return 'Unknown Date';
         
         if (typeof date === 'string') {
             date = new Date(date);
