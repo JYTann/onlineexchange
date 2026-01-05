@@ -4104,35 +4104,35 @@ const firebaseConfig = {
             // Create default events
             const defaultEvents = [
                 {
-                    title: '线上辩论赛初赛',
-                    description: '两校联合辩论赛初赛，主题：科技发展对传统文化的影响',
+                    title: 'Preliminary Round of the Online Debating Competition',
+                    description: 'Preliminary Round of the Joint Debating Competition: "The Impact of Technological Development on Traditional Culture"',
                     date: new Date(new Date().setDate(new Date().getDate() + 7)),
                     time: '14:00',
                     type: 'competition',
                     school: 'both',
-                    authorName: '平台管理员',
+                    authorName: 'Platform Administrator',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     createdBy: 'system'
                 },
                 {
-                    title: '文化分享会：马来西亚节日',
-                    description: '由宽柔中学同学分享马来西亚传统节日与文化习俗',
+                    title: 'Cultural Sharing Session: Festivals in Malaysia',
+                    description: 'Sharing Session by Foon Yew High School Students: Traditional Festivals and Culture of Malaysia',
                     date: new Date(new Date().setDate(new Date().getDate() + 14)),
                     time: '16:00',
                     type: 'cultural',
                     school: 'fyhs',
-                    authorName: '平台管理员',
+                    authorName: 'Platform Administrator',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     createdBy: 'system'
                 },
                 {
-                    title: '语言交换伙伴见面会',
-                    description: '线上语言交换伙伴首次见面交流活动',
+                    title: 'Language Exchange Partner Meetup',
+                    description: 'Inaugural Online Meetup for Language Exchange Partners',
                     date: new Date(new Date().setDate(new Date().getDate() + 21)),
                     time: '15:00',
                     type: 'language',
                     school: 'both',
-                    authorName: '平台管理员',
+                    authorName: 'Platform Administrator',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     createdBy: 'system'
                 }
@@ -4148,8 +4148,8 @@ const firebaseConfig = {
             defaultDate.setDate(defaultDate.getDate() + 30); // 30天后
             
             const defaultCountdown = {
-                eventName: '第一届线上文化交流大会',
-                eventDescription: '马来西亚宽柔中学与台湾高雄高级中学首届线上文化交流活动，包含学术分享、文化展示、互动交流等环节。',
+                eventName: 'The 1st Online Cultural Exchange Conference',
+                eventDescription: 'The Inaugural Online Cultural Exchange between Foon Yew High School, Malaysia, and Kaohsiung Municipal Kaohsiung Senior High School, Taiwan, featuring academic sharing, cultural showcases, and interactive sessions.',
                 eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
                 eventTime: '14:00',
                 eventPlatform: 'zoom',
@@ -4169,8 +4169,8 @@ const firebaseConfig = {
             // Create default past events in history
             const pastEvents = [
                 {
-                    eventName: '平台启动仪式',
-                    eventDescription: '两校线上交流平台正式上线启动仪式',
+                    eventName: 'Platform Launch Ceremony',
+                    eventDescription: 'Official Launch Ceremony of the Joint School Online Exchange Platform',
                     eventDate: firebase.firestore.Timestamp.fromDate(new Date(new Date().setDate(new Date().getDate() - 15))),
                     eventTime: '10:00',
                     eventPlatform: 'google-meet',
@@ -4181,8 +4181,8 @@ const firebaseConfig = {
                     createdBy: 'system'
                 },
                 {
-                    eventName: '教师交流座谈会',
-                    eventDescription: '两校教师教学经验分享与交流',
+                    eventName: 'Faculty Discussion Session',
+                    eventDescription: 'Teaching Experience Sharing and Exchange among Faculty of Both Schools',
                     eventDate: firebase.firestore.Timestamp.fromDate(new Date(new Date().setDate(new Date().getDate() - 7))),
                     eventTime: '15:00',
                     eventPlatform: 'microsoft-teams',
@@ -4209,8 +4209,8 @@ const firebaseConfig = {
             defaultDate.setDate(defaultDate.getDate() + 30);
             
             const defaultCountdown = {
-                eventName: '线上文化交流会',
-                eventDescription: '马来西亚宽柔中学与台湾高雄高级中学的线上文化交流活动',
+                eventName: 'Online Cultural Exchange Conference',
+                eventDescription: 'Online Cultural Exchange between Foon Yew High School, Malaysia and Kaohsiung Municipal Kaohsiung Senior High School, Taiwan',
                 eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
                 eventTime: '14:00',
                 eventPlatform: 'zoom',
@@ -4382,7 +4382,7 @@ const firebaseConfig = {
         
         // Delete account button
         document.getElementById('delete-account-btn').addEventListener('click', function() {
-            if (confirm('确定要删除您的账户吗？此操作无法撤销！')) {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone!')) {
                 deleteAccount();
             }
         });
@@ -4393,38 +4393,38 @@ const firebaseConfig = {
         // Feature buttons on dashboard
         document.getElementById('academic-btn').addEventListener('click', function() {
             navigateTo('calendar');
-            showAlert('学术研讨活动可在日历中查看', 'info');
+            showAlert('Academic seminars can be found in the calendar.', 'info');
         });
         
         document.getElementById('competition-btn').addEventListener('click', function() {
             navigateTo('calendar');
-            showAlert('联合竞赛活动可在日历中查看', 'info');
+            showAlert('Joint competition can be found in the calendar.', 'info');
         });
         
         document.getElementById('language-btn').addEventListener('click', function() {
             navigateTo('wall');
-            showAlert('语言交换伙伴可在交流墙寻找', 'info');
+            showAlert('Language exchange partners can be found on the Communication Wall.', 'info');
         });
         
         // Footer links
         document.getElementById('about-link').addEventListener('click', function(e) {
             e.preventDefault();
-            showAlert('关于我们：这是一个促进两校文化交流的线上平台', 'info');
+            showAlert('About Us: This is an online platform dedicated to promoting cultural exchange between the two schools.', 'info');
         });
         
         document.getElementById('privacy-link').addEventListener('click', function(e) {
             e.preventDefault();
-            showAlert('隐私政策：我们承诺保护用户隐私和数据安全', 'info');
+            showAlert('Privacy Policy: We are committed to protecting user privacy and data security.', 'info');
         });
         
         document.getElementById('terms-link').addEventListener('click', function(e) {
             e.preventDefault();
-            showAlert('使用条款：请遵守平台规则，友好交流', 'info');
+            showAlert('Terms of Use: Please abide by the platform rules and interact respectfully.', 'info');
         });
         
         document.getElementById('contact-link').addEventListener('click', function(e) {
             e.preventDefault();
-            showAlert('联系我们：如有问题请发送邮件至 contact@exchange.edu', 'info');
+            showAlert('Contact Us: If you have any questions, please email us at tanjunyuanfoonyew@gmail.com', 'info');
         });
         
         // Dashboard buttons that navigate to other pages
@@ -4511,16 +4511,16 @@ document.addEventListener('click', function(e) {
     // 处理"暂无公告"的添加按钮
     if (e.target.closest('#empty-announcement-add-btn') || 
         e.target.closest('#announcement-empty-add-btn') ||
-        (e.target.textContent && e.target.textContent.includes('添加第一个公告'))) {
+        (e.target.textContent && e.target.textContent.includes('Add the first announcement'))) {
         e.preventDefault();
         if (currentUser && isAdmin) {
             // 导航到管理员面板发布公告
             navigateTo('admin');
-            showAlert('请在管理员面板发布公告', 'info');
+            showAlert('Please post announcements in the Admin Panel.', 'info');
         } else if (currentUser) {
-            showAlert('只有管理员可以发布公告', 'error');
+            showAlert('Only administrators can post announcements.', 'error');
         } else {
-            showAlert('请先登录', 'error');
+            showAlert('Please log in first.', 'error');
             openModal('login');
         }
     }
@@ -4528,12 +4528,12 @@ document.addEventListener('click', function(e) {
     // 处理交流墙的添加按钮
     if (e.target.closest('#empty-wall-add-btn') || 
         e.target.closest('#wall-add-btn') ||
-        (e.target.textContent && e.target.textContent.includes('添加第一个贴文'))) {
+        (e.target.textContent && e.target.textContent.includes('Add the first post'))) {
         e.preventDefault();
         if (currentUser) {
             openModal('add-note-modal');
         } else {
-            showAlert('请先登录才能添加贴文', 'error');
+            showAlert('Please log in first to add a post.', 'error');
             openModal('login');
         }
     }
@@ -4588,11 +4588,11 @@ function openEditNoteModal(noteId, noteData) {
     const currentImageDiv = document.getElementById('current-note-image');
     if (noteData.imageUrl) {
         currentImageDiv.innerHTML = `
-            <img src="${noteData.imageUrl}" alt="当前图片" style="max-width: 200px; border-radius: 5px;">
+            <img src="${noteData.imageUrl}" alt="Current Image" style="max-width: 200px; border-radius: 5px;">
         `;
         document.getElementById('image-actions').style.display = 'block';
     } else {
-        currentImageDiv.innerHTML = '<p>无图片</p>';
+        currentImageDiv.innerHTML = '<p>No image</p>';
         document.getElementById('image-actions').style.display = 'none';
     }
     
@@ -4650,7 +4650,7 @@ async function handleEditAnnouncement(e) {
         const content = document.getElementById('edit-announcement-content').value;
         
         if (!title.trim() || !content.trim()) {
-            showAlert('请填写标题和内容', 'error');
+            showAlert('Please fill in the title and content.', 'error');
             return;
         }
         
@@ -4671,7 +4671,7 @@ async function handleEditAnnouncement(e) {
             });
             
             closeModal('edit-announcement-modal');
-            showAlert('公告已更新', 'success');
+            showAlert('The latest announcement is now live.', 'success');
             
             // 刷新页面数据
             if (currentPage === 'announcements') {
@@ -4683,7 +4683,7 @@ async function handleEditAnnouncement(e) {
             
         } catch (error) {
             console.error('Error updating announcement:', error);
-            showAlert(`更新公告失败: ${error.message}`, 'error');
+            showAlert(`Failed to update announcement: ${error.message}`, 'error');
         }
     }
 
@@ -4696,7 +4696,7 @@ async function handleEditNote(e) {
     const content = document.getElementById('edit-note-content').value;
     const color = document.getElementById('edit-note-color').value;
     const imageFile = document.getElementById('edit-note-image').files[0];
-    const removeImage = document.getElementById('current-note-image').innerHTML.includes('将在保存后删除');
+    const removeImage = document.getElementById('current-note-image').innerHTML.includes('Will be deleted after saving');
     
     try {
         let imageUrl = null;
@@ -4758,7 +4758,7 @@ async function handleEditNote(e) {
         });
         
         closeModal('edit-note-modal');
-        showAlert('贴文已更新', 'success');
+        showAlert('Post updated successfully', 'success');
         
         // 刷新页面数据
         if (currentPage === 'wall') {
@@ -4767,7 +4767,7 @@ async function handleEditNote(e) {
         
     } catch (error) {
         console.error('Error updating note:', error);
-        showAlert(`更新贴文失败: ${error.message}`, 'error');
+        showAlert(`Failed to update post: ${error.message}`, 'error');
     }
 }
 
@@ -4815,7 +4815,7 @@ async function handleEditEvent(e) {
         });
         
         closeModal('edit-event-modal');
-        showAlert('活动已更新', 'success');
+        showAlert('Event updated successfully', 'success');
         
         // 刷新页面数据
         if (currentPage === 'calendar') {
@@ -4824,7 +4824,7 @@ async function handleEditEvent(e) {
         
     } catch (error) {
         console.error('Error updating event:', error);
-        showAlert(`更新活动失败: ${error.message}`, 'error');
+        showAlert(`Failed to update event: ${error.message}`, 'error');
     }
 }
 
@@ -4865,7 +4865,7 @@ async function undoChanges(type) {
     const originalData = editHistory[type]?.[id]?.data;
     
     if (!originalData) {
-        showAlert('没有可撤销的更改', 'warning');
+        showAlert('No reversible changes found.', 'warning');
         return;
     }
     
@@ -4884,7 +4884,7 @@ async function undoChanges(type) {
         
         if (originalData.imageUrl) {
             document.getElementById('current-note-image').innerHTML = `
-                <img src="${originalData.imageUrl}" alt="当前图片" style="max-width: 200px; border-radius: 5px;">
+                <img src="${originalData.imageUrl}" alt="Current Image" style="max-width: 200px; border-radius: 5px;">
             `;
         }
     } else if (type === 'event') {
@@ -4925,7 +4925,7 @@ async function displayEditLog(collection, docId) {
         }
         
         if (!historyCollection) {
-            logContainer.innerHTML = '<p>暂无编辑历史</p>';
+            logContainer.innerHTML = '<p>No edit history available.</p>';
             return;
         }
         
@@ -4936,7 +4936,7 @@ async function displayEditLog(collection, docId) {
             .get();
         
         if (historySnapshot.empty) {
-            logContainer.innerHTML = '<p>暂无编辑历史</p>';
+            logContainer.innerHTML = '<p>No edit history available.</p>';
             return;
         }
         
@@ -4947,8 +4947,8 @@ async function displayEditLog(collection, docId) {
             const date = history.editedAt?.toDate();
             html += `
                 <li style="margin-bottom: 5px; font-size: 0.9rem;">
-                    ${date ? formatDateTime(date) : '未知时间'} 
-                    - 由 ${history.editedByName || '用户'} 编辑
+                    ${date ? formatDateTime(date) : 'Time Unknown'} 
+                    - Edited by ${history.editedByName || 'User'}
                 </li>
             `;
         });
@@ -4957,7 +4957,7 @@ async function displayEditLog(collection, docId) {
         logContainer.innerHTML = html;
     } catch (error) {
         console.error('Error loading edit history:', error);
-        logContainer.innerHTML = '<p>加载编辑历史失败</p>';
+        logContainer.innerHTML = '<p>Failed to load edit history</p>';
     }
 }
 
@@ -5002,7 +5002,7 @@ function openDeleteConfirmation(itemId, itemType, itemName) {
     modal.setAttribute('data-delete-id', itemId);
     modal.setAttribute('data-delete-type', itemType);
     
-    message.textContent = `确定要删除 "${itemName}" 吗？此操作无法撤销。`;
+    message.textContent = `Are you sure you want to delete "${itemName}"? This action cannot be undone.`;
     
     openModal('confirm-delete-modal');
 }
@@ -5028,9 +5028,9 @@ async function confirmDelete() {
                 break;
         }
         
-        showAlert('删除成功', 'success');
+        showAlert('Deleted successfully', 'success');
     } catch (error) {
-        showAlert(`删除失败: ${error.message}`, 'error');
+        showAlert(`Delete failed: ${error.message}`, 'error');
     }
 }
 
@@ -5041,7 +5041,7 @@ async function deleteAnnouncement(announcementId) {
         const announcementData = announcementDoc.data();
         
         if (!isAdmin && announcementData.authorId !== currentUser?.uid) {
-            showAlert('您没有权限删除此公告', 'error');
+            showAlert('You do not have permission to delete this announcement.', 'error');
             return;
         }
         
@@ -5101,7 +5101,7 @@ function updateBatchUI() {
     
     if (selectedItems.size > 0) {
         batchActions.classList.add('active');
-        selectedCount.textContent = `已选择 ${selectedItems.size} 个项目`;
+        selectedCount.textContent = `${selectedItems.size} items selected`;
     } else {
         batchActions.classList.remove('active');
     }
@@ -5135,11 +5135,11 @@ function toggleSelectAll(e) {
 // 批量删除
 async function handleBatchDelete() {
     if (selectedItems.size === 0) {
-        showAlert('请先选择要删除的项目', 'warning');
+        showAlert('Please select the items you want to delete first.', 'warning');
         return;
     }
     
-    if (!confirm(`确定要删除选中的 ${selectedItems.size} 个项目吗？`)) {
+    if (!confirm(`Are you sure you want to delete the ${selectedItems.size} selected items?`)) {
         return;
     }
     
@@ -5167,11 +5167,11 @@ async function handleBatchDelete() {
         // 清除选择
         clearSelection();
         
-        showAlert(`已成功删除 ${selectedItems.size} 个项目`, 'success');
+        showAlert(`Successfully deleted ${selectedItems.size} items`, 'success');
         
     } catch (error) {
         console.error('Error in batch delete:', error);
-        showAlert('批量删除过程中出现错误', 'error');
+        showAlert('An error occurred during bulk deletion.', 'error');
     }
 }
 
@@ -5241,7 +5241,7 @@ function scheduleAutoSave(type) {
         clearTimeout(autoSaveTimer);
     }
     
-    showAutoSaveStatus('正在保存...', 'saving');
+    showAutoSaveStatus('Saving changes...', 'saving');
     
     autoSaveTimer = setTimeout(() => {
         autoSaveContent(type);
@@ -5289,11 +5289,11 @@ async function autoSaveContent(type) {
                 break;
         }
         
-        showAutoSaveStatus('已自动保存', 'saved');
+        showAutoSaveStatus('Saved automatically', 'saved');
         
     } catch (error) {
         console.error('Auto-save error:', error);
-        showAutoSaveStatus('保存失败', 'error');
+        showAutoSaveStatus('Failed to save', 'error');
     }
 }
 
@@ -5337,15 +5337,15 @@ function showShortcutHint() {
 
 // 格式化日期时间
 function formatDateTime(date) {
-    if (!date) return '未知时间';
+    if (!date) return 'Time Unknown';
     
     const now = new Date();
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
     
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}小时前`;
+    if (diffMins < 1) return 'Just Now';
+    if (diffMins < 60) return `${diffMins}Minutes Before`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}Hours Before`;
     
     return formatDate(date);
 }
@@ -5381,7 +5381,7 @@ function formatDateTime(date) {
     
     // Navigation
     function navigateTo(pageId) {
-    console.log('导航到页面:', pageId);
+    console.log('Navigate to page:', pageId);
     
     // 更新活动导航链接
     navLinks.forEach(link => {
@@ -5431,7 +5431,7 @@ function formatDateTime(date) {
                     loadAdminData();
                 } else {
                     navigateTo('dashboard');
-                    showAlert('您没有管理员权限', 'error');
+                    showAlert('You do not have administrator permissions.', 'error');
                 }
                 break;
         }
@@ -5440,11 +5440,11 @@ function formatDateTime(date) {
 
        // 初始化倒计时页面
 function initCountdownPage() {
-    console.log('初始化倒计时页面');
+    console.log('Initializing countdown page');
     
     // 确保倒计时页面元素存在
     if (!document.getElementById('countdown-page')) {
-        console.error('倒计时页面元素未找到');
+        console.error('Countdown page elements not found');
         return;
     }
     
@@ -5462,14 +5462,14 @@ function initCountdownPage() {
     if (adminTab) {
         adminTab.addEventListener('click', function(e) {
             if (!isAdmin) {
-                showAlert('需要管理员权限访问设置页面', 'error');
+                showAlert('Administrator permissions are required to access the settings page.', 'error');
                 e.preventDefault();
                 return;
             }
         });
     }
     
-    console.log('倒计时页面初始化完成');
+    console.log('Countdown page initialization complete');
 }
 
 // 初始化倒计时标签页
@@ -5508,7 +5508,7 @@ function initCountdownTabs() {
             // 如果是管理员标签，检查权限
             if (tabId === 'countdown-admin') {
                 if (!isAdmin) {
-                    showAlert('需要管理员权限访问设置页面', 'error');
+                    showAlert('Administrator permissions are required to access the settings page.', 'error');
                     document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
                     return;
                 }
@@ -5539,8 +5539,8 @@ function resetCountdownForm() {
 function clearCountdownTemplate() {
     // 清除模板消息
     const messageElement = document.getElementById('countdown-message');
-    if (messageElement && messageElement.textContent.includes('加载倒计时信息...')) {
-        messageElement.textContent = '倒计时设置已激活';
+    if (messageElement && messageElement.textContent.includes('Loading countdown information...')) {
+        messageElement.textContent = 'Countdown settings activated';
         messageElement.style.background = 'rgba(46, 204, 113, 0.1)';
         messageElement.style.borderColor = 'var(--success)';
         messageElement.style.color = 'var(--success)';
@@ -5550,7 +5550,7 @@ function clearCountdownTemplate() {
     const eventTitle = document.getElementById('countdown-event-title');
     const eventDesc = document.getElementById('countdown-event-desc');
     
-    if (eventTitle.textContent === '下一次线上交流会') {
+    if (eventTitle.textContent === 'Next Online Exchange Meeting') {
         // 这表示还在使用模板内容
         // 实际内容会在 updateCountdownDisplay 中更新
     }
@@ -5645,7 +5645,7 @@ async function loadCountdownData() {
         }
     } catch (error) {
         console.error('Error loading countdown data:', error);
-        showCountdownMessage('加载倒计时数据时出错', 'error');
+        showCountdownMessage('Error loading countdown data', 'error');
         
         // 尝试创建默认数据
         try {
@@ -5664,8 +5664,8 @@ async function createDefaultCountdown() {
         defaultDate.setDate(defaultDate.getDate() + 7);
         
         const defaultCountdown = {
-            eventName: '线上文化交流会',
-            eventDescription: '马来西亚宽柔中学与台湾高雄高级中学的线上文化交流活动',
+            eventName: 'Online Cultural Exchange Conference',
+            eventDescription: 'Online Cultural Exchange between Foon Yew High School, Malaysia and Kaohsiung Municipal Kaohsiung Senior High School, Taiwan',
             eventDate: firebase.firestore.Timestamp.fromDate(defaultDate),
             eventTime: '14:00',
             eventPlatform: 'zoom',
@@ -5695,8 +5695,8 @@ function updateCountdownDisplay(data) {
     if (!data) return;
     
     // 更新标题和描述
-    document.getElementById('countdown-event-title').textContent = data.eventName || '下一次线上交流会';
-    document.getElementById('countdown-event-desc').textContent = data.eventDescription || '宽柔中学与高雄中学的线上交流活动';
+    document.getElementById('countdown-event-title').textContent = data.eventName || 'Next Online Exchange Meeting';
+    document.getElementById('countdown-event-desc').textContent = data.eventDescription || 'Online Exchange Activity between Foon Yew High School and Kaohsiung Senior High School';
     
     // 更新日期时间显示
     const eventDate = data.eventDate?.toDate();
@@ -5714,15 +5714,15 @@ function updateCountdownDisplay(data) {
     
     // 更新平台
     const platformMap = {
-        'zoom': 'Zoom 会议',
+        'zoom': 'Zoom Meeting',
         'google-meet': 'Google Meet',
         'microsoft-teams': 'Microsoft Teams',
-        'other': '其他平台'
+        'other': 'Other Platform'
     };
-    document.getElementById('event-platform').textContent = platformMap[data.eventPlatform] || data.eventPlatform || '线上会议平台';
+    document.getElementById('event-platform').textContent = platformMap[data.eventPlatform] || data.eventPlatform || 'Online Meeting Platform';
     
     // 更新参与人数
-    document.getElementById('event-participants').textContent = `${data.participants || 0} 人`;
+    document.getElementById('event-participants').textContent = `${data.participants || 0} person`;
     
     // 更新主题颜色
     if (data.themeColor) {
@@ -5765,7 +5765,7 @@ function updateCountdownTime(targetDate) {
     // 检查是否已过期
     if (diff <= 0) {
         clearInterval(window.countdownTimer);
-        showCountdownMessage('交流会正在进行中！立即加入！', 'success');
+        showCountdownMessage('The exchange meeting is now in progress! Join now!', 'success');
         document.getElementById('countdown-display').classList.add('countdown-completed');
         document.querySelectorAll('.countdown-number').forEach(el => {
             el.textContent = '00';
@@ -5795,19 +5795,19 @@ function updateCountdownTime(targetDate) {
     // 如果少于24小时，添加紧急样式
     if (days === 0 && hours < 24) {
         document.getElementById('countdown-display').classList.add('countdown-urgent');
-        showCountdownMessage('交流会即将开始！请做好准备！', 'warning');
+        showCountdownMessage('The exchange meeting is starting soon! Please be prepared!', 'warning');
     } else {
         document.getElementById('countdown-display').classList.remove('countdown-urgent');
         
         // 根据剩余时间显示不同消息
         if (days === 1) {
-            showCountdownMessage('交流会明天开始！请检查您的设备！', 'info');
+            showCountdownMessage('The exchange meeting starts tomorrow! Please check your equipment!', 'info');
         } else if (days === 7) {
-            showCountdownMessage('交流会还有一周！', 'info');
+            showCountdownMessage('One week until the exchange meeting！', 'info');
         } else if (days < 7) {
-            showCountdownMessage('交流会即将到来！', 'info');
+            showCountdownMessage('The exchange meeting is coming soon！', 'info');
         } else {
-            showCountdownMessage('交流会正在筹备中...', 'info');
+            showCountdownMessage('The exchange meeting is being prepared...', 'info');
         }
     }
     
@@ -5888,14 +5888,14 @@ async function saveCountdownSettings(e) {
     
     // 防止重复提交
     if (isSavingCountdown) {
-        showAlert('正在保存中，请稍候...', 'info');
+        showAlert('Saving, please wait...', 'info');
         return;
     }
     
     console.log('保存倒计时设置...');
     
     if (!isAdmin) {
-        showAlert('需要管理员权限保存设置', 'error');
+        showAlert('Administrator permissions are required to save settings.', 'error');
         return;
     }
     
@@ -5910,17 +5910,17 @@ async function saveCountdownSettings(e) {
     
     // 表单验证
     if (!eventName || !eventName.trim()) {
-        showAlert('请填写活动名称', 'error');
+        showAlert('Please provide an event name.', 'error');
         return;
     }
     
     if (!eventDate) {
-        showAlert('请选择活动日期', 'error');
+        showAlert('Please provide an event date.', 'error');
         return;
     }
     
     if (!eventTime) {
-        showAlert('请选择活动时间', 'error');
+        showAlert('Please provide an event time.', 'error');
         return;
     }
     
@@ -5941,7 +5941,7 @@ async function saveCountdownSettings(e) {
         
         // 验证日期
         if (isNaN(targetDate.getTime())) {
-            showAlert('无效的日期时间格式', 'error');
+            showAlert('Invalid date and time format.', 'error');
             return;
         }
         
@@ -5962,13 +5962,13 @@ async function saveCountdownSettings(e) {
             reminders: 0
         };
         
-        console.log('保存倒计时数据:', countdownData);
+        console.log('Save countdown data:', countdownData);
         
         // 保存到Firestore
         await db.collection('countdown').doc('current').set(countdownData, { merge: true });
         
-        console.log('倒计时设置保存成功');
-        showAlert('倒计时设置已保存', 'success');
+        console.log('Countdown settings saved successfully');
+        showAlert('Countdown settings saved', 'success');
         
         // 保存当前滚动位置
         const scrollPosition = window.scrollY;
@@ -6009,13 +6009,13 @@ async function saveCountdownSettings(e) {
         }, 500);
         
     } catch (error) {
-        console.error('保存倒计时设置失败:', error);
-        showAlert(`保存设置失败: ${error.message}`, 'error');
+        console.error('Failed to save countdown settings:', error);
+        showAlert(`Failed to save countdown settings: ${error.message}`, 'error');
         
         // 恢复按钮状态
         const submitBtn = document.querySelector('#countdown-settings-form button[type="submit"]');
         if (submitBtn) {
-            submitBtn.innerHTML = '保存倒计时设置';
+            submitBtn.innerHTML = 'Save countdown settings';
             submitBtn.disabled = false;
         }
     } finally {
@@ -6062,22 +6062,22 @@ function testCountdown() {
     
     const testData = {
         eventDate: firebase.firestore.Timestamp.fromDate(eventDate),
-        eventTime: '测试时间',
+        eventTime: 'Test Time',
         themeColor: document.getElementById('countdown-event-color').value
     };
     
     updateCountdownPreview(testData);
-    showAlert('测试倒计时已更新（设置为5分钟后）', 'info');
+    showAlert('Test countdown updated (set to 5 minutes from now).', 'info');
 }
 
 // 清除倒计时
 async function clearCountdown() {
     if (!isAdmin) {
-        showAlert('需要管理员权限清除倒计时', 'error');
+        showAlert('Administrator permissions are required to clear the countdown.', 'error');
         return;
     }
     
-    if (!confirm('确定要清除当前倒计时吗？')) {
+    if (!confirm('Are you sure you want to clear the current countdown?')) {
         return;
     }
     
@@ -6088,7 +6088,7 @@ async function clearCountdown() {
             clearedBy: currentUser.uid
         });
         
-        showAlert('倒计时已清除', 'success');
+        showAlert('Countdown cleared', 'success');
         
         // 重新加载页面
         document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
@@ -6096,14 +6096,14 @@ async function clearCountdown() {
         
     } catch (error) {
         console.error('Error clearing countdown:', error);
-        showAlert(`清除倒计时失败: ${error.message}`, 'error');
+        showAlert(`Failed to clear countdown: ${error.message}`, 'error');
     }
 }
 
 // 设置提醒
 async function setReminder() {
     if (!currentUser) {
-        showAlert('请先登录才能设置提醒', 'error');
+        showAlert('Please log in first to set reminders.', 'error');
         openModal('login');
         return;
     }
@@ -6113,7 +6113,7 @@ async function setReminder() {
         const countdownDoc = await db.collection('countdown').doc('current').get();
         
         if (!countdownDoc.exists || !countdownDoc.data().isActive) {
-            showAlert('当前没有活动的倒计时', 'warning');
+            showAlert('There are currently no active countdowns.', 'warning');
             return;
         }
         
@@ -6121,7 +6121,7 @@ async function setReminder() {
         const eventDate = countdownData.eventDate?.toDate();
         
         if (!eventDate) {
-            showAlert('活动时间未设置', 'error');
+            showAlert('Event time has not been set.', 'error');
             return;
         }
         
@@ -6132,7 +6132,7 @@ async function setReminder() {
             .get();
         
         if (!reminderCheck.empty) {
-            showAlert('您已经设置过提醒了', 'info');
+            showAlert('You have already set a reminder.', 'info');
             return;
         }
         
@@ -6155,14 +6155,14 @@ async function setReminder() {
             reminders: firebase.firestore.FieldValue.increment(1)
         });
         
-        showAlert('提醒设置成功！活动前一天会发送通知', 'success');
+        showAlert('Reminder set successfully! A notification will be sent the day before the event.', 'success');
         
         // 更新统计显示
         updateCountdownStats();
         
     } catch (error) {
         console.error('Error setting reminder:', error);
-        showAlert(`设置提醒失败: ${error.message}`, 'error');
+        showAlert(`Failed to set reminder: ${error.message}`, 'error');
     }
 }
 
@@ -6172,25 +6172,25 @@ function shareCountdown() {
     const eventDate = document.getElementById('event-date-time').textContent;
     const currentUrl = window.location.href.split('#')[0] + '#countdown';
     
-    const shareText = `${eventTitle} 倒计时\n活动时间: ${eventDate}\n查看倒计时: ${currentUrl}`;
+    const shareText = `${eventTitle} Countdown\nEvent Time: ${eventDate}\nView Countdown: ${currentUrl}`;
     
     // 复制到剪贴板
     navigator.clipboard.writeText(shareText).then(() => {
-        showAlert('倒计时链接已复制到剪贴板！', 'success');
+        showAlert('Countdown link copied to clipboard!', 'success');
     }).catch(err => {
         console.error('Failed to copy: ', err);
         
         // 备用方法：显示分享对话框
         const shareData = {
-            title: `${eventTitle} 倒计时`,
-            text: `活动时间: ${eventDate}`,
+            title: `${eventTitle} Countdown`,
+            text: `Event Time: ${eventDate}`,
             url: currentUrl
         };
         
         if (navigator.share) {
             navigator.share(shareData).catch(console.error);
         } else {
-            showAlert('请手动复制链接', 'info');
+            showAlert('Please copy the link manually.', 'info');
         }
     });
 }
@@ -6206,11 +6206,11 @@ function viewEventDetails() {
     const details = `
         <div style="text-align: left;">
             <h4>${eventTitle}</h4>
-            <p><strong>活动时间:</strong> ${eventDate}</p>
-            <p><strong>活动平台:</strong> ${eventPlatform}</p>
-            <p><strong>预计参与:</strong> ${participants}</p>
+            <p><strong>Event Time:</strong> ${eventDate}</p>
+            <p><strong>Event Platform:</strong> ${eventPlatform}</p>
+            <p><strong>Estimated Participants:</strong> ${participants}</p>
             <hr>
-            <p style="color: var(--gray);">更多详情将在活动临近时公布</p>
+            <p style="color: var(--gray);">More details will be announced as the event approaches.</p>
         </div>
     `;
     
@@ -6238,7 +6238,7 @@ async function updateCountdownStats() {
                 const now = new Date();
                 const diff = eventDate - now;
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                document.getElementById('days-remaining').textContent = days > 0 ? days : '已开始';
+                document.getElementById('days-remaining').textContent = days > 0 ? days : 'Started';
             }
             
             // 更新查看次数到数据库（去重逻辑可以在云函数中实现）
@@ -6264,7 +6264,7 @@ async function loadPastEvents() {
             .get();
         
         if (pastEventsSnapshot.empty) {
-            pastEventsList.innerHTML = '<p style="color: var(--gray); text-align: center;">暂无过往活动记录</p>';
+            pastEventsList.innerHTML = '<p style="color: var(--gray); text-align: center;">No past events found.</p>';
             return;
         }
         
@@ -6282,7 +6282,7 @@ async function loadPastEvents() {
                         <div class="history-title">${event.eventName}</div>
                     </div>
                     <div class="history-status ${eventDate > now ? 'status-upcoming' : 'status-completed'}">
-                        ${eventDate > now ? '即将开始' : '已完成'}
+                        ${eventDate > now ? 'Starting soon' : 'Completed'}
                     </div>
                 </div>
             `;
@@ -6403,7 +6403,7 @@ async function loadPastEvents() {
             }
         } catch (error) {
             console.error('Error loading user data:', error);
-            showAlert('加载用户数据失败，请刷新页面重试', 'error');
+            showAlert('Failed to load user data. Please refresh the page and try again.', 'error');
         }
     }
     
@@ -6421,8 +6421,8 @@ async function loadPastEvents() {
         }
         
         // Update user info
-        userName.textContent = userData.name || (currentUser ? currentUser.email.split('@')[0] : '用户');
-        userRole.textContent = userData.role === 'admin' ? '管理员' : '学生';
+        userName.textContent = userData.name || (currentUser ? currentUser.email.split('@')[0] : 'User');
+        userRole.textContent = userData.role === 'admin' ? 'Administrator' : 'Student';
         
         // Update avatar
         const firstChar = userName.textContent.charAt(0).toUpperCase();
@@ -6430,10 +6430,10 @@ async function loadPastEvents() {
         document.getElementById('profile-avatar').textContent = firstChar;
         
         // Update profile page
-        document.getElementById('profile-name').textContent = userData.name || '未设置';
-        document.getElementById('profile-school').textContent = `学校: ${userData.school === 'fyhs' ? '马来西亚宽柔中学' : userData.school === 'kshs' ? '台湾高雄高级中学' : '未设置'}`;
-        document.getElementById('profile-grade').textContent = `年级: ${userData.grade || '未设置'}`;
-        document.getElementById('profile-email').textContent = `邮箱: ${currentUser ? currentUser.email : '未设置'}`;
+        document.getElementById('profile-name').textContent = userData.name || 'Not set';
+        document.getElementById('profile-school').textContent = `School: ${userData.school === 'fyhs' ? 'Foon Yew High School' : userData.school === 'kshs' ? 'Kaohsiung Senior High School' : 'Not set'}`;
+        document.getElementById('profile-grade').textContent = `Grade: ${userData.grade || 'Not set'}`;
+        document.getElementById('profile-email').textContent = `Email: ${currentUser ? currentUser.email : 'Not set'}`;
         
         // Update profile form
         document.getElementById('edit-name').value = userData.name || '';
@@ -6508,9 +6508,9 @@ async function loadPastEvents() {
             });
             
             closeModal('login');
-            showAlert('登录成功', 'success');
+            showAlert('Login successfully', 'success');
         } catch (error) {
-            showAlert(`登录失败: ${error.message}`, 'error');
+            showAlert(`Failed to login: ${error.message}`, 'error');
         }
     }
     
@@ -6525,12 +6525,12 @@ async function loadPastEvents() {
         const grade = document.getElementById('register-grade').value;
         
         if (password !== confirmPassword) {
-            showAlert('两次输入的密码不一致', 'error');
+            showAlert('The passwords you entered do not match.', 'error');
             return;
         }
         
         if (!school) {
-            showAlert('请选择所属学校', 'error');
+            showAlert('Please choose your affiliated school.', 'error');
             return;
         }
         
@@ -6590,18 +6590,18 @@ async function loadPastEvents() {
             
             closeModal('login');
             closeModal('register');
-            showAlert('Google账号登录成功', 'success');
+            showAlert('Successfully logged in with Google account.', 'success');
         } catch (error) {
-            showAlert(`Google登录失败: ${error.message}`, 'error');
+            showAlert(`Failed to logged in with Google account: ${error.message}`, 'error');
         }
     }
     
     async function handleLogout() {
         try {
             await auth.signOut();
-            showAlert('已成功退出登录', 'success');
+            showAlert('Successfully signed out.', 'success');
         } catch (error) {
-            showAlert(`退出登录失败: ${error.message}`, 'error');
+            showAlert(`Failed to signed out: ${error.message}`, 'error');
         }
     }
     
@@ -6616,7 +6616,7 @@ async function loadPastEvents() {
             
             const recentAnnouncements = document.getElementById('recent-announcements');
             if (announcementsSnapshot.empty) {
-                recentAnnouncements.innerHTML = '<p>暂无公告</p>';
+                recentAnnouncements.innerHTML = '<p>No announcements available.</p>';
             } else {
                 let html = '';
                 announcementsSnapshot.forEach(doc => {
@@ -6633,7 +6633,7 @@ async function loadPastEvents() {
             }
         } catch (error) {
             console.error('Error loading announcements:', error);
-            document.getElementById('recent-announcements').innerHTML = '<p>加载公告时出错</p>';
+            document.getElementById('recent-announcements').innerHTML = '<p>Failed to load announcements.</p>';
         }
         
         // Load upcoming events (next 7 days)
@@ -6650,7 +6650,7 @@ async function loadPastEvents() {
             
             const upcomingEvents = document.getElementById('upcoming-events');
             if (eventsSnapshot.empty) {
-                upcomingEvents.innerHTML = '<p>暂无近期活动</p>';
+                upcomingEvents.innerHTML = '<p>No upcoming events.</p>';
             } else {
                 let html = '';
                 eventsSnapshot.forEach(doc => {
@@ -6666,7 +6666,7 @@ async function loadPastEvents() {
             }
         } catch (error) {
             console.error('Error loading events:', error);
-            document.getElementById('upcoming-events').innerHTML = '<p>加载活动时出错</p>';
+            document.getElementById('upcoming-events').innerHTML = '<p>Failed to load events.</p>';
         }
         
         // Update statistics
@@ -6705,7 +6705,7 @@ async function loadPastEvents() {
         const announcementsList = document.getElementById('announcements-list');
         
         // 显示加载状态
-        announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载公告...</p></div>';
+        announcementsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading announcements...</p></div>';
         
         try {
             const announcementsSnapshot = await db.collection('announcements')
@@ -6716,8 +6716,8 @@ async function loadPastEvents() {
     announcementsList.innerHTML = `
         <div class="empty-state">
             <i class="fas fa-bullhorn" style="font-size: 4rem; opacity: 0.3;"></i>
-            <p>暂无公告</p>
-            ${isAdmin ? '<button class="btn btn-primary" id="empty-announcement-add-btn">发布第一个公告</button>' : ''}
+            <p>No announcements available.</p>
+            ${isAdmin ? '<button class="btn btn-primary" id="empty-announcement-add-btn">Post the first announcement</button>' : ''}
         </div>
     `;
 } else {
@@ -6732,21 +6732,21 @@ async function loadPastEvents() {
                                 <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px;">
                                     <button class="btn btn-small btn-outline edit-announcement-btn" 
                                             onclick="openEditAnnouncementModal('${doc.id}', ${JSON.stringify(data).replace(/'/g, "\\'")})">
-                                        <i class="fas fa-edit"></i> 编辑
+                                        <i class="fas fa-edit"></i> Edit
                                     </button>
                                     <button class="btn btn-small" 
                                             style="background-color: var(--danger); color: white;"
                                             onclick="openDeleteConfirmation('${doc.id}', 'announcement', '${data.title}')">
-                                        <i class="fas fa-trash"></i> 删除
+                                        <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </div>
                             ` : ''}
                             <h4>${data.title}</h4>
                             <div class="announcement-content">${data.content}</div>
                             <div class="announcement-meta">
-                                <span><i class="fas fa-user"></i> ${data.authorName || '管理员'}</span>
+                                <span><i class="fas fa-user"></i> ${data.authorName || 'Administrator'}</span>
                                 <span><i class="fas fa-clock"></i> ${formatDate(data.createdAt?.toDate())}</span>
-                                ${data.updatedAt ? `<span><i class="fas fa-edit"></i> 编辑于 ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
+                                ${data.updatedAt ? `<span><i class="fas fa-edit"></i> Edited at ${formatDate(data.updatedAt?.toDate())}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -6758,9 +6758,9 @@ async function loadPastEvents() {
             announcementsList.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
-                    <p>加载公告时出错: ${error.message}</p>
+                    <p>Failed to load announcement: ${error.message}</p>
                     <button class="btn btn-outline" onclick="loadAnnouncements()">
-                        <i class="fas fa-redo"></i> 重新加载
+                        <i class="fas fa-redo"></i> Reload
                     </button>
                 </div>
             `;
@@ -6772,7 +6772,7 @@ async function loadPastEvents() {
     const padletWall = document.getElementById('padlet-wall');
     
     // 显示加载状态
-    padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载交流墙...</p></div>';
+    padletWall.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading communication wall...</p></div>';
     
     try {
         const postsSnapshot = await db.collection('wallPosts')
