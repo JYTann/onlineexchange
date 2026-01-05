@@ -4214,10 +4214,28 @@ async function displayEditLog(collection, docId) {
         logContainer.innerHTML = '<p>加载编辑历史失败</p>';
     }
 }
+
 // 记录编辑历史
 async function recordEditHistory(collection, docId, data) {
     try {
-        await db.collection(`${collection}History`).add({
+        let historyCollection;
+        
+        // 根据类型确定正确的集合名称
+        switch(collection) {
+            case 'announcements':
+                historyCollection = 'announcementHistory';
+                break;
+            case 'wallPosts':
+                historyCollection = 'noteHistory';
+                break;
+            case 'events':
+                historyCollection = 'eventHistory';
+                break;
+        }
+        
+        if (!historyCollection) return;
+        
+        await db.collection(historyCollection).add({
             docId: docId,
             ...data,
             editedByName: userName.textContent,
