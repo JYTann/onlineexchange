@@ -4003,7 +4003,7 @@ const firebaseConfig = {
     let autoSaveTimer = null;
     
     // Initialize the application
-      document.addEventListener('DOMContentLoaded', function() {
+   document.addEventListener('DOMContentLoaded', function() {
     // 修复登录按钮点击
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
@@ -4056,6 +4056,12 @@ const firebaseConfig = {
     initTabs();
     generateCalendar(new Date());
     loadDashboardData();
+    
+    // 新增：初始化倒计时页面
+    initCountdownPage();
+    
+    // 新增：初始化Firestore默认数据
+    initializeFirestore();
 });
     
     // Initialize Firebase collections with default data
@@ -5375,22 +5381,26 @@ function formatDateTime(date) {
     
     // Navigation
     function navigateTo(pageId) {
-        // Update active nav link
-        navLinks.forEach(link => {
-            if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
-        
-        // Hide all pages
-        Object.values(pages).forEach(page => {
+    console.log('导航到页面:', pageId);
+    
+    // 更新活动导航链接
+    navLinks.forEach(link => {
+        if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+    
+    // 隐藏所有页面
+    Object.values(pages).forEach(page => {
+        if (page) {
             page.classList.remove('active');
-        });
-        
-        // Show target page
-        if (pages[pageId]) {
+        }
+    });
+    
+    // 显示目标页面
+    if (pages[pageId]) {
         pages[pageId].classList.add('active');
         currentPage = pageId;
         
@@ -5404,14 +5414,17 @@ function formatDateTime(date) {
                 break;
             case 'wall':
                 loadWallPosts();
-                // 确保添加按钮状态正确
                 updateAddNoteButton();
                 break;
             case 'calendar':
                 loadCalendarEvents();
                 break;
             case 'countdown':
-                loadCountdownData();
+                // 确保倒计时页面正确初始化
+                setTimeout(() => {
+                    initCountdownPage();
+                    loadCountdownData();
+                }, 100);
                 break;
             case 'admin':
                 if (isAdmin) {
@@ -5427,25 +5440,47 @@ function formatDateTime(date) {
 
        // 初始化倒计时页面
 function initCountdownPage() {
-    // 添加倒计时页面到pages对象
-    pages['countdown'] = document.getElementById('countdown-page');
+    console.log('初始化倒计时页面');
     
-    // 初始化标签页
+    // 确保倒计时页面元素存在
+    if (!document.getElementById('countdown-page')) {
+        console.error('倒计时页面元素未找到');
+        return;
+    }
+    
+    // 初始化倒计时标签页
     initCountdownTabs();
     
-    // 初始化事件监听器
+    // 初始化倒计时事件监听器
     initCountdownEventListeners();
     
     // 加载倒计时数据
     loadCountdownData();
+    
+    // 为管理员标签页添加点击事件
+    const adminTab = document.getElementById('countdown-admin-tab');
+    if (adminTab) {
+        adminTab.addEventListener('click', function(e) {
+            if (!isAdmin) {
+                showAlert('需要管理员权限访问设置页面', 'error');
+                e.preventDefault();
+                return;
+            }
+        });
+    }
+    
+    console.log('倒计时页面初始化完成');
 }
 
 // 初始化倒计时标签页
 // 在 initCountdownTabs 函数中修复
+// 修复标签页切换函数
 function initCountdownTabs() {
     const countdownTabs = document.querySelectorAll('#countdown-page .tab');
     countdownTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            
             const tabId = this.getAttribute('data-tab');
             
             // 更新活动标签
@@ -5456,7 +5491,19 @@ function initCountdownTabs() {
             document.querySelectorAll('#countdown-page .tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            document.getElementById(tabId).classList.add('active');
+            
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // 防止页面滚动
+            setTimeout(() => {
+                document.getElementById('countdown-page').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 100);
             
             // 如果是管理员标签，检查权限
             if (tabId === 'countdown-admin') {
@@ -5466,10 +5513,25 @@ function initCountdownTabs() {
                     return;
                 }
                 
-                // 如果是管理员，加载表单数据
+                // 加载表单数据
                 loadCountdownFormData();
             }
         });
+    });
+}
+
+       // 在保存成功后重置表单
+function resetCountdownForm() {
+    document.getElementById('countdown-settings-form').reset();
+    document.getElementById('countdown-event-color').value = '#4361ee';
+    
+    // 重置颜色选择器
+    document.querySelectorAll('.color-option').forEach(option => {
+        if (option.getAttribute('data-color') === '#4361ee') {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
     });
 }
 
@@ -5816,8 +5878,21 @@ function populateCountdownForm(data) {
 }
 
 // 保存倒计时设置（管理员）
+let isSavingCountdown = false;
+
 async function saveCountdownSettings(e) {
-    e.preventDefault();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    // 防止重复提交
+    if (isSavingCountdown) {
+        showAlert('正在保存中，请稍候...', 'info');
+        return;
+    }
+    
+    console.log('保存倒计时设置...');
     
     if (!isAdmin) {
         showAlert('需要管理员权限保存设置', 'error');
@@ -5833,26 +5908,51 @@ async function saveCountdownSettings(e) {
     const participants = parseInt(document.getElementById('countdown-event-participants').value) || 0;
     const themeColor = document.getElementById('countdown-event-color').value;
     
-    if (!eventName || !eventDate || !eventTime) {
-        showAlert('请填写活动名称、日期和时间', 'error');
+    // 表单验证
+    if (!eventName || !eventName.trim()) {
+        showAlert('请填写活动名称', 'error');
         return;
     }
     
+    if (!eventDate) {
+        showAlert('请选择活动日期', 'error');
+        return;
+    }
+    
+    if (!eventTime) {
+        showAlert('请选择活动时间', 'error');
+        return;
+    }
+    
+    isSavingCountdown = true;
+    
     try {
-        // 修复：正确处理日期时间
+        // 显示加载状态
+        const submitBtn = document.querySelector('#countdown-settings-form button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+        submitBtn.disabled = true;
+        
+        // 处理日期时间
         const [year, month, day] = eventDate.split('-');
         const [hours, minutes] = eventTime.split(':');
         
-        const targetDate = new Date(year, month - 1, day, hours, minutes, 0);
+        const targetDate = new Date(year, month - 1, day, hours || 0, minutes || 0, 0);
         
-        // 保存倒计时数据
+        // 验证日期
+        if (isNaN(targetDate.getTime())) {
+            showAlert('无效的日期时间格式', 'error');
+            return;
+        }
+        
+        // 创建倒计时数据
         const countdownData = {
-            eventName: eventName,
-            eventDescription: eventDescription,
+            eventName: eventName.trim(),
+            eventDescription: eventDescription.trim(),
             eventDate: firebase.firestore.Timestamp.fromDate(targetDate),
             eventTime: eventTime,
             eventPlatform: eventPlatform,
-            eventLink: eventLink,
+            eventLink: eventLink.trim(),
             participants: participants,
             themeColor: themeColor,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -5862,32 +5962,64 @@ async function saveCountdownSettings(e) {
             reminders: 0
         };
         
-        // 保存当前倒计时设置 - 确保使用 set 方法而不是 update
+        console.log('保存倒计时数据:', countdownData);
+        
+        // 保存到Firestore
         await db.collection('countdown').doc('current').set(countdownData, { merge: true });
         
+        console.log('倒计时设置保存成功');
         showAlert('倒计时设置已保存', 'success');
+        
+        // 保存当前滚动位置
+        const scrollPosition = window.scrollY;
         
         // 更新显示
         updateCountdownDisplay(countdownData);
         updateCountdownPreview(countdownData);
         
-        // 重启倒计时计时器
+        // 重新启动倒计时计时器
         if (window.countdownTimer) {
             clearInterval(window.countdownTimer);
         }
         startCountdownTimer(countdownData);
         
-        // 刷新统计数据
+        // 更新统计信息
         updateCountdownStats();
         
-        // 切换到查看页面
+        // 恢复按钮状态
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // 等待DOM更新
         setTimeout(() => {
-            document.querySelector('#countdown-page .tab[data-tab="countdown-view"]').click();
-        }, 1000);
+            // 切换到查看标签页
+            const viewTab = document.querySelector('#countdown-page .tab[data-tab="countdown-view"]');
+            if (viewTab) {
+                viewTab.click();
+            }
+            
+            // 保持页面滚动位置
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+            });
+            
+            // 刷新倒计时数据
+            loadCountdownData();
+        }, 500);
         
     } catch (error) {
-        console.error('Error saving countdown settings:', error);
+        console.error('保存倒计时设置失败:', error);
         showAlert(`保存设置失败: ${error.message}`, 'error');
+        
+        // 恢复按钮状态
+        const submitBtn = document.querySelector('#countdown-settings-form button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '保存倒计时设置';
+            submitBtn.disabled = false;
+        }
+    } finally {
+        isSavingCountdown = false;
     }
 }
 
