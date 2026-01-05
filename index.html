@@ -6401,6 +6401,7 @@ function previewLogo(event, school) {
 }
 
 // 保存Logo到Firebase Storage
+// 修改saveSchoolLogos函数
 async function saveSchoolLogos() {
     if (!isAdmin) {
         showAlert('需要管理员权限', 'error');
@@ -6418,35 +6419,28 @@ async function saveSchoolLogos() {
     try {
         showAlert('正在上传Logo...', 'info');
         
-        // 上传宽柔中学Logo
+        const logoData = {};
+        
+        // 处理宽柔中学Logo
         if (fyhsFile) {
-            const storageRef = storage.ref();
-            const fyhsLogoRef = storageRef.child(`school-logos/fyhs-logo.${fyhsFile.name.split('.').pop()}`);
-            await fyhsLogoRef.put(fyhsFile);
-            const fyhsLogoUrl = await fyhsLogoRef.getDownloadURL();
-            
-            // 保存到Firestore
-            await db.collection('settings').doc('logos').set({
-                fyhsLogoUrl: fyhsLogoUrl,
-                fyhsLogoUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                fyhsLogoUpdatedBy: currentUser.uid
-            }, { merge: true });
+            const fyhsBase64 = await fileToBase64(fyhsFile);
+            logoData.fyhsLogoBase64 = fyhsBase64;
+            logoData.fyhsLogoType = fyhsFile.type;
+            logoData.fyhsLogoUpdated = firebase.firestore.FieldValue.serverTimestamp();
+            logoData.fyhsLogoUpdatedBy = currentUser.uid;
         }
         
-        // 上传高雄中学Logo
+        // 处理高雄中学Logo
         if (kshsFile) {
-            const storageRef = storage.ref();
-            const kshsLogoRef = storageRef.child(`school-logos/kshs-logo.${kshsFile.name.split('.').pop()}`);
-            await kshsLogoRef.put(kshsFile);
-            const kshsLogoUrl = await kshsLogoRef.getDownloadURL();
-            
-            // 保存到Firestore
-            await db.collection('settings').doc('logos').set({
-                kshsLogoUrl: kshsLogoUrl,
-                kshsLogoUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                kshsLogoUpdatedBy: currentUser.uid
-            }, { merge: true });
+            const kshsBase64 = await fileToBase64(kshsFile);
+            logoData.kshsLogoBase64 = kshsBase64;
+            logoData.kshsLogoType = kshsFile.type;
+            logoData.kshsLogoUpdated = firebase.firestore.FieldValue.serverTimestamp();
+            logoData.kshsLogoUpdatedBy = currentUser.uid;
         }
+        
+        // 保存到Firestore
+        await db.collection('settings').doc('logos').set(logoData, { merge: true });
         
         showAlert('Logo上传成功', 'success');
         
@@ -6457,6 +6451,85 @@ async function saveSchoolLogos() {
         console.error('Error saving logos:', error);
         showAlert(`Logo上传失败: ${error.message}`, 'error');
     }
+}
+
+// 辅助函数：将文件转换为Base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// 修改loadSchoolLogos函数
+async function loadSchoolLogos() {
+    try {
+        // 从Firestore获取Logo数据
+        const logosDoc = await db.collection('settings').doc('logos').get();
+        
+        if (logosDoc.exists) {
+            const logosData = logosDoc.data();
+            
+            // 设置宽柔中学Logo
+            if (logosData.fyhsLogoBase64) {
+                const fyhsImg = document.getElementById('fyhs-logo-img');
+                if (fyhsImg) {
+                    fyhsImg.src = logosData.fyhsLogoBase64;
+                    fyhsImg.style.display = 'block';
+                }
+            } else {
+                // 使用默认SVG
+                setDefaultLogo('fyhs');
+            }
+            
+            // 设置高雄中学Logo
+            if (logosData.kshsLogoBase64) {
+                const kshsImg = document.getElementById('kshs-logo-img');
+                if (kshsImg) {
+                    kshsImg.src = logosData.kshsLogoBase64;
+                    kshsImg.style.display = 'block';
+                }
+            } else {
+                // 使用默认SVG
+                setDefaultLogo('kshs');
+            }
+        } else {
+            // 使用默认SVG
+            setDefaultLogo('fyhs');
+            setDefaultLogo('kshs');
+        }
+    } catch (error) {
+        console.error('Error loading logos:', error);
+        setDefaultLogo('fyhs');
+        setDefaultLogo('kshs');
+    }
+}
+
+// 设置默认Logo（SVG）
+function setDefaultLogo(school) {
+    const imgElement = document.getElementById(`${school}-logo-img`);
+    if (!imgElement) return;
+    
+    if (school === 'fyhs') {
+        imgElement.src = 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="20" width="80" height="80" rx="15" fill="#e53935"/>
+                <text x="60" y="70" text-anchor="middle" fill="white" font-size="28" font-weight="bold" font-family="Arial">FY</text>
+                <text x="60" y="95" text-anchor="middle" fill="white" font-size="12" font-family="Arial">宽柔中学</text>
+            </svg>
+        `);
+    } else if (school === 'kshs') {
+        imgElement.src = 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="50" fill="#1565c0"/>
+                <text x="60" y="65" text-anchor="middle" fill="white" font-size="28" font-weight="bold" font-family="Arial">KS</text>
+                <text x="60" y="90" text-anchor="middle" fill="white" font-size="12" font-family="Arial">高雄中学</text>
+            </svg>
+        `);
+    }
+    imgElement.style.display = 'block';
 }
 
 // 加载Logo
