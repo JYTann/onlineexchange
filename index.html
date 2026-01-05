@@ -3421,6 +3421,39 @@ const firebaseConfig = {
             showShortcutHint();
         }
     });
+
+        // 修复：添加事件委托来处理动态生成的按钮
+document.addEventListener('click', function(e) {
+    // 处理"暂无公告"的添加按钮
+    if (e.target.closest('#empty-announcement-add-btn') || 
+        e.target.closest('#announcement-empty-add-btn') ||
+        (e.target.textContent && e.target.textContent.includes('添加第一个公告'))) {
+        e.preventDefault();
+        if (currentUser && isAdmin) {
+            // 导航到管理员面板发布公告
+            navigateTo('admin');
+            showAlert('请在管理员面板发布公告', 'info');
+        } else if (currentUser) {
+            showAlert('只有管理员可以发布公告', 'error');
+        } else {
+            showAlert('请先登录', 'error');
+            openModal('login');
+        }
+    }
+    
+    // 处理交流墙的添加按钮
+    if (e.target.closest('#empty-wall-add-btn') || 
+        e.target.closest('#wall-add-btn') ||
+        (e.target.textContent && e.target.textContent.includes('添加第一个贴文'))) {
+        e.preventDefault();
+        if (currentUser) {
+            openModal('add-note-modal');
+        } else {
+            showAlert('请先登录才能添加贴文', 'error');
+            openModal('login');
+        }
+    }
+});
     }
 
        function openEditAnnouncementModal(announcementId, announcementData) {
@@ -4686,14 +4719,14 @@ function formatDateTime(date) {
                 .get();
             
             if (announcementsSnapshot.empty) {
-                announcementsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-bullhorn" style="font-size: 4rem; opacity: 0.3;"></i>
-                        <p>暂无公告</p>
-                        ${isAdmin ? '<button class="btn btn-primary" onclick="document.getElementById(\'add-event-tab\')?.click()">发布第一个公告</button>' : ''}
-                    </div>
-                `;
-            } else {
+    announcementsList.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-bullhorn" style="font-size: 4rem; opacity: 0.3;"></i>
+            <p>暂无公告</p>
+            ${isAdmin ? '<button class="btn btn-primary" id="empty-announcement-add-btn">发布第一个公告</button>' : ''}
+        </div>
+    `;
+} else {
                 let html = '';
                 announcementsSnapshot.forEach(doc => {
                     const data = doc.data();
@@ -5305,12 +5338,17 @@ function updateAddNoteButton() {
             }
             
             // Add delete event listener
-            newNote.querySelector('.delete-note').addEventListener('click', function() {
-                const noteId = this.closest('.padlet-note').getAttribute('data-id');
-                if (confirm('确定要删除这个贴文吗？')) {
-                    deleteWallPost(noteId);
-                }
-            });
+            setTimeout(() => {
+    const deleteBtn = newNote.querySelector ? newNote.querySelector('.delete-note') : null;
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            const noteId = newNote.getAttribute('data-id');
+            if (confirm('确定要删除这个贴文吗？')) {
+                deleteWallPost(noteId);
+            }
+        });
+    }
+}, 100);
             
             // Reinitialize drag and drop
             initDragAndDrop();
@@ -5440,28 +5478,24 @@ function updateAddNoteButton() {
         
         try {
             // 修复日期问题：使用本地时区
-            const eventDate = new Date(date);
-            
-            // 重要：避免时区转换问题
-            // 将日期调整为本地时区
-            eventDate.setMinutes(eventDate.getMinutes() - eventDate.getTimezoneOffset());
-            
-            if (time) {
-                const [hours, minutes] = time.split(':');
-                eventDate.setHours(hours, minutes);
-            }
-            
-            const eventData = {
-                title: title,
-                description: description,
-                date: eventDate,  // 使用调整后的日期
-                time: time || '',
-                type: type,
-                school: school,
-                authorId: currentUser.uid,
-                authorName: userName.textContent,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
+            const eventDate = new Date(date + 'T12:00:00'); // 使用中午12点避免时区问题
+
+if (time) {
+    const [hours, minutes] = time.split(':');
+    eventDate.setHours(parseInt(hours), parseInt(minutes));
+}
+
+const eventData = {
+    title: title,
+    description: description,
+    date: firebase.firestore.Timestamp.fromDate(eventDate), // 使用Firestore时间戳
+    time: time || '',
+    type: type,
+    school: school,
+    authorId: currentUser.uid,
+    authorName: userName.textContent,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+};
             
             const docRef = await db.collection('events').add(eventData);
             
