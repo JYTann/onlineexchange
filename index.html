@@ -8406,15 +8406,6 @@ function updateAddNoteButton() {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
-
-       function getLocalDateKey(date) {
-    return [
-        date.getFullYear(),
-        String(date.getMonth() + 1).padStart(2, '0'),
-        String(date.getDate()).padStart(2, '0')
-    ].join('-');
-}
-
     
     function generateCalendar(date) {
         const calendar = document.getElementById('calendar');
@@ -8446,28 +8437,23 @@ function updateAddNoteButton() {
         });
         
         // Add empty cells for days before first day of month
-for (let day = 1; day <= daysInMonth; day++) {
-    const dayDate = new Date(date.getFullYear(), date.getMonth(), day);
-    const dateKey = getLocalDateKey(dayDate);
-    const isToday = isSameDay(dayDate, new Date());
-
-    html += `
-        <div class="calendar-day" data-date="${dateKey}">
-            <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">
-                ${day}
-            </div>
-            <div id="events-${dateKey}"></div>
-            ${
-                currentUser
-                    ? `<button class="add-event-btn" data-date="${dateKey}">
-                        <i class="fas fa-plus"></i>
-                       </button>`
-                    : ''
-            }
-        </div>
-    `;
-}
-
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            html += `<div class="calendar-day"></div>`;
+        }
+        
+        // Add cells for each day of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayDate = new Date(date.getFullYear(), date.getMonth(), day);
+            const isToday = isSameDay(dayDate, new Date());
+            
+            html += `
+                <div class="calendar-day" data-date="${dayDate.toISOString().split('T')[0]}">
+                    <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">${day}</div>
+                    <div id="events-${dayDate.toISOString().split('T')[0]}"></div>
+                    ${currentUser ? `<button class="add-event-btn" data-date="${dayDate.toISOString().split('T')[0]}"><i class="fas fa-plus"></i></button>` : ''}
+                </div>
+            `;
+        }
         
         calendar.innerHTML = html;
         
@@ -8507,12 +8493,7 @@ for (let day = 1; day <= daysInMonth; day++) {
                 const data = doc.data();
                 const date = data.date?.toDate();
                 if (date) {
-const dateString = [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
-].join('-');
-
+                    const dateString = date.toISOString().split('T')[0];
                     const eventContainer = document.getElementById(`events-${dateString}`);
                     
                     if (eventContainer) {
@@ -9230,11 +9211,9 @@ const eventData = {
 };
             
             const docRef = await db.collection('events').add(eventData);
-            const dateString = [
-    eventDate.getFullYear(),
-    String(eventDate.getMonth() + 1).padStart(2, '0'),
-    String(eventDate.getDate()).padStart(2, '0')
-].join('-');
+            
+            // 修复：使用本地日期字符串显示
+            const dateString = eventDate.toISOString().split('T')[0];
             const eventContainer = document.getElementById(`events-${dateString}`);
             
             if (eventContainer) {
