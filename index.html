@@ -9211,9 +9211,11 @@ const eventData = {
 };
             
             const docRef = await db.collection('events').add(eventData);
-            
-            // 修复：使用本地日期字符串显示
-            const dateString = eventDate.toISOString().split('T')[0];
+            const dateString = [
+    eventDate.getFullYear(),
+    String(eventDate.getMonth() + 1).padStart(2, '0'),
+    String(eventDate.getDate()).padStart(2, '0')
+].join('-');
             const eventContainer = document.getElementById(`events-${dateString}`);
             
             if (eventContainer) {
