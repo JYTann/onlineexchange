@@ -8406,6 +8406,30 @@ function updateAddNoteButton() {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
+
+       // 添加辅助函数来处理日期时区
+function toLocalDate(date) {
+    if (!date) return null;
+    
+    // 如果是从 Firestore 获取的时间戳
+    if (typeof date.toDate === 'function') {
+        date = date.toDate();
+    }
+    
+    // 转换为本地时间
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+}
+
+function formatLocalDate(date) {
+    const localDate = toLocalDate(date);
+    if (!localDate) return 'Unknown Date';
+    
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
     
     function generateCalendar(date) {
         const calendar = document.getElementById('calendar');
