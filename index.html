@@ -8466,7 +8466,30 @@ function updateAddNoteButton() {
             });
         });
     }
+    // 添加辅助函数来处理日期时区
+function toLocalDate(date) {
+    if (!date) return null;
     
+    // 如果是从 Firestore 获取的时间戳
+    if (typeof date.toDate === 'function') {
+        date = date.toDate();
+    }
+    
+    // 转换为本地时间
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+}
+
+function formatLocalDate(date) {
+    const localDate = toLocalDate(date);
+    if (!localDate) return 'Unknown Date';
+    
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
+       
     async function loadCalendarEvents() {
         const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
         
@@ -9191,7 +9214,12 @@ async function handleUpdateProfile(e) {
         
         try {
             // 修复日期问题：使用本地时区
-            const eventDate = new Date(date + 'T12:00:00'); // 使用中午12点避免时区问题
+            const eventDate = new Date(date);
+eventDate.setHours(0, 0, 0, 0); // 设置为当天的开始时间
+
+// 或者如果需要包含时间
+const localDateString = date + (time ? 'T' + time : 'T00:00:00');
+const eventDate = new Date(localDateString); // 使用中午12点避免时区问题
 
 if (time) {
     const [hours, minutes] = time.split(':');
@@ -9674,15 +9702,22 @@ const eventData = {
     }
     
     function formatDate(date) {
-        if (!date) return 'Unknown Date';
-        
-        if (typeof date === 'string') {
-            date = new Date(date);
-        }
-        
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('zh-CN', options);
+    if (!date) return 'Unknown Date';
+    
+    if (typeof date === 'string') {
+        date = new Date(date);
     }
+    
+    // 使用 UTC 时间来避免时区转换问题
+    const utcDate = new Date(Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate()
+    ));
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
+    return utcDate.toLocaleDateString('zh-CN', options);
+}
     
     function isSameDay(date1, date2) {
         return date1.getFullYear() === date2.getFullYear() &&
