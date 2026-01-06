@@ -8467,95 +8467,50 @@ function updateAddNoteButton() {
         });
     }
     
-  async function loadCalendarEvents() {
-    const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
-    
-    // Clear existing events
-    calendarDays.forEach(day => {
-        const eventContainer = day.querySelector('div[id^="events-"]');
-        if (eventContainer) {
-            eventContainer.innerHTML = '';
-        }
-    });
-    
-    try {
-        // 修复：正确处理日期范围查询
-        const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
-        const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+    async function loadCalendarEvents() {
+        const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
         
-        // 设置时间为午夜，避免时区问题
-        firstDay.setHours(0, 0, 0, 0);
-        lastDay.setHours(23, 59, 59, 999);
-        
-        const eventsSnapshot = await db.collection('events')
-            .where('date', '>=', firebase.firestore.Timestamp.fromDate(firstDay))
-            .where('date', '<=', firebase.firestore.Timestamp.fromDate(lastDay))
-            .orderBy('date')
-            .get();
-        
-        eventsSnapshot.forEach(doc => {
-            const data = doc.data();
-            const date = data.date?.toDate();
-            if (date) {
-                // 修复：使用本地日期来匹配日历格子
-                const localDateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD格式
-                
-                // 获取原始的日期字符串（不包含时间）
-                const originalDate = data.originalDate || localDateStr;
-                
-                const eventContainer = document.getElementById(`events-${originalDate}`);
-                
-                if (eventContainer) {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'calendar-event';
-                    eventElement.textContent = data.title;
-                    eventElement.setAttribute('data-id', doc.id);
-                    eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
-                    
-                    eventContainer.appendChild(eventElement);
-                }
+        // Clear existing events
+        calendarDays.forEach(day => {
+            const eventContainer = day.querySelector('div[id^="events-"]');
+            if (eventContainer) {
+                eventContainer.innerHTML = '';
             }
         });
-    } catch (error) {
-        console.error('Error loading calendar events:', error);
+        
+        try {
+            // Get first and last day of current month view
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+            
+            const eventsSnapshot = await db.collection('events')
+                .where('date', '>=', firstDay)
+                .where('date', '<=', lastDay)
+                .orderBy('date')
+                .get();
+            
+            eventsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const date = data.date?.toDate();
+                if (date) {
+                    const dateString = date.toISOString().split('T')[0];
+                    const eventContainer = document.getElementById(`events-${dateString}`);
+                    
+                    if (eventContainer) {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'calendar-event';
+                        eventElement.textContent = data.title;
+                        eventElement.setAttribute('data-id', doc.id);
+                        eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
+                        
+                        eventContainer.appendChild(eventElement);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error loading calendar events:', error);
+        }
     }
-}
-
-       // 辅助函数：正确处理日期时间
-function handleEventDateTime(dateInput, timeInput) {
-    // 如果没有时间，设置为中午12点
-    if (!timeInput) {
-        const date = new Date(dateInput);
-        date.setHours(12, 0, 0, 0); // 设置为中午12点，避免时区转换问题
-        return {
-            date: date,
-            dateString: dateInput, // 保留原始日期字符串
-            time: ''
-        };
-    }
-    
-    // 如果有时间，正确处理
-    const [hours, minutes] = timeInput.split(':').map(Number);
-    const date = new Date(dateInput);
-    
-    // 重要：使用setHours而不是创建新的Date对象来避免时区问题
-    date.setHours(hours, minutes, 0, 0);
-    
-    return {
-        date: date,
-        dateString: dateInput,
-        time: timeInput
-    };
-}
-
-// 辅助函数：将日期格式化为YYYY-MM-DD（用于日历格子匹配）
-function formatDateForCalendar(date) {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
     
    async function loadAdminData() {
     try {
@@ -9214,86 +9169,75 @@ async function handleUpdateProfile(e) {
         }
     }
     
-// 修复 handleAddEvent 函数中的日期处理部分
-async function handleAddEvent(e) {
-    e.preventDefault();
-    
-    if (!currentUser) {
-        showAlert('Please login first', 'error');
-        return;
-    }
-    
-    const title = document.getElementById('event-title').value;
-    const description = document.getElementById('event-description').value;
-    const date = document.getElementById('event-date').value;
-    const time = document.getElementById('event-time').value;
-    const type = document.getElementById('event-type').value;
-    const school = document.getElementById('event-school').value;
-    
-    if (!title || !date) {
-        showAlert('Please enter the title and date.', 'error');
-        return;
-    }
-    
-    try {
-        // 修复：正确处理日期时间，避免时区问题
-        let eventDate;
+    async function handleAddEvent(e) {
+        e.preventDefault();
         
-        if (time) {
-            // 将日期和时间组合，并指定为本地时间
-            const [hours, minutes] = time.split(':');
-            // 使用本地时间创建日期对象
-            eventDate = new Date(date);
-            eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-        } else {
-            // 如果没有时间，设置为当天的中午12点（避免跨天问题）
-            eventDate = new Date(date);
-            eventDate.setHours(12, 0, 0, 0);
+        if (!currentUser) {
+            showAlert('Please login first', 'error');
+            return;
         }
         
-        // 重要：使用本地时间的午夜来存储，避免时区转换问题
-        // 或者使用UTC时间来存储
-        const eventData = {
-            title: title,
-            description: description,
-            date: firebase.firestore.Timestamp.fromDate(eventDate), // 存储为时间戳
-            time: time || '',
-            type: type,
-            school: school,
-            authorId: currentUser.uid,
-            authorName: userName.textContent,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
+        const title = document.getElementById('event-title').value;
+        const description = document.getElementById('event-description').value;
+        const date = document.getElementById('event-date').value;
+        const time = document.getElementById('event-time').value;
+        const type = document.getElementById('event-type').value;
+        const school = document.getElementById('event-school').value;
         
-        const docRef = await db.collection('events').add(eventData);
-        
-        // 使用本地日期字符串显示
-        const dateString = date; // 直接使用输入日期
-        
-        const eventContainer = document.getElementById(`events-${dateString}`);
-        
-        if (eventContainer) {
-            const eventElement = document.createElement('div');
-            eventElement.className = 'calendar-event';
-            eventElement.textContent = title;
-            eventElement.setAttribute('data-id', docRef.id);
-            eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
-            
-            eventContainer.appendChild(eventElement);
+        if (!title || !date) {
+            showAlert('Please enter the title and date.', 'error');
+            return;
         }
         
-        eventForm.reset();
-        document.querySelector('[data-tab="view-calendar"]').click();
-        showAlert('Event added successfully!', 'success');
-        
-        loadDashboardData();
-        if (isAdmin) loadAdminData();
-        
-    } catch (error) {
-        console.error('Error adding event:', error);
-        showAlert(`Failed to add the post: ${error.message}`, 'error');
-    }
+        try {
+            // 修复日期问题：使用本地时区
+            const eventDate = new Date(date + 'T12:00:00'); // 使用中午12点避免时区问题
+
+if (time) {
+    const [hours, minutes] = time.split(':');
+    eventDate.setHours(parseInt(hours), parseInt(minutes));
 }
+
+const eventData = {
+    title: title,
+    description: description,
+    date: firebase.firestore.Timestamp.fromDate(eventDate), // 使用Firestore时间戳
+    time: time || '',
+    type: type,
+    school: school,
+    authorId: currentUser.uid,
+    authorName: userName.textContent,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+};
+            
+            const docRef = await db.collection('events').add(eventData);
+            
+            // 修复：使用本地日期字符串显示
+            const dateString = eventDate.toISOString().split('T')[0];
+            const eventContainer = document.getElementById(`events-${dateString}`);
+            
+            if (eventContainer) {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'calendar-event';
+                eventElement.textContent = title;
+                eventElement.setAttribute('data-id', docRef.id);
+                eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
+                
+                eventContainer.appendChild(eventElement);
+            }
+            
+            eventForm.reset();
+            document.querySelector('[data-tab="view-calendar"]').click();
+            showAlert('活动已添加', 'success');
+            
+            loadDashboardData();
+            if (isAdmin) loadAdminData();
+            
+        } catch (error) {
+            console.error('Error adding event:', error);
+            showAlert(`Failed to add the post: ${error.message}`, 'error');
+        }
+    }
     
     async function handleAdminAddAnnouncement(e) {
         e.preventDefault();
@@ -9437,34 +9381,28 @@ async function handleAddEvent(e) {
         document.getElementById('event-detail-title').textContent = eventData.title;
         
         // 修复：正确处理日期对象
-    let eventDate;
-    if (eventData.date && typeof eventData.date.toDate === 'function') {
-        eventDate = eventData.date.toDate();
-    } else if (eventData.date instanceof Date) {
-        eventDate = eventData.date;
-    } else if (eventData.date) {
-        eventDate = new Date(eventData.date);
-    }
-    
-    let html = `
-        <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
-    `;
-    
-    if (eventDate) {
-        // 修复：使用本地时区显示日期，不转换
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // 使用用户本地时区
-        };
-        html += `<p><strong>Date:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
-    }
-    
-    // 显示原始时间（不转换）
-    if (eventData.time) {
-        html += `<p><strong>时间:</strong> ${eventData.time} (本地时间)</p>`;
-    }
+        let eventDate;
+        if (eventData.date && typeof eventData.date.toDate === 'function') {
+            eventDate = eventData.date.toDate();
+        } else if (eventData.date instanceof Date) {
+            eventDate = eventData.date;
+        } else if (eventData.date) {
+            eventDate = new Date(eventData.date);
+        }
+        
+        let html = `
+            <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
+        `;
+        
+        if (eventDate) {
+            // 修复：使用本地时区显示日期
+            const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
+            html += `<p><strong>Date:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
+        }
+        
+        if (eventData.time) {
+            html += `<p><strong>时间:</strong> ${eventData.time}</p>`;
+        }
         
         if (eventData.type) {
             const typeMap = {
