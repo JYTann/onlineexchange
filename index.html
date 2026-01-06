@@ -6971,21 +6971,48 @@ function updateCountdownDisplay(data) {
 }
 
 // 开始倒计时计时器
+// 开始倒计时计时器
 function startCountdownTimer(data) {
     const eventDate = data.eventDate?.toDate();
     if (!eventDate) return;
     
-    // 设置时间
+    // 获取事件时区信息
+    const eventTimezone = data.timezone || 'Asia/Taipei';
+    const eventTimezoneOffset = data.timezoneOffset || 8; // 默认UTC+8
+    
+    // 设置具体时间
     const timeStr = data.eventTime || '00:00';
     const [hours, minutes] = timeStr.split(':').map(Number);
-    eventDate.setHours(hours, minutes, 0, 0);
     
-    // 更新倒计时显示
-    updateCountdownTime(eventDate);
+    // 创建目标时区的时间对象
+    // 首先获取事件的UTC时间
+    const utcDate = new Date(eventDate.getTime());
     
-    // 每秒更新一次
+    // 计算事件在目标时区的本地时间
+    // 公式：目标时区时间 = UTC时间 + 目标时区偏移
+    const targetOffset = eventTimezoneOffset * 60 * 60 * 1000; // 转换为毫秒
+    const targetDate = new Date(utcDate.getTime() + targetOffset);
+    
+    // 设置具体的小时和分钟
+    targetDate.setHours(hours, minutes, 0, 0);
+    
+    // 转换回UTC时间用于计算
+    const eventUTCDate = new Date(targetDate.getTime() - targetOffset);
+    
+    // 计算当前UTC时间
+    const nowUTC = new Date();
+    
+    // 计算时差
+    const diff = eventUTCDate - nowUTC;
+    
+    // 立即更新显示
+    updateCountdownTime(diff, eventTimezoneOffset);
+    
+    // 每秒更新一次（使用UTC时间计算）
     const timer = setInterval(() => {
-        updateCountdownTime(eventDate);
+        const currentUTC = new Date();
+        const currentDiff = eventUTCDate - currentUTC;
+        updateCountdownTime(currentDiff, eventTimezoneOffset);
     }, 1000);
     
     // 保存计时器引用以便清理
@@ -6993,13 +7020,12 @@ function startCountdownTimer(data) {
 }
 
 // 更新倒计时时间
-function updateCountdownTime(targetDate) {
-    const now = new Date();
-    const diff = targetDate - now;
-    
+function updateCountdownTime(diff, timezoneOffset = 8) {
     // 检查是否已过期
     if (diff <= 0) {
-        clearInterval(window.countdownTimer);
+        if (window.countdownTimer) {
+            clearInterval(window.countdownTimer);
+        }
         showCountdownMessage('The exchange meeting is now in progress! Join now!', 'success');
         document.getElementById('countdown-display').classList.add('countdown-completed');
         document.querySelectorAll('.countdown-number').forEach(el => {
@@ -7027,6 +7053,9 @@ function updateCountdownTime(targetDate) {
         setTimeout(() => el.classList.remove('updated'), 500);
     });
     
+    // 更新时区显示
+    updateTimezoneDisplay(timezoneOffset);
+    
     // 如果少于24小时，添加紧急样式
     if (days === 0 && hours < 24) {
         document.getElementById('countdown-display').classList.add('countdown-urgent');
@@ -7048,6 +7077,34 @@ function updateCountdownTime(targetDate) {
     
     // 更新剩余天数统计
     document.getElementById('days-remaining').textContent = days;
+}
+
+// 更新时区显示
+function updateTimezoneDisplay(timezoneOffset) {
+    const timezoneElement = document.getElementById('event-timezone');
+    if (!timezoneElement) return;
+    
+    const timezoneNames = {
+        8: '台湾/马来西亚时间 (UTC+8)',
+        0: '格林威治时间 (UTC)',
+        '-5': '美国东部时间 (UTC-5)',
+        '-8': '美国太平洋时间 (UTC-8)'
+    };
+    
+    timezoneElement.textContent = timezoneNames[timezoneOffset] || `UTC${timezoneOffset >= 0 ? '+' : ''}${timezoneOffset}`;
+    
+    // 同时显示用户本地时间对比
+    const userOffset = -new Date().getTimezoneOffset() / 60;
+    if (Math.abs(userOffset - timezoneOffset) > 0) {
+        const timezoneInfo = document.getElementById('timezone-info');
+        if (timezoneInfo) {
+            timezoneInfo.innerHTML = `
+                <small style="color: var(--gray);">
+                    (您的本地时间: UTC${userOffset >= 0 ? '+' : ''}${userOffset})
+                </small>
+            `;
+        }
+    }
 }
 
 // 显示倒计时消息
@@ -9169,75 +9226,122 @@ async function handleUpdateProfile(e) {
         }
     }
     
-    async function handleAddEvent(e) {
-        e.preventDefault();
+ async function handleAddEvent(e) {
+    e.preventDefault();
+    
+    if (!currentUser) {
+        showAlert('Please login first', 'error');
+        return;
+    }
+    
+    const title = document.getElementById('event-title').value;
+    const description = document.getElementById('event-description').value;
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const type = document.getElementById('event-type').value;
+    const school = document.getElementById('event-school').value;
+    
+    if (!title || !date) {
+        showAlert('Please enter the title and date.', 'error');
+        return;
+    }
+    
+    try {
+        // 创建指定时区的时间 (UTC+8 - 两校共同时区)
+        // 马来西亚和台湾都在UTC+8时区
+        const timezone = 'Asia/Taipei'; // 也可以使用 'Asia/Kuala_Lumpur'
+        const timezoneOffset = 8; // UTC+8
         
-        if (!currentUser) {
-            showAlert('Please login first', 'error');
-            return;
+        // 构造本地日期时间字符串
+        let dateTimeStr = `${date}`;
+        if (time) {
+            dateTimeStr += `T${time}:00`;
+        } else {
+            dateTimeStr += 'T12:00:00'; // 默认中午12点
         }
         
-        const title = document.getElementById('event-title').value;
-        const description = document.getElementById('event-description').value;
-        const date = document.getElementById('event-date').value;
-        const time = document.getElementById('event-time').value;
-        const type = document.getElementById('event-type').value;
-        const school = document.getElementById('event-school').value;
+        // 创建Date对象（会使用本地时区解析）
+        const localDate = new Date(dateTimeStr);
         
-        if (!title || !date) {
-            showAlert('Please enter the title and date.', 'error');
-            return;
+        // 计算UTC时间
+        // 公式：UTC时间 = 本地时间 - 本地时区偏移 + 目标时区偏移
+        const localOffset = localDate.getTimezoneOffset(); // 分钟数
+        const targetOffset = -timezoneOffset * 60; // UTC+8 = -480分钟
+        
+        // 转换为目标时区的UTC时间
+        const utcDate = new Date(localDate.getTime() + (targetOffset - localOffset) * 60 * 1000);
+        
+        const eventData = {
+            title: title,
+            description: description,
+            date: firebase.firestore.Timestamp.fromDate(utcDate),
+            time: time || '',
+            type: type,
+            school: school,
+            authorId: currentUser.uid,
+            authorName: userName.textContent,
+            // 添加时区信息
+            timezone: timezone,
+            timezoneOffset: timezoneOffset,
+            timezoneName: getTimezoneName(timezone),
+            // 存储原始本地时间字符串（用于显示）
+            displayDate: date,
+            displayTime: time || '12:00',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        const docRef = await db.collection('events').add(eventData);
+        
+        // 显示时使用正确的时区
+        const displayDate = formatDateForTimezone(utcDate, timezoneOffset);
+        const dateString = displayDate.toISOString().split('T')[0];
+        const eventContainer = document.getElementById(`events-${dateString}`);
+        
+        if (eventContainer) {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'calendar-event';
+            eventElement.textContent = title;
+            eventElement.setAttribute('data-id', docRef.id);
+            eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
+            
+            eventContainer.appendChild(eventElement);
         }
         
-        try {
-            // 修复日期问题：使用本地时区
-            const eventDate = new Date(date + 'T12:00:00'); // 使用中午12点避免时区问题
-
-if (time) {
-    const [hours, minutes] = time.split(':');
-    eventDate.setHours(parseInt(hours), parseInt(minutes));
+        eventForm.reset();
+        document.querySelector('[data-tab="view-calendar"]').click();
+        showAlert('活动已添加', 'success');
+        
+        loadDashboardData();
+        if (isAdmin) loadAdminData();
+        
+    } catch (error) {
+        console.error('Error adding event:', error);
+        showAlert(`Failed to add the post: ${error.message}`, 'error');
+    }
 }
 
-const eventData = {
-    title: title,
-    description: description,
-    date: firebase.firestore.Timestamp.fromDate(eventDate), // 使用Firestore时间戳
-    time: time || '',
-    type: type,
-    school: school,
-    authorId: currentUser.uid,
-    authorName: userName.textContent,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-};
-            
-            const docRef = await db.collection('events').add(eventData);
-            
-            // 修复：使用本地日期字符串显示
-            const dateString = eventDate.toISOString().split('T')[0];
-            const eventContainer = document.getElementById(`events-${dateString}`);
-            
-            if (eventContainer) {
-                const eventElement = document.createElement('div');
-                eventElement.className = 'calendar-event';
-                eventElement.textContent = title;
-                eventElement.setAttribute('data-id', docRef.id);
-                eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
-                
-                eventContainer.appendChild(eventElement);
-            }
-            
-            eventForm.reset();
-            document.querySelector('[data-tab="view-calendar"]').click();
-            showAlert('活动已添加', 'success');
-            
-            loadDashboardData();
-            if (isAdmin) loadAdminData();
-            
-        } catch (error) {
-            console.error('Error adding event:', error);
-            showAlert(`Failed to add the post: ${error.message}`, 'error');
-        }
-    }
+// 辅助函数：获取时区显示名称
+function getTimezoneName(timezone) {
+    const timezoneNames = {
+        'Asia/Taipei': '台湾时间 (UTC+8)',
+        'Asia/Kuala_Lumpur': '马来西亚时间 (UTC+8)',
+        'Asia/Singapore': '新加坡时间 (UTC+8)',
+        'Asia/Shanghai': '北京时间 (UTC+8)'
+    };
+    return timezoneNames[timezone] || `UTC+${timezone === 'Asia/Taipei' || timezone === 'Asia/Kuala_Lumpur' ? '8' : 'Unknown'}`;
+}
+
+// 辅助函数：根据时区格式化日期
+function formatDateForTimezone(date, timezoneOffset) {
+    // 根据时区偏移调整日期
+    const adjustedDate = new Date(date.getTime());
+    const localOffset = adjustedDate.getTimezoneOffset(); // 分钟数
+    const targetOffset = -timezoneOffset * 60; // UTC+8 = -480分钟
+    
+    // 调整到目标时区
+    adjustedDate.setMinutes(adjustedDate.getMinutes() + (targetOffset - localOffset));
+    return adjustedDate;
+}
     
     async function handleAdminAddAnnouncement(e) {
         e.preventDefault();
@@ -9395,38 +9499,63 @@ const eventData = {
         `;
         
         if (eventDate) {
-            // 修复：使用本地时区显示日期
-            const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
-            html += `<p><strong>Date:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
-        }
-        
-        if (eventData.time) {
-            html += `<p><strong>时间:</strong> ${eventData.time}</p>`;
-        }
-        
-        if (eventData.type) {
-            const typeMap = {
-                'academic': 'Academic Seminar',
-                'cultural': 'Cultural Exchange',
-                'competition': 'Joint Competition',
-                'language': 'Language Exchange',
-                'other': 'Other'
-            };
-            html += `<p><strong>类型:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
-        }
-        
-        if (eventData.school) {
-            const schoolMap = {
-                'both': 'Joint by Both Schools',
-                'fyhs': 'Foon Yew High School',
-                'kshs': 'Kaohsiung Senior High School'
-            };
-            html += `<p><strong>Organizer:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
-        }
-        
-        html += `<p><strong>Creator:</strong> ${eventData.authorName || 'Unknown User'}</p>`;
-        
-        document.getElementById('event-detail-content').innerHTML = html;
+    // 修复：正确处理日期对象
+    let eventDate;
+    if (eventData.date && typeof eventData.date.toDate === 'function') {
+        eventDate = eventData.date.toDate();
+    } else if (eventData.date instanceof Date) {
+        eventDate = eventData.date;
+    } else if (eventData.date) {
+        eventDate = new Date(eventData.date);
+    }
+    
+    let html = `
+        <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
+    `;
+    
+    if (eventDate) {
+        // 使用增强的格式化函数，包含时区信息
+        html += `<p><strong>Date & Time:</strong> ${formatDateForEvent(eventDate, eventData)}</p>`;
+    }
+    
+    if (eventData.time) {
+        html += `<p><strong>Time:</strong> ${eventData.time}</p>`;
+    }
+    
+    // 显示时区信息
+    const timezoneName = eventData.timezoneName || 'UTC+8';
+    html += `<p><strong>Timezone:</strong> ${timezoneName}</p>`;
+    
+    // 显示用户本地时间对比
+    const userOffset = -new Date().getTimezoneOffset() / 60;
+    const eventOffset = eventData.timezoneOffset || 8;
+    if (Math.abs(userOffset - eventOffset) > 0) {
+        html += `<p><small style="color: var(--gray);">(Your local time: UTC${userOffset >= 0 ? '+' : ''}${userOffset})</small></p>`;
+    }
+    
+    if (eventData.type) {
+        const typeMap = {
+            'academic': 'Academic Seminar',
+            'cultural': 'Cultural Exchange',
+            'competition': 'Joint Competition',
+            'language': 'Language Exchange',
+            'other': 'Other'
+        };
+        html += `<p><strong>Type:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
+    }
+    
+    if (eventData.school) {
+        const schoolMap = {
+            'both': 'Joint by Both Schools',
+            'fyhs': 'Foon Yew High School',
+            'kshs': 'Kaohsiung Senior High School'
+        };
+        html += `<p><strong>Organizer:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
+    }
+    
+    html += `<p><strong>Creator:</strong> ${eventData.authorName || 'Unknown User'}</p>`;
+    
+    document.getElementById('event-detail-content').innerHTML = html;
         
         const actions = document.getElementById('event-detail-actions');
         actions.innerHTML = '';
@@ -9673,16 +9802,133 @@ const eventData = {
         }
     }
     
-    function formatDate(date) {
-        if (!date) return 'Unknown Date';
-        
-        if (typeof date === 'string') {
-            date = new Date(date);
-        }
-        
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('zh-CN', options);
+// 增强的日期格式化函数，支持时区
+function formatDate(date, options = {}) {
+    if (!date) return 'Unknown Date';
+    
+    // 确保是Date对象
+    if (typeof date === 'string') {
+        date = new Date(date);
+    } else if (date && typeof date.toDate === 'function') {
+        date = date.toDate();
     }
+    
+    if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+    }
+    
+    // 默认选项
+    const defaultOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Taipei', // 默认使用台湾/马来西亚时区
+        timeZoneName: 'short'
+    };
+    
+    // 合并选项
+    const formatOptions = { ...defaultOptions, ...options };
+    
+    // 格式化日期
+    let formattedDate;
+    try {
+        formattedDate = date.toLocaleDateString('zh-CN', formatOptions);
+        
+        // 如果需要包含时间
+        if (options.includeTime) {
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: formatOptions.timeZone,
+                timeZoneName: 'short'
+            };
+            const formattedTime = date.toLocaleTimeString('zh-CN', timeOptions);
+            formattedDate += ` ${formattedTime}`;
+        }
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        // 备选方案：使用简单格式
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        formattedDate = `${year}年${month}月${day}日`;
+        if (options.includeTime) {
+            formattedDate += ` ${hours}:${minutes}`;
+        }
+    }
+    
+    return formattedDate;
+}
+
+// 特定用途的格式化函数
+function formatDateForEvent(date, eventData = {}) {
+    if (!date) return '时间未定';
+    
+    // 获取事件时区
+    const timezone = eventData.timezone || 'Asia/Taipei';
+    const timezoneName = eventData.timezoneName || 'UTC+8';
+    
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: timezone,
+        timeZoneName: 'short'
+    };
+    
+    try {
+        const formatted = new Date(date).toLocaleDateString('zh-CN', options);
+        return `${formatted} (${timezoneName})`;
+    } catch (error) {
+        // 备选方案
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const hours = d.getHours().toString().padStart(2, '0');
+        const minutes = d.getMinutes().toString().padStart(2, '0');
+        
+        return `${year}年${month}月${day}日 ${hours}:${minutes} (${timezoneName})`;
+    }
+}
+
+// 计算相对时间（考虑时区）
+function formatRelativeTime(date, referenceDate = new Date()) {
+    if (!date) return '未知时间';
+    
+    const d = new Date(date);
+    const now = new Date(referenceDate);
+    
+    // 考虑时区差异
+    const timezoneOffset = 8; // 默认UTC+8
+    const localOffset = -now.getTimezoneOffset() / 60;
+    const offsetDiff = timezoneOffset - localOffset;
+    
+    // 调整时间
+    d.setHours(d.getHours() + offsetDiff);
+    now.setHours(now.getHours() + offsetDiff);
+    
+    const diffMs = now - d;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return '刚刚';
+    if (diffMins < 60) return `${diffMins}分钟前`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}小时前`;
+    if (diffMins < 10080) return `${Math.floor(diffMins / 1440)}天前`;
+    
+    // 超过一周显示具体日期
+    return formatDate(d, { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
     
     function isSameDay(date1, date2) {
         return date1.getFullYear() === date2.getFullYear() &&
