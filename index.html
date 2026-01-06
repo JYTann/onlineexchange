@@ -8406,6 +8406,15 @@ function updateAddNoteButton() {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
+
+       function getLocalDateKey(date) {
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('-');
+}
+
     
     function generateCalendar(date) {
         const calendar = document.getElementById('calendar');
