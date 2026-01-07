@@ -5022,6 +5022,10 @@ const CLOUDINARY_CONFIG = {
     uploadPreset: 'school_exchange', // 您需要先创建这个preset
     apiKey: '771132298449885' // 请替换为新的API Key
 };
+
+       // 全局图表实例
+let progressChart = null;
+let trackingChartLoaded = false;  // 防止重复加载
     
     // Initialize Firebase
     try {
@@ -5183,7 +5187,7 @@ const CLOUDINARY_CONFIG = {
         // 安全初始化图表
         if (window.location.hash.includes('admin')) {
             setTimeout(() => {
-                safeInitializeProgressChart();
+                //safeInitializeProgressChart();
             }, 1000);
         }
     }, 2000);
@@ -7620,14 +7624,14 @@ function initTaskTracking() {
 }
 
 // ==================== 修复4：简化loadTrackingTab函数 ====================
+// 修改 loadTrackingTab 函数：
 async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab:', tabId);
     
     try {
-        // 如果离开图表标签页，清理图表
-        if (tabId !== 'tracking-overview' && window.progressChart) {
-            window.progressChart.destroy();
-            window.progressChart = null;
+        // 如果离开图表标签页，重置标志
+        if (tabId !== 'tracking-overview') {
+            trackingChartLoaded = false;
         }
         
         switch(tabId) {
@@ -7641,22 +7645,14 @@ async function loadTrackingTab(tabId) {
                 await loadStudentProgressList();
                 break;
             case 'tracking-reports':
-                // 清空之前的报告
-                const reportOutput = document.getElementById('report-output');
-                if (reportOutput) {
-                    reportOutput.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-chart-bar"></i>
-                            <p>Select parameters and generate a report</p>
-                        </div>
-                    `;
-                }
+                document.getElementById('report-output').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>Select parameters and generate a report</p>
+                    </div>
+                `;
                 break;
-            default:
-                console.warn('Unknown tracking tab:', tabId);
         }
-        
-        console.log('Tracking tab loaded:', tabId);
     } catch (error) {
         console.error(`Error loading tracking tab ${tabId}:`, error);
         showAlert(`Error loading ${tabId}: ${error.message}`, 'error');
@@ -11817,38 +11813,19 @@ function activateTrackingTab(tabId) {
 }
 
 // 图表清理辅助函数
+// 修改 cleanupCharts 函数为：
 function cleanupCharts() {
     try {
-        // 清理进度图表
-        if (window.progressChart && typeof window.progressChart.destroy === 'function') {
+        // 只清理进度图表
+        if (progressChart) {
             try {
-                window.progressChart.destroy();
+                progressChart.destroy();
             } catch (e) {
-                console.error('Error destroying progress chart:', e);
+                console.error('Error destroying chart:', e);
             }
-            window.progressChart = null;
+            progressChart = null;
         }
-        
-        // 清理所有Chart.js实例
-        if (typeof Chart !== 'undefined' && Chart.instances) {
-            Object.keys(Chart.instances).forEach(key => {
-                try {
-                    Chart.instances[key].destroy();
-                } catch (e) {
-                    console.error('Error destroying chart instance:', e);
-                }
-            });
-        }
-        
-        // 清理Canvas元素
-        const canvas = document.getElementById('progress-chart');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-        
+        trackingChartLoaded = false;
     } catch (error) {
         console.error('Error in cleanupCharts:', error);
     }
@@ -11861,7 +11838,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
         // 安全的图表初始化函数
-async function safeInitializeProgressChart() {
+/*async function safeInitializeProgressChart() {
     try {
         await initializeProgressChart();
     } catch (error) {
@@ -11890,7 +11867,7 @@ async function safeInitializeProgressChart() {
             }
         }, 1000);
     }
-}
+}*/
 
        
        
@@ -11907,7 +11884,7 @@ async function loadTrackingTab(tabId) {
             case 'tracking-overview':
                 await loadTrackingOverview();
                                 setTimeout(() => {
-                    safeInitializeProgressChart();
+                    //safeInitializeProgressChart();
                 }, 300);
                 break;
             case 'tracking-tasks':
@@ -11932,16 +11909,16 @@ async function loadTrackingTab(tabId) {
     }
 }
 
-       function checkChartJSAvailability() {
+     /*  function checkChartJSAvailability() {
     if (typeof Chart === 'undefined') {
         console.warn('Chart.js not loaded, attempting to load...');
         loadChartJS();
         return false;
     }
     return true;
-}
+}*/
 
-function loadChartJS() {
+/*function loadChartJS() {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
     script.onload = function() {
@@ -11956,7 +11933,7 @@ function loadChartJS() {
         showAlert('Failed to load charting library. Some features may not work properly.', 'warning');
     };
     document.head.appendChild(script);
-}
+}*/
 
 // Load tracking overview
 async function loadTrackingOverview() {
@@ -12028,54 +12005,44 @@ async function loadTrackingOverview() {
 }
 
 // Initialize progress chart
+// 替换整个 initializeProgressChart 函数为：
 async function initializeProgressChart() {
     try {
+        console.log('开始初始化图表...');
+        
         const canvas = document.getElementById('progress-chart');
         if (!canvas) {
-            console.log('Canvas element not found');
-            return;
+            console.error('Canvas 元素不存在');
+            return false;
         }
 
-        // 确保Canvas元素存在且可访问
-        if (!canvas.getContext) {
-            console.error('Canvas context not available');
-            return;
+        // 如果已经加载过，跳过
+        if (trackingChartLoaded) {
+            console.log('图表已加载，跳过');
+            return true;
         }
 
-        // 获取Canvas的上下文
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-            console.error('Failed to get canvas context');
-            return;
+            console.error('无法获取 Canvas 上下文');
+            return false;
         }
 
-        // 重要：清理现有图表实例
-        if (window.progressChart) {
-            try {
-                console.log('Destroying existing chart...');
-                window.progressChart.destroy();
-                window.progressChart = null;
-            } catch (destroyError) {
-                console.error('Error destroying chart:', destroyError);
-            }
+        // ⭐ 核心：先销毁旧的
+        if (progressChart) {
+            console.log('销毁旧图表...');
+            progressChart.destroy();
+            progressChart = null;
         }
-
-        // 可选：重置Canvas尺寸（强制刷新）
-        canvas.width = canvas.width;
 
         // 获取图表数据
         const tasks = await taskTracking.getAllTasks();
         const students = await db.collection('users').get();
         
         if (!tasks || tasks.length === 0 || !students || students.size === 0) {
-            console.log('No data available for chart');
-            // 显示占位符消息
+            console.log('没有数据，不显示图表');
             canvas.style.display = 'none';
-            const container = canvas.parentElement;
-            if (container) {
-                container.innerHTML = '<div class="empty-state"><p>No chart data available</p></div>';
-            }
-            return;
+            return false;
         }
 
         // 计算任务完成数据
@@ -12092,10 +12059,9 @@ async function initializeProgressChart() {
             completionCounts.push(completions.size);
         }
 
-        // 检查是否有数据
-        if (taskNames.length === 0 || completionCounts.length === 0) {
-            console.log('No chart data to display');
-            return;
+        if (taskNames.length === 0) {
+            console.log('没有图表数据');
+            return false;
         }
 
         // 创建图表数据
@@ -12111,7 +12077,7 @@ async function initializeProgressChart() {
         };
 
         // 创建新图表实例
-        window.progressChart = new Chart(ctx, {
+        progressChart = new Chart(ctx, {
             type: 'bar',
             data: chartData,
             options: {
@@ -12141,19 +12107,13 @@ async function initializeProgressChart() {
             }
         });
 
-        console.log('Chart initialized successfully');
+        trackingChartLoaded = true;
+        console.log('图表初始化成功');
+        return true;
         
     } catch (error) {
-        console.error('Error initializing chart:', error);
-        // 确保清理
-        if (window.progressChart) {
-            try {
-                window.progressChart.destroy();
-                window.progressChart = null;
-            } catch (e) {
-                console.error('Error destroying chart after error:', e);
-            }
-        }
+        console.error('图表初始化失败:', error);
+        return false;
     }
 }
        
