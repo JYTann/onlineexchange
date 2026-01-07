@@ -5434,37 +5434,24 @@ const chartManager = {
     },
     
     // 显示图表
-// 在 ChartManager 对象中修改 show 方法
-show() {
-    console.log('ChartManager.show() called');
-    
-    const container = document.getElementById('progress-chart-container');
-    if (!container) {
-        console.error('图表容器未找到');
-        return;
-    }
-    
-    // 强制显示容器
-    container.style.display = 'block';
-    container.style.visibility = 'visible';
-    container.style.opacity = '1';
-    container.style.height = '350px';
-    container.style.minHeight = '350px';
-    
-    console.log('图表容器已显示');
-    
-    // 重新初始化图表
-    setTimeout(async () => {
-        try {
-            await this.initialize();
-            await this.refresh();
-            console.log('图表显示完成');
-        } catch (error) {
-            console.error('显示图表时出错:', error);
-            this.showError();
+    show() {
+        console.log('ChartManager.show() called');
+        
+        if (!this.isInitialized) {
+            console.log('Chart not initialized, initializing first...');
+            this.initialize();
+            return;
         }
-    }, 100);
-},
+        
+        const container = document.getElementById('progress-chart-container');
+        if (container) {
+            container.style.display = 'block';
+            console.log('Chart container shown');
+        }
+        
+        // 确保图表可见时更新尺寸
+        setTimeout(() => this.refresh(), 100);
+    },
     
     // 隐藏图表
     hide() {
@@ -8150,18 +8137,18 @@ function formatDateTime(date) {
 }
 
 // ==================== 修复1：更新activateTrackingTab函数 ====================
-// 修复 activateTrackingTab 函数
+// 激活跟踪标签页
 function activateTrackingTab(tabId) {
-    console.log('激活跟踪标签页:', tabId);
+    console.log('Activating tracking tab:', tabId);
     
     try {
         const trackingContainer = document.getElementById('admin-tracking');
         if (!trackingContainer) {
-            console.error('跟踪容器未找到');
+            console.error('Tracking container not found');
             return;
         }
         
-        // 更新标签状态
+        // 更新tab状态
         trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
             t.classList.remove('active');
         });
@@ -8181,66 +8168,46 @@ function activateTrackingTab(tabId) {
             activeContent.classList.add('active');
         }
         
-        // ========== 关键修复：图表管理 ==========
+        // 图表处理：只在 tracking-overview 显示图表
         if (tabId === 'tracking-overview') {
-            console.log('显示图表 for tracking-overview');
-            
-            // 确保图表容器可见
-            const chartContainer = document.getElementById('progress-chart-container');
-            if (chartContainer) {
-                chartContainer.style.display = 'block';
-                chartContainer.style.visibility = 'visible';
-                chartContainer.style.opacity = '1';
-            }
-            
-            // 延迟加载以确保DOM完全渲染
-            setTimeout(async () => {
-                try {
-                    console.log('初始化图表...');
-                    await chartManager.initialize();
-                    await chartManager.refresh();
-                    console.log('图表初始化完成');
-                } catch (chartError) {
-                    console.error('图表初始化错误:', chartError);
-                }
-            }, 300);
-            
+            console.log('Showing chart for tracking-overview');
+            setTimeout(() => {
+                loadTrackingOverview();
+            }, 100); // 延迟确保DOM更新
         } else {
-            console.log('隐藏图表 for non-overview tab');
-            // 其他标签页隐藏图表
+            console.log('Hiding chart for non-overview tab');
             chartManager.hide();
-        }
-        
-        // 加载其他标签页内容
-        switch(tabId) {
-            case 'tracking-tasks':
-                setTimeout(() => loadManageTasks(), 100);
-                break;
-            case 'tracking-students':
-                setTimeout(() => loadStudentProgressList(), 100);
-                break;
-            case 'tracking-reports':
-                const reportOutput = document.getElementById('report-output');
-                if (reportOutput) {
-                    reportOutput.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-chart-bar"></i>
-                            <p>选择参数并生成报告</p>
-                        </div>
-                    `;
-                }
-                break;
+            
+            // 加载其他标签页内容
+            switch(tabId) {
+                case 'tracking-tasks':
+                    loadManageTasks();
+                    break;
+                case 'tracking-students':
+                    loadStudentProgressList();
+                    break;
+                case 'tracking-reports':
+                    const reportOutput = document.getElementById('report-output');
+                    if (reportOutput) {
+                        reportOutput.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Select parameters and generate a report</p>
+                            </div>
+                        `;
+                    }
+                    break;
+            }
         }
         
     } catch (error) {
-        console.error('激活跟踪标签页时出错:', error);
+        console.error('Error activating tracking tab:', error);
     }
 }
 
 // ==================== 修复2：更新initTaskTracking函数 ====================
-// 查找并修复 initTaskTracking 函数中的重复声明
 function initTaskTracking() {
-    console.log('初始化任务跟踪...');
+    console.log('Initializing task tracking...');
     
     // 延迟执行确保DOM加载完成
     setTimeout(() => {
@@ -8248,118 +8215,50 @@ function initTaskTracking() {
             // Add Task button
             const addTaskBtn = document.getElementById('add-task-btn');
             if (addTaskBtn) {
-                addTaskBtn.addEventListener('click', () => openTaskModal());
-                console.log('添加任务按钮监听器已添加');
+                addTaskBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openTaskModal();
+                });
+                console.log('Add task button listener added');
             }
             
             // Task form submission
             const taskForm = document.getElementById('task-form');
             if (taskForm) {
                 taskForm.addEventListener('submit', handleSaveTask);
-                console.log('任务表单监听器已添加');
+                console.log('Task form listener added');
             }
             
             // Generate report button
             const generateReportBtn = document.getElementById('generate-report');
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', handleGenerateReport);
-                console.log('生成报告按钮监听器已添加');
+                console.log('Generate report button listener added');
             }
             
-            // ========== 修复：避免重复声明 trackingContainer ==========
-            // 只在函数顶部声明一次
+            // Task tracking tabs - 使用事件委托
             const trackingContainer = document.getElementById('admin-tracking');
-            
             if (trackingContainer) {
-                // 标签页事件委托 - 使用现有变量
                 trackingContainer.addEventListener('click', function(e) {
                     const tab = e.target.closest('.tab');
                     if (tab && tab.closest('#admin-tracking')) {
                         e.preventDefault();
                         e.stopPropagation();
-                        
                         const tabId = tab.getAttribute('data-tab');
-                        console.log('跟踪标签页点击:', tabId);
-                        
+                        console.log('Tracking tab clicked:', tabId);
                         if (tabId) {
-                            // 如果是切换到 overview，先清理旧的图表实例
-                            if (tabId === 'tracking-overview') {
-                                console.log('切换到 tracking-overview，准备图表...');
-                                // 清理可能存在的残留图表
-                                chartManager.destroy();
-                            }
-                            
-                            // 激活标签页
                             activateTrackingTab(tabId);
                         }
                     }
                 });
-                console.log('跟踪标签监听器已添加');
-                
-                // 如果当前在 tracking-overview 标签页，初始化图表
-                const currentTab = trackingContainer.querySelector('.tab.active[data-tab]');
-                if (currentTab && currentTab.getAttribute('data-tab') === 'tracking-overview') {
-                    console.log('当前在 tracking-overview，初始化图表...');
-                    setTimeout(() => {
-                        loadTrackingOverview();
-                    }, 500);
-                }
+                console.log('Tracking tabs listener added');
             }
             
-            console.log('任务跟踪初始化完成');
+            console.log('Task tracking initialization complete');
         } catch (error) {
-            console.error('初始化任务跟踪时出错:', error);
+            console.error('Error initializing task tracking:', error);
         }
     }, 500);
-}
-
-       // 创建一个简化的图表显示函数
-function ensureChartVisible() {
-    console.log('确保图表可见...');
-    
-    const chartContainer = document.getElementById('progress-chart-container');
-    const canvas = document.getElementById('progress-chart');
-    
-    if (!chartContainer || !canvas) {
-        console.warn('图表元素未找到');
-        return false;
-    }
-    
-    // 强制设置样式
-    chartContainer.style.cssText = `
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        width: 100% !important;
-        height: 350px !important;
-        min-height: 350px !important;
-        position: relative !important;
-        z-index: 100 !important;
-    `;
-    
-    // 设置 canvas 尺寸
-    canvas.style.cssText = `
-        display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-    `;
-    
-    // 设置实际尺寸
-    canvas.width = chartContainer.clientWidth;
-    canvas.height = chartContainer.clientHeight;
-    
-    console.log('图表容器状态:', {
-        display: chartContainer.style.display,
-        width: canvas.width,
-        height: canvas.height,
-        containerWidth: chartContainer.clientWidth,
-        containerHeight: chartContainer.clientHeight
-    });
-    
-    return true;
 }
 
 function debugReset() {
@@ -12703,72 +12602,53 @@ function loadChartJS() {
 }
 
 // Load tracking overview
+// Load tracking overview
 async function loadTrackingOverview() {
     try {
-        console.log('开始加载跟踪概览...');
-                // 确保图表容器可见
-        if (!ensureChartVisible()) {
-            throw new Error('无法使图表容器可见');
-        }
+        console.log('Loading tracking overview via ChartManager...');
         
-        // 等待一下确保样式应用
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // 清理旧图表
-        chartManager.destroy();
-        
-        // 初始化新图表
-        await chartManager.initialize();
         // 确保图表容器可见
         const chartContainer = document.getElementById('progress-chart-container');
         if (chartContainer) {
             chartContainer.style.display = 'block';
-            chartContainer.style.visibility = 'visible';
-            chartContainer.style.opacity = '1';
-            
-            // 等待CSS渲染
-            await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        // ========== 关键修复：先确保图表容器准备好 ==========
-        console.log('初始化图表管理器...');
+        // 使用 ChartManager 安全地初始化图表
         await chartManager.initialize();
         
         // 刷新图表数据
-        console.log('刷新图表数据...');
         await chartManager.refresh();
         
-        // 加载统计数据
-        console.log('加载统计数据...');
+        // 加载统计数据（保持不变）
         const stats = await taskTracking.getStatistics();
         if (stats) {
             document.getElementById('tracking-stats').innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
                     <div class="stat-card">
                         <div class="stat-number">${stats.totalStudents}</div>
-                        <div class="stat-label">总学生数</div>
+                        <div class="stat-label">Total Students</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">${stats.totalTasks}</div>
-                        <div class="stat-label">活跃任务</div>
+                        <div class="stat-label">Active Tasks</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">${stats.totalCompletions}</div>
-                        <div class="stat-label">总完成数</div>
+                        <div class="stat-label">Total Completions</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">${stats.avgCompletion}%</div>
-                        <div class="stat-label">平均完成率</div>
+                        <div class="stat-label">Average Completion</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">${stats.todayCompletions || 0}</div>
-                        <div class="stat-label">今日完成数</div>
+                        <div class="stat-label">Today's Completions</div>
                     </div>
                 </div>
             `;
         }
         
-        // 加载最近活动
+        // 加载最近活动（保持不变）
         const recentActivities = await taskTracking.getRecentActivities(5);
         if (recentActivities.length > 0) {
             let html = '';
@@ -12786,38 +12666,22 @@ async function loadTrackingOverview() {
                             <span style="font-size: 0.9rem; color: var(--gray);">${timeAgo}</span>
                         </div>
                         ${activity.manualUpdate ? 
-                            '<div style="font-size: 0.85rem; color: var(--warning); margin-top: 5px;">管理员手动更新</div>' : 
-                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px;">系统自动跟踪</div>'}
+                            '<div style="font-size: 0.85rem; color: var(--warning); margin-top: 5px;">Manual update by admin</div>' : 
+                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px);">Auto-tracked by system</div>'}
                     </div>
                 `;
             });
             document.getElementById('recent-tracked-activities').innerHTML = html;
         } else {
             document.getElementById('recent-tracked-activities').innerHTML = 
-                '<div class="empty-state"><p>暂无最近活动</p></div>';
+                '<div class="empty-state"><p>No recent activities</p></div>';
         }
         
-        console.log('跟踪概览加载成功');
+        console.log('Tracking overview loaded successfully');
         
     } catch (error) {
-        console.error('加载跟踪概览时出错:', error);
-        
-        // 显示错误信息
-        const chartContainer = document.getElementById('progress-chart-container');
-        if (chartContainer) {
-            chartContainer.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--warning); margin-bottom: 15px;"></i>
-                    <p style="color: var(--gray); margin-bottom: 15px;">加载图表数据时出错</p>
-                    <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 20px;">${error.message}</p>
-                    <button class="btn btn-small btn-outline" onclick="loadTrackingOverview()">
-                        <i class="fas fa-redo"></i> 重试
-                    </button>
-                </div>
-            `;
-        }
-        
-        showAlert('加载跟踪概览时出错: ' + error.message, 'error');
+        console.error('Error loading tracking overview:', error);
+        showAlert('Error loading tracking overview', 'error');
     }
 }
 
