@@ -671,6 +671,38 @@ tbody tr:nth-child(8) { animation-delay: 0.4s; }
     background: rgba(231, 76, 60, 0.05);
 }
 
+/* 覆盖内联样式的CSS */
+.table-container table[style*="border-collapse"] {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: white !important;
+    border-radius: var(--border-radius-lg) !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.table-container th[style*="border-bottom"],
+.table-container td[style*="border-bottom"] {
+    border: none !important;
+    padding: 1.2rem 1.5rem !important;
+}
+
+.table-container thead th {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* 覆盖内容管理表格样式 */
+div[style*="max-height: 300px; overflow-y: auto;"] {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+div[style*="padding: 12px; border-bottom: 1px solid var(--light-gray);"] {
+    padding: 1.2rem 1.5rem !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+        
 /* 用户菜单现代化设计 */
 .user-menu {
     display: flex;
