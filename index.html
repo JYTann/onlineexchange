@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.13.0/cloudinary-core-shrinkwrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
  /* 现代化设计增强版 CSS */
@@ -11822,6 +11823,32 @@ async function loadTrackingTab(tabId) {
     }
 }
 
+       function checkChartJSAvailability() {
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded, attempting to load...');
+        loadChartJS();
+        return false;
+    }
+    return true;
+}
+
+function loadChartJS() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = function() {
+        console.log('Chart.js loaded successfully');
+        // 重新尝试初始化图表
+        if (window.initializeProgressChart && document.getElementById('progress-chart')) {
+            initializeProgressChart();
+        }
+    };
+    script.onerror = function() {
+        console.error('Failed to load Chart.js');
+        showAlert('Failed to load charting library. Some features may not work properly.', 'warning');
+    };
+    document.head.appendChild(script);
+}
+
 // Load tracking overview
 async function loadTrackingOverview() {
     try {
@@ -11895,20 +11922,41 @@ async function loadTrackingOverview() {
 async function initializeProgressChart() {
     try {
         const canvas = document.getElementById('progress-chart');
-        if (!canvas) return;
+        if (!canvas) {
+            console.log('Progress chart canvas not found');
+            return;
+        }
 
-        // Remove existing chart if any
+        // 检查 Chart 库是否已加载
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js library is not loaded');
+            showAlert('Chart library not loaded. Please refresh the page.', 'error');
+            return;
+        }
+
+        // 移除现有图表
         if (window.progressChart) {
             window.progressChart.destroy();
         }
 
         const ctx = canvas.getContext('2d');
         
-        // Get data for chart
+        // 获取数据用于图表
         const tasks = await taskTracking.getAllTasks();
         const students = await db.collection('users').get();
         
-        // Calculate completion per task
+        // 检查是否有数据
+        if (!tasks || tasks.length === 0 || !students || students.empty) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state" style="height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--gray); opacity: 0.5;"></i>
+                    <p>No data available for chart</p>
+                </div>
+            `;
+            return;
+        }
+
+        // 计算每个任务的完成情况
         const taskNames = [];
         const completionCounts = [];
         
@@ -11922,7 +11970,7 @@ async function initializeProgressChart() {
             completionCounts.push(completions.size);
         }
 
-        // Create chart data
+        // 创建图表数据
         const chartData = {
             labels: taskNames,
             datasets: [{
@@ -11946,6 +11994,9 @@ async function initializeProgressChart() {
                         title: {
                             display: true,
                             text: 'Number of Completions'
+                        },
+                        ticks: {
+                            stepSize: 1
                         }
                     },
                     x: {
@@ -11966,9 +12017,17 @@ async function initializeProgressChart() {
 
     } catch (error) {
         console.error('Error initializing chart:', error);
+        const canvas = document.getElementById('progress-chart');
+        if (canvas && canvas.parentElement) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state" style="height: 300px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <p>Error loading chart data</p>
+                </div>
+            `;
+        }
     }
 }
-
 // Load manage tasks
 async function loadManageTasks() {
     try {
