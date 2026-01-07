@@ -7656,7 +7656,7 @@ function initTaskTracking() {
 // ==================== 修复4：简化loadTrackingTab函数 ====================
 async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab:', tabId);
-
+    
     try {
         // 如果离开图表标签页，清理图表
         if (tabId !== 'tracking-overview') {
@@ -7674,18 +7674,11 @@ async function loadTrackingTab(tabId) {
                 }
             }
         }
-    
-    try {
-        // 如果离开图表标签页，清理图表
-        if (tabId !== 'tracking-overview' && window.progressChart) {
-            window.progressChart.destroy();
-            window.progressChart = null;
-        }
         
         switch(tabId) {
             case 'tracking-overview':
                 await loadTrackingOverview();
-                                setTimeout(() => {
+                setTimeout(() => {
                     safeInitializeProgressChart();
                 }, 500);
                 break;
@@ -7717,6 +7710,7 @@ async function loadTrackingTab(tabId) {
         showAlert(`Error loading ${tabId}: ${error.message}`, 'error');
     }
 }
+    
        // 初始化倒计时页面
 function initCountdownPage() {
     console.log('Initializing countdown page');
