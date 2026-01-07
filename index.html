@@ -8560,7 +8560,7 @@ function formatLocalDate(date) {
         
         // 新增：获取倒计时统计数据
         const countdownData = await getCountdownAdminStats();
-        
+        await loadPlatformSettings();
         // Update admin statistics
         document.getElementById('admin-total-users').textContent = totalUsers;
         document.getElementById('admin-active-today').textContent = activeUsersQuery.size;
@@ -8576,6 +8576,23 @@ function formatLocalDate(date) {
         showAlert('加载管理员数据时出错', 'error');
     }
 }
+
+       function validateFormData(data) {
+    const validated = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+        if (value === undefined || value === null) {
+            validated[key] = '';
+        } else if (typeof value === 'string') {
+            validated[key] = value.trim();
+        } else {
+            validated[key] = value;
+        }
+    }
+    
+    return validated;
+}
+       
 
 // 新增：获取倒计时管理员统计数据
 async function getCountdownAdminStats() {
