@@ -12027,68 +12027,135 @@ async function loadTrackingOverview() {
     }
 }
 
+// Initialize progress chart
 async function initializeProgressChart() {
     try {
         const canvas = document.getElementById('progress-chart');
-        if (!canvas || !canvas.getContext) return;
-
-        // ⭐ 用 Chart.js 官方方式清理
-        const existingChart = Chart.getChart(canvas);
-        if (existingChart) {
-            existingChart.destroy();
-        }
-
-        const ctx = canvas.getContext('2d');
-
-        const tasks = await taskTracking.getAllTasks();
-        const students = await db.collection('users').get();
-
-        if (!tasks || tasks.length === 0 || students.size === 0) {
-            console.log('No data available for chart');
+        if (!canvas) {
+            console.log('Canvas element not found');
             return;
         }
 
+        // 确保Canvas元素存在且可访问
+        if (!canvas.getContext) {
+            console.error('Canvas context not available');
+            return;
+        }
+
+        // 获取Canvas的上下文
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Failed to get canvas context');
+            return;
+        }
+
+        // 重要：清理现有图表实例
+        if (window.progressChart) {
+            try {
+                console.log('Destroying existing chart...');
+                window.progressChart.destroy();
+                window.progressChart = null;
+            } catch (destroyError) {
+                console.error('Error destroying chart:', destroyError);
+            }
+        }
+
+        // 可选：重置Canvas尺寸（强制刷新）
+        canvas.width = canvas.width;
+
+        // 获取图表数据
+        const tasks = await taskTracking.getAllTasks();
+        const students = await db.collection('users').get();
+        
+        if (!tasks || tasks.length === 0 || !students || students.size === 0) {
+            console.log('No data available for chart');
+            // 显示占位符消息
+            canvas.style.display = 'none';
+            const container = canvas.parentElement;
+            if (container) {
+                container.innerHTML = '<div class="empty-state"><p>No chart data available</p></div>';
+            }
+            return;
+        }
+
+        // 计算任务完成数据
         const taskNames = [];
         const completionCounts = [];
-
+        
         for (const task of tasks) {
             const completions = await db.collection('taskProgress')
                 .where('taskId', '==', task.id)
                 .where('completed', '==', true)
                 .get();
-
+            
             taskNames.push(task.name);
             completionCounts.push(completions.size);
         }
 
-        new Chart(ctx, {
+        // 检查是否有数据
+        if (taskNames.length === 0 || completionCounts.length === 0) {
+            console.log('No chart data to display');
+            return;
+        }
+
+        // 创建图表数据
+        const chartData = {
+            labels: taskNames,
+            datasets: [{
+                label: 'Number of Completions',
+                data: completionCounts,
+                backgroundColor: 'rgba(67, 97, 238, 0.6)',
+                borderColor: 'rgba(67, 97, 238, 1)',
+                borderWidth: 2
+            }]
+        };
+
+        // 创建新图表实例
+        window.progressChart = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: taskNames,
-                datasets: [{
-                    label: 'Number of Completions',
-                    data: completionCounts,
-                    backgroundColor: 'rgba(67, 97, 238, 0.6)',
-                    borderColor: 'rgba(67, 97, 238, 1)',
-                    borderWidth: 2
-                }]
-            },
+            data: chartData,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Completions'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tasks'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
                 }
             }
         });
 
         console.log('Chart initialized successfully');
-
+        
     } catch (error) {
         console.error('Error initializing chart:', error);
+        // 确保清理
+        if (window.progressChart) {
+            try {
+                window.progressChart.destroy();
+                window.progressChart = null;
+            } catch (e) {
+                console.error('Error destroying chart after error:', e);
+            }
+        }
     }
 }
-
        
 // Load manage tasks
 async function loadManageTasks() {
