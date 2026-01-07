@@ -540,25 +540,45 @@ main {
 }
 
 
-        /* 确保图表容器有明确尺寸 */
+/* 强制图表容器始终显示 */
 #progress-chart-container {
-    position: relative;
-    width: 100%;
-    height: 300px !important;
-    min-height: 300px !important;
-    max-height: 300px;
-    margin: 20px 0;
-    padding: 10px;
-    background: white;
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--light-gray);
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 350px !important;
+    min-height: 350px !important;
+    max-height: 350px !important;
+    position: relative !important;
+    background: white !important;
+    border: 2px solid #4361ee !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin: 20px 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    z-index: 100 !important;
 }
 
-/* 确保Canvas填满容器 */
+/* 移除所有可能隐藏容器的样式 */
+#progress-chart-container[style*="display: none"],
+#progress-chart-container[style*="display:none"],
+#progress-chart-container.hidden,
+#progress-chart-container.d-none {
+    display: block !important;
+}
+
+/* Canvas样式 */
 #progress-chart {
+    display: block !important;
     width: 100% !important;
     height: 100% !important;
-    display: block !important;
+    position: absolute !important;
+    top: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    box-sizing: border-box !important;
 }
 
 /* 修复Chart.js的响应式问题 */
@@ -5171,7 +5191,7 @@ const chartManager = {
     isDestroying: false,
     
     // 初始化（带三重保护）
-    async initialize() {
+        async initialize() {
         console.log('ChartManager.initialize() called');
         
         // 保护1：正在创建中，跳过
@@ -5185,6 +5205,28 @@ const chartManager = {
             console.log('Chart already initialized, returning existing instance');
             return true;
         }
+        
+        // ========== 关键修复：确保容器可见 ==========
+        const container = document.getElementById('progress-chart-container');
+        if (container) {
+            if (container.style.display === 'none' || window.getComputedStyle(container).display === 'none') {
+                console.warn('Container was hidden, forcing display');
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
+                container.style.opacity = '1';
+                
+                // 等待浏览器重新渲染
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // 确保容器有尺寸
+            if (container.clientWidth === 0 || container.clientHeight === 0) {
+                container.style.width = '100%';
+                container.style.height = '350px';
+                container.style.minHeight = '350px';
+            }
+        }
+        // ========== 关键修复结束 ==========
         
         // 保护3：使用 Chart.getChart() 检查是否已有图表
         const canvas = document.getElementById('progress-chart');
@@ -5219,225 +5261,107 @@ const chartManager = {
     },
     
     // 创建图表实例（带双重检查）
-    async createChart() {
+       async createChart() {
         console.log('ChartManager.createChart() called');
         
         try {
+            const container = document.getElementById('progress-chart-container');
             const canvas = document.getElementById('progress-chart');
-            if (!canvas) {
-                console.warn('Canvas not found, cannot create chart');
+            
+            if (!container || !canvas) {
+                console.warn('Chart elements not found');
                 return false;
             }
             
-            // ========== 关键修复：正确设置Canvas尺寸 ==========
-            console.log('Canvas before fix:', {
-                offsetWidth: canvas.offsetWidth,
-                offsetHeight: canvas.offsetHeight,
-                clientWidth: canvas.clientWidth,
-                clientHeight: canvas.clientHeight,
-                style: {
-                    width: canvas.style.width,
-                    height: canvas.style.height,
-                    display: canvas.style.display
-                }
-            });
-            
-            // 方法1：先通过CSS设置容器尺寸
-            const container = document.getElementById('progress-chart-container');
-            if (container) {
-                // 确保容器有固定尺寸
-                if (!container.style.height) {
-                    container.style.height = '300px';
-                    container.style.minHeight = '300px';
-                }
-                if (!container.style.width) {
-                    container.style.width = '100%';
-                }
+            // ========== 双重检查容器可见性 ==========
+            const computedStyle = window.getComputedStyle(container);
+            if (computedStyle.display === 'none') {
+                console.error('Container is still hidden! Forcing display...');
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
+                
+                // 等待重新渲染
+                await new Promise(resolve => setTimeout(resolve, 50));
             }
             
-            // 方法2：直接设置Canvas的CSS尺寸
-            canvas.style.width = '100%';
-            canvas.style.height = '300px';
-            canvas.style.display = 'block';
-            
-            // 给浏览器一点时间计算尺寸
-            await new Promise(resolve => setTimeout(resolve, 50));
-            
-            // 方法3：强制读取和设置绘图尺寸
-            const computedStyle = window.getComputedStyle(canvas);
-            const canvasWidth = parseInt(computedStyle.width) || 400;
-            const canvasHeight = parseInt(computedStyle.height) || 300;
-            
-            console.log('Computed canvas dimensions:', {
-                width: canvasWidth,
-                height: canvasHeight,
-                computedWidth: computedStyle.width,
-                computedHeight: computedStyle.height
-            });
-            
-            // 设置Canvas的绘图尺寸（考虑设备像素比）
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = canvasWidth * dpr;
-            canvas.height = canvasHeight * dpr;
-            
-            // 恢复CSS尺寸（因为设置width/height属性会覆盖CSS）
-            canvas.style.width = canvasWidth + 'px';
-            canvas.style.height = canvasHeight + 'px';
-            
-            console.log('Canvas after fix:', {
-                width: canvas.width,
-                height: canvas.height,
-                styleWidth: canvas.style.width,
-                styleHeight: canvas.style.height
-            });
-            // ========== 关键修复结束 ==========
+            // 确保容器有尺寸
+            if (container.clientWidth === 0) {
+                container.style.width = '100%';
+            }
+            if (container.clientHeight === 0) {
+                container.style.height = '350px';
+                container.style.minHeight = '350px';
+            }
+            // ========================================
             
             // 检查已有图表
             if (Chart) {
                 const existingChart = Chart.getChart(canvas);
                 if (existingChart) {
-                    console.log('Chart already exists on canvas, reusing...');
+                    console.log('Chart already exists, reusing');
                     this.instance = existingChart;
-                    this.isInitialized = true;
                     
                     // 更新数据
                     const chartData = await this.getChartData();
                     existingChart.data = chartData;
                     existingChart.update();
                     
-                    this.hideLoading();
                     return true;
                 }
             }
             
-            // 清理旧的实例引用
+            // 清理旧实例
             if (this.instance) {
                 try {
                     this.instance.destroy();
-                } catch (e) {
-                    console.error('Error destroying old chart:', e);
-                }
+                } catch (e) {}
                 this.instance = null;
             }
             
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                console.error('Canvas context not available');
-                this.showError();
-                return false;
-            }
+            // 设置Canvas尺寸
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
             
-            // 如果有设备像素比，缩放上下文
-            if (dpr !== 1) {
-                ctx.scale(dpr, dpr);
-            }
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.width = containerWidth;
+            canvas.height = containerHeight;
             
-            // 显示加载状态
-            this.showLoading();
-            
-            // 获取数据
-            const chartData = await this.getChartData();
-            
-            console.log('Creating chart with data:', {
-                labels: chartData.labels,
-                data: chartData.datasets?.[0]?.data
+            console.log('Canvas dimensions:', {
+                width: canvas.width,
+                height: canvas.height,
+                containerWidth,
+                containerHeight
             });
             
-            // 创建图表实例
-            try {
-                this.instance = new Chart(ctx, {
-                    type: 'bar',
-                    data: chartData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Completions'
-                                },
-                                ticks: {
-                                    precision: 0 // 确保显示整数
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Tasks'
-                                },
-                                ticks: {
-                                    autoSkip: false,
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                }
+            // 获取数据并创建图表
+            this.showLoading();
+            const chartData = await this.getChartData();
+            const ctx = canvas.getContext('2d');
+            
+            this.instance = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
                             }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        return `${context.dataset.label}: ${context.parsed.y}`;
-                                    }
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 800
                         }
                     }
-                });
-                
-                // 强制重绘
-                setTimeout(() => {
-                    if (this.instance && !this.instance.destroyed) {
-                        this.instance.resize();
-                        this.instance.update();
-                    }
-                }, 100);
-                
-            } catch (chartError) {
-                console.error('Chart creation failed:', chartError);
-                
-                // 创建最简图表作为后备
-                try {
-                    this.instance = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Test'],
-                            datasets: [{
-                                label: 'Test Data',
-                                data: [1],
-                                backgroundColor: 'rgba(100, 100, 100, 0.5)'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                    console.log('Fallback chart created');
-                } catch (fallbackError) {
-                    console.error('Even fallback chart failed:', fallbackError);
-                    this.showError();
-                    return false;
                 }
-            }
+            });
             
-            console.log('Chart instance created successfully');
-            this.isInitialized = true;
             this.hideLoading();
-            
+            console.log('Chart created successfully');
             return true;
             
         } catch (error) {
-            console.error('Error in createChart:', error);
+            console.error('Chart creation error:', error);
             this.showError();
             return false;
         }
