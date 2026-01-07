@@ -9364,42 +9364,74 @@ const eventData = {
         }
     }
     
-    async function saveAdminSettings() {
-        if (!isAdmin) {
-            showAlert('You do not have permission to change system settings.', 'error');
-            return;
-        }
-        
-        const platformName = document.getElementById('platform-name').value;
-        const welcomeMessage = document.getElementById('welcome-message').value;
-        const maintenanceMode = document.getElementById('maintenance-mode').checked;
-        
-        try {
-            // Save settings to Firestore
-            await db.collection('settings').doc('platform').set({
-                platformName: platformName,
-                welcomeMessage: welcomeMessage,
-                maintenanceMode: maintenanceMode,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedBy: currentUser.uid
-            }, { merge: true });
-            
-            // Update platform name in header
-            document.querySelector('.logo-text h1').textContent = platformName;
-            
-            // Update welcome message
-            const welcomeElement = document.getElementById('welcome-message');
-            if (welcomeElement) {
-                welcomeElement.textContent = welcomeMessage;
-            }
-            
-            showAlert('System settings saved successfully!', 'success');
-            
-        } catch (error) {
-            console.error('Error saving settings:', error);
-            showAlert(`Failed to save settings: ${error.message}`, 'error');
-        }
+async function saveAdminSettings() {
+    if (!isAdmin) {
+        showAlert('You do not have permission to change system settings.', 'error');
+        return;
     }
+    
+    const platformName = document.getElementById('platform-name').value;
+    const welcomeMessage = document.getElementById('welcome-message').value;
+    const maintenanceMode = document.getElementById('maintenance-mode').checked;
+    
+    // 验证输入
+    if (!platformName || !welcomeMessage) {
+        showAlert('Please fill in platform name and welcome message.', 'error');
+        return;
+    }
+    
+    try {
+        // 准备设置数据，确保没有 undefined 值
+        const settingsData = {
+            platformName: platformName.trim(),
+            welcomeMessage: welcomeMessage.trim(),
+            maintenanceMode: maintenanceMode,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentUser.uid
+        };
+        
+        // 记录要保存的数据（用于调试）
+        console.log('Saving settings:', settingsData);
+        
+        // Save settings to Firestore
+        await db.collection('settings').doc('platform').set(settingsData, { merge: true });
+        
+        // Update platform name in header
+        const platformTitle = document.querySelector('.logo-text h1');
+        if (platformTitle) {
+            platformTitle.textContent = settingsData.platformName;
+        }
+        
+        // Update welcome message on dashboard
+        const welcomeElement = document.getElementById('welcome-message');
+        if (welcomeElement) {
+            welcomeElement.textContent = settingsData.welcomeMessage;
+        }
+        
+        showAlert('System settings saved successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        showAlert(`Failed to save settings: ${error.message}`, 'error');
+    }
+}
+
+       async function loadPlatformSettings() {
+    try {
+        const settingsDoc = await db.collection('settings').doc('platform').get();
+        
+        if (settingsDoc.exists) {
+            const settings = settingsDoc.data();
+            
+            // 填充表单
+            document.getElementById('platform-name').value = settings.platformName || 'Foon Yew High School - Kaohsiung Senior High School Online Exchange Platform';
+            document.getElementById('welcome-message').value = settings.welcomeMessage || 'Welcome to the Two-School Exchange Platform！';
+            document.getElementById('maintenance-mode').checked = settings.maintenanceMode || false;
+        }
+    } catch (error) {
+        console.error('Error loading platform settings:', error);
+    }
+}
     
     async function showEventDetail(eventId, eventData) {
         document.getElementById('event-detail-title').textContent = eventData.title;
