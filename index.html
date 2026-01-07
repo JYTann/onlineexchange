@@ -8827,7 +8827,7 @@ async function updateAdminDashboardWithCountdown() {
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.email}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">${user.school === 'fyhs' ? 'Foon Yew High School' : user.school === 'kshs' ? 'Kaohsiung Senior High School' : user.school || '未设置'}</td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
-                            <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? '管理员' : '学生'}</span>
+                            <span class="badge ${user.role === 'admin' ? 'badge-primary' : ''}">${user.role === 'admin' ? 'Admin' : 'Student'}</span>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
                             ${userId !== currentUser?.uid ? `
