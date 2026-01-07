@@ -8238,8 +8238,9 @@ function activateTrackingTab(tabId) {
 }
 
 // ==================== 修复2：更新initTaskTracking函数 ====================
+// 查找并修复 initTaskTracking 函数中的重复声明
 function initTaskTracking() {
-    console.log('Initializing task tracking...');
+    console.log('初始化任务跟踪...');
     
     // 延迟执行确保DOM加载完成
     setTimeout(() => {
@@ -8247,47 +8248,30 @@ function initTaskTracking() {
             // Add Task button
             const addTaskBtn = document.getElementById('add-task-btn');
             if (addTaskBtn) {
-                addTaskBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openTaskModal();
-                });
-                console.log('Add task button listener added');
+                addTaskBtn.addEventListener('click', () => openTaskModal());
+                console.log('添加任务按钮监听器已添加');
             }
             
             // Task form submission
             const taskForm = document.getElementById('task-form');
             if (taskForm) {
                 taskForm.addEventListener('submit', handleSaveTask);
-                console.log('Task form listener added');
+                console.log('任务表单监听器已添加');
             }
             
             // Generate report button
             const generateReportBtn = document.getElementById('generate-report');
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', handleGenerateReport);
-                console.log('Generate report button listener added');
+                console.log('生成报告按钮监听器已添加');
             }
             
-            // Task tracking tabs - 使用事件委托
+            // ========== 修复：避免重复声明 trackingContainer ==========
+            // 只在函数顶部声明一次
             const trackingContainer = document.getElementById('admin-tracking');
+            
             if (trackingContainer) {
-                trackingContainer.addEventListener('click', function(e) {
-                    const tab = e.target.closest('.tab');
-                    if (tab && tab.closest('#admin-tracking')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const tabId = tab.getAttribute('data-tab');
-                        console.log('Tracking tab clicked:', tabId);
-                        if (tabId) {
-                            activateTrackingTab(tabId);
-                        }
-                    }
-                });
-                console.log('Tracking tabs listener added');
-            }
-
-                const trackingContainer = document.getElementById('admin-tracking');
-            if (trackingContainer) {
+                // 标签页事件委托 - 使用现有变量
                 trackingContainer.addEventListener('click', function(e) {
                     const tab = e.target.closest('.tab');
                     if (tab && tab.closest('#admin-tracking')) {
@@ -8311,20 +8295,20 @@ function initTaskTracking() {
                     }
                 });
                 console.log('跟踪标签监听器已添加');
+                
+                // 如果当前在 tracking-overview 标签页，初始化图表
+                const currentTab = trackingContainer.querySelector('.tab.active[data-tab]');
+                if (currentTab && currentTab.getAttribute('data-tab') === 'tracking-overview') {
+                    console.log('当前在 tracking-overview，初始化图表...');
+                    setTimeout(() => {
+                        loadTrackingOverview();
+                    }, 500);
+                }
             }
             
-            // 如果当前在 tracking-overview 标签页，初始化图表
-            const currentTab = trackingContainer?.querySelector('.tab.active[data-tab]');
-            if (currentTab && currentTab.getAttribute('data-tab') === 'tracking-overview') {
-                console.log('当前在 tracking-overview，初始化图表...');
-                setTimeout(() => {
-                    loadTrackingOverview();
-                }, 500);
-            }
-            
-            console.log('Task tracking initialization complete');
+            console.log('任务跟踪初始化完成');
         } catch (error) {
-            console.error('Error initializing task tracking:', error);
+            console.error('初始化任务跟踪时出错:', error);
         }
     }, 500);
 }
