@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foon Yew High School - Kaohsiung Senior High School Online Exchange Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
@@ -4291,17 +4292,29 @@ footer::before {
                         </div>
                     </div>
                     
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-chart-line"></i>
-                            <h3>Progress Overview</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="progress-chart-container" style="height: 300px;">
-                                <canvas id="progress-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
+<!-- Progress Overview Card - 修改后 -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-chart-line"></i>
+        <h3>Progress Overview</h3>
+    </div>
+    <div class="card-body">
+        <div id="progress-chart-container" style="height: 300px; position: relative;">
+            <canvas id="progress-chart"></canvas>
+            <div id="chart-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); z-index: 10;">
+                <div class="spinner" style="width: 40px; height: 40px; margin-bottom: 15px;"></div>
+                <p style="color: var(--gray); font-size: 0.95rem;">Loading chart data...</p>
+            </div>
+            <div id="chart-error" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); z-index: 10;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--warning); margin-bottom: 15px;"></i>
+                <p style="color: var(--gray); margin-bottom: 15px;">Failed to load chart</p>
+                <button class="btn btn-small btn-outline" onclick="chartManager.refresh()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
                     
                     <div class="card">
                         <div class="card-header">
@@ -5092,6 +5105,196 @@ const CLOUDINARY_CONFIG = {
     let autoSaveTimer = null;
     let progressChartInstance = null;
 
+// 全局图表管理
+const chartManager = {
+    instance: null,
+    isInitialized: false,
+    isVisible: false,
+    
+    // 初始化（只执行一次）
+    async initialize() {
+        if (this.isInitialized) return;
+        
+        try {
+            console.log('Initializing chart manager...');
+            await this.createChart();
+            this.isInitialized = true;
+            console.log('Chart manager initialized');
+        } catch (error) {
+            console.error('Chart manager initialization failed:', error);
+        }
+    },
+    
+    // 创建图表实例
+    async createChart() {
+        console.log('Creating new chart instance...');
+        
+        // 清理旧的（如果存在）
+        this.destroy();
+        
+        const canvas = document.getElementById('progress-chart');
+        if (!canvas) {
+            console.warn('Canvas not found, delaying chart creation');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Canvas context not available');
+            return;
+        }
+        
+        // 重置canvas尺寸
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        // 获取数据
+        const chartData = await this.getChartData();
+        
+        // 创建图表实例
+        this.instance = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Completions'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tasks'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+        
+        console.log('Chart instance created');
+    },
+    
+    // 获取图表数据
+    async getChartData() {
+        try {
+            const tasks = await taskTracking.getAllTasks();
+            const students = await db.collection('users').get();
+            
+            const taskNames = [];
+            const completionCounts = [];
+            
+            for (const task of tasks) {
+                const completions = await db.collection('taskProgress')
+                    .where('taskId', '==', task.id)
+                    .where('completed', '==', true)
+                    .get();
+                
+                taskNames.push(task.name);
+                completionCounts.push(completions.size);
+            }
+            
+            return {
+                labels: taskNames,
+                datasets: [{
+                    label: 'Number of Completions',
+                    data: completionCounts,
+                    backgroundColor: 'rgba(67, 97, 238, 0.6)',
+                    borderColor: 'rgba(67, 97, 238, 1)',
+                    borderWidth: 2
+                }]
+            };
+        } catch (error) {
+            console.error('Error getting chart data:', error);
+            return { labels: [], datasets: [] };
+        }
+    },
+    
+    // 显示图表
+    show() {
+        if (!this.isInitialized) {
+            this.initialize();
+        }
+        
+        const container = document.getElementById('progress-chart-container');
+        if (container) {
+            container.style.display = 'block';
+        }
+        
+        const loading = document.getElementById('chart-loading');
+        if (loading) {
+            loading.style.display = 'flex';
+        }
+        
+        this.isVisible = true;
+        
+        // 延迟更新数据（确保DOM已显示）
+        setTimeout(() => this.refresh(), 100);
+    },
+    
+    // 隐藏图表
+    hide() {
+        const container = document.getElementById('progress-chart-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+        this.isVisible = false;
+    },
+    
+    // 刷新数据
+    async refresh() {
+        if (!this.instance || !this.isVisible) return;
+        
+        console.log('Refreshing chart data...');
+        
+        try {
+            const chartData = await this.getChartData();
+            this.instance.data = chartData;
+            this.instance.update();
+            
+            // 隐藏加载状态
+            const loading = document.getElementById('chart-loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            
+            console.log('Chart refreshed successfully');
+        } catch (error) {
+            console.error('Error refreshing chart:', error);
+        }
+    },
+    
+    // 销毁图表
+    destroy() {
+        if (this.instance) {
+            try {
+                this.instance.destroy();
+                console.log('Chart instance destroyed');
+            } catch (error) {
+                console.error('Error destroying chart:', error);
+            }
+            this.instance = null;
+        }
+        this.isInitialized = false;
+    },
+    
+    // 重置（用于页面切换时）
+    reset() {
+        this.destroy();
+        this.isInitialized = false;
+    }
+};
+       
        function initImageLazyLoading() {
     const lazyImages = document.querySelectorAll('img.lazy-load');
     
@@ -7454,6 +7657,12 @@ function formatDateTime(date) {
         window.wallTimer = null;
     }
 
+         // 清理图表管理器（如果是离开admin页面）
+    if (currentPage === 'admin' && pageId !== 'admin') {
+        chartManager.hide();
+        chartManager.reset();
+    }
+
          // 清理图表（新增）
     if (window.progressChart) {
         window.progressChart.destroy();
@@ -7659,29 +7868,25 @@ async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab:', tabId);
     
     try {
-        // 如果离开图表标签页，清理图表
-        if (tabId !== 'tracking-overview') {
-            if (window.progressChart) {
-                window.progressChart.destroy();
-                window.progressChart = null;
+        // 清理所有标签页内容
+        const tabs = ['tracking-overview', 'tracking-tasks', 'tracking-students', 'tracking-reports'];
+        tabs.forEach(tab => {
+            const content = document.getElementById(tab);
+            if (content) {
+                content.style.display = 'none';
             }
-            
-            // 清理Canvas
-            const canvas = document.getElementById('progress-chart');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-            }
+        });
+        
+        // 显示目标标签页
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.style.display = 'block';
         }
         
+        // 根据标签页类型执行不同逻辑
         switch(tabId) {
             case 'tracking-overview':
                 await loadTrackingOverview();
-                setTimeout(() => {
-                    safeInitializeProgressChart();
-                }, 500);
                 break;
             case 'tracking-tasks':
                 await loadManageTasks();
@@ -12027,10 +12232,15 @@ function loadChartJS() {
 // Load tracking overview
 async function loadTrackingOverview() {
     try {
-        // Load statistics
+        console.log('Loading tracking overview...');
+        
+        // 显示图表容器
+        chartManager.show();
+        
+        // 加载统计数据
         const stats = await taskTracking.getStatistics();
         if (stats) {
-            document.getElementById('tracking-stats').innerHTML = `
+            const statsHtml = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
                     <div class="stat-card">
                         <div class="stat-number">${stats.totalStudents}</div>
@@ -12054,10 +12264,17 @@ async function loadTrackingOverview() {
                     </div>
                 </div>
             `;
+            
+            const statsContainer = document.getElementById('tracking-stats');
+            if (statsContainer) {
+                statsContainer.innerHTML = statsHtml;
+            }
         }
-
-        // Load recent activities
+        
+        // 加载最近活动
         const recentActivities = await taskTracking.getRecentActivities(5);
+        const activitiesContainer = document.getElementById('recent-tracked-activities');
+        
         if (recentActivities.length > 0) {
             let html = '';
             recentActivities.forEach(activity => {
@@ -12079,17 +12296,16 @@ async function loadTrackingOverview() {
                     </div>
                 `;
             });
-            document.getElementById('recent-tracked-activities').innerHTML = html;
+            activitiesContainer.innerHTML = html;
         } else {
-            document.getElementById('recent-tracked-activities').innerHTML = 
-                '<div class="empty-state"><p>No recent activities</p></div>';
+            activitiesContainer.innerHTML = '<div class="empty-state"><p>No recent activities</p></div>';
         }
-
-        // Initialize chart
-        await initializeProgressChart();
-
+        
+        console.log('Tracking overview loaded');
+        
     } catch (error) {
         console.error('Error loading tracking overview:', error);
+        showAlert('Error loading tracking overview', 'error');
     }
 }
 
