@@ -1002,6 +1002,35 @@ main {
     overflow: hidden;
 }
 
+        /* 紧急CSS修复 - 确保图表容器总是可见 */
+#progress-chart-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 350px !important;
+    min-height: 350px !important;
+    position: relative !important;
+    background: white !important;
+    border: 2px solid #4361ee !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin: 20px 0 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+    z-index: 1000 !important;
+}
+
+#progress-chart {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 20px !important;
+}
+
         /* 添加在现有的CSS中，例如在.padlet-container样式后面 */
 
 /* Exchange Links Container */
