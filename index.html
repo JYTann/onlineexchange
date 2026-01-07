@@ -5163,97 +5163,111 @@ const chartManager = {
     },
     
     // 创建图表实例（带双重检查）
+        // 创建图表实例（带双重检查）
     async createChart() {
         console.log('ChartManager.createChart() called');
         
-        const canvas = document.getElementById('progress-chart');
-        if (!canvas) {
-            console.warn('Canvas not found, cannot create chart');
-            throw new Error('Canvas element not found');
-        }
-        
-        // 检查1：再次使用 Chart.getChart() 确保没有重复
-        if (Chart) {
-            const existingChart = Chart.getChart(canvas);
-            if (existingChart) {
-                console.log('Chart already exists on canvas, destroying first...');
+        try {
+            const canvas = document.getElementById('progress-chart');
+            if (!canvas) {
+                console.warn('Canvas not found, cannot create chart');
+                return false; // 不再 throw
+            }
+            
+            // 检查1：再次使用 Chart.getChart() 确保没有重复
+            if (Chart) {
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    console.log('Chart already exists on canvas, destroying first...');
+                    try {
+                        existingChart.destroy();
+                    } catch (destroyError) {
+                        console.error('Error destroying existing chart:', destroyError);
+                    }
+                }
+            }
+            
+            // 检查2：清理旧的实例引用
+            if (this.instance) {
                 try {
-                    existingChart.destroy();
-                } catch (destroyError) {
-                    console.error('Error destroying existing chart:', destroyError);
+                    this.instance.destroy();
+                    console.log('Old chart instance destroyed');
+                } catch (e) {
+                    console.error('Error destroying old chart instance:', e);
                 }
+                this.instance = null;
             }
-        }
-        
-        // 检查2：清理旧的实例引用
-        if (this.instance) {
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Canvas context not available');
+                return false; // 不再 throw
+            }
+            
+            // 确保Canvas尺寸正确
+            canvas.width = canvas.offsetWidth || 300;
+            canvas.height = canvas.offsetHeight || 200;
+            
+            // 显示加载状态
+            this.showLoading();
+            
+            // 获取数据
+            const chartData = await this.getChartData();
+            
+            // 创建图表实例
             try {
-                this.instance.destroy();
-                console.log('Old chart instance destroyed');
-            } catch (e) {
-                console.error('Error destroying old chart instance:', e);
-            }
-            this.instance = null;
-        }
-        
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error('Canvas context not available');
-            throw new Error('Canvas context not available');
-        }
-        
-        // 确保Canvas尺寸正确
-        canvas.width = canvas.offsetWidth || 300;
-        canvas.height = canvas.offsetHeight || 200;
-        
-        // 显示加载状态
-        this.showLoading();
-        
-        // 获取数据
-        const chartData = await this.getChartData();
-        
-        // 创建图表实例
-        this.instance = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Number of Completions'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Tasks'
+                this.instance = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Completions'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tasks'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
                         }
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                }
+                });
+            } catch (chartError) {
+                console.warn('Chart creation failed (non-critical):', chartError);
+                this.showError();
+                return false;
             }
-        });
-        
-        console.log('New chart instance created successfully');
-        this.hideLoading();
-        
-        return this.instance;
+            
+            console.log('New chart instance created successfully');
+            this.hideLoading();
+            
+            return true;
+            
+        } catch (error) {
+            console.warn('Non-critical error in createChart (will continue):', error);
+            this.showError();
+            return false; // 关键：返回false但不throw
+        }
     },
     
     // 获取图表数据
@@ -7840,6 +7854,66 @@ function formatDateTime(date) {
         }
     });
 }
+
+       function ultimateSafeChart() {
+    try {
+        const canvas = document.getElementById('progress-chart');
+        if (!canvas) {
+            console.warn('No canvas found for chart');
+            return null;
+        }
+        
+        // 清理已有的 chart（用最安全的方式）
+        if (typeof Chart !== 'undefined') {
+            try {
+                const existing = Chart.getChart(canvas);
+                if (existing) {
+                    console.log('Found existing chart, will reuse');
+                    return existing;
+                }
+            } catch (e) {
+                console.warn('Error checking existing chart:', e);
+            }
+        }
+        
+        // 如果 Chart.js 没加载，什么都不做
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not loaded, skipping chart creation');
+            return null;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.warn('Could not get canvas context');
+            return null;
+        }
+        
+        // 创建最基本的图表（不会失败的配置）
+        const basicChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Safe Mode'],
+                datasets: [{
+                    label: 'Chart loaded safely',
+                    data: [1],
+                    backgroundColor: 'rgba(100, 100, 100, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false  // 禁用动画，更稳定
+            }
+        });
+        
+        console.log('Ultimate safe chart created successfully');
+        return basicChart;
+        
+    } catch (error) {
+        console.warn('Ultimate safe chart failed (non-critical):', error);
+        return null;
+    }
+}
     
     // Navigation
  function navigateTo(pageId) {
@@ -7858,15 +7932,12 @@ function formatDateTime(date) {
         window.wallTimer = null;
     }
 
-    // 只在离开admin页面时重置图表管理器
-    if (currentPage === 'admin' && pageId !== 'admin') {
-        console.log('Leaving admin page, resetting chart manager');
-        chartManager.reset();
-    }
-
-    // 如果离开tracking页面，清理图表
-    if (currentPage === 'admin' && currentPage.includes('tracking')) {
-        chartManager.hide();
+    // ⚠️ 重要：如果还在 admin 页面，不要 reset chart
+    if (currentPage === 'admin' && pageId === 'admin') {
+        console.log('Staying in admin page, no chart reset needed');
+    } else if (currentPage === 'admin' && pageId !== 'admin') {
+        console.log('Leaving admin page, soft reset chart manager');
+        chartManager.hide();  // 只隐藏，不重置
     }
 
          // 清理图表（新增）
@@ -8093,6 +8164,13 @@ function initTaskTracking() {
     }, 500);
 }
 
+function debugReset() {
+    console.trace('🚨 RESET TRIGGERED - Stack trace below:');
+    console.log('Current page:', currentPage);
+    console.log('Current tab:', document.querySelector('.tab.active')?.getAttribute('data-tab'));
+    console.log('Chart status:', chartManager.getStatus());
+}
+       
 // ==================== 修复4：简化loadTrackingTab函数 ====================
 async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab via unified system:', tabId);
@@ -12373,9 +12451,11 @@ async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab:', tabId);
     
     try {
-                if (tabId !== 'tracking-overview') {
-            cleanupCharts();
+        if (tabId !== 'tracking-overview') {
+            console.log('Hiding chart for non-overview tab');
+            chartManager.hide();
         }
+        
         switch(tabId) {
             case 'tracking-overview':
                 await loadTrackingOverview();
