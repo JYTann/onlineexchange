@@ -12094,96 +12094,96 @@ const taskTracking = {
 
     // Initialize task tracking
         async initialize() {
-        console.log('ChartManager.initialize() called');
+    console.log('ChartManager.initialize() called');
 
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            // 如果容器被移出屏幕，移回来
-            if (container.style.left === '-9999px') {
-                container.style.position = 'relative';
-                container.style.left = '0';
-            }
-            
-            // 强制显示
+    const container = document.getElementById('progress-chart-container'); // 第1次声明
+    if (container) {
+        // 如果容器被移出屏幕，移回来
+        if (container.style.left === '-9999px') {
+            container.style.position = 'relative';
+            container.style.left = '0';
+        }
+        
+        // 强制显示
+        container.style.display = 'block';
+        container.style.visibility = 'visible';
+        container.style.opacity = '1';
+        
+        // 确保有尺寸
+        if (!container.style.height || container.clientHeight < 300) {
+            container.style.height = '350px';
+            container.style.minHeight = '350px';
+        }
+        
+        // 等待浏览器计算
+        await new Promise(resolve => setTimeout(resolve, 50));
+    }
+        
+    // 保护1：正在创建中，跳过
+    if (this.isCreating) {
+        console.warn('Chart is already being created, skipping...');
+        return false;
+    }
+    
+    // 保护2：已经初始化且实例存在，跳过
+    if (this.isInitialized && this.instance) {
+        console.log('Chart already initialized, returning existing instance');
+        return true;
+    }
+    
+    // ========== 关键修复：确保容器可见 ==========
+    // 注意：这里不再重新声明 container，直接使用上面已经声明的 container 变量
+    if (container) {
+        if (container.style.display === 'none' || window.getComputedStyle(container).display === 'none') {
+            console.warn('Container was hidden, forcing display');
             container.style.display = 'block';
             container.style.visibility = 'visible';
             container.style.opacity = '1';
             
-            // 确保有尺寸
-            if (!container.style.height || container.clientHeight < 300) {
-                container.style.height = '350px';
-                container.style.minHeight = '350px';
-            }
-            
-            // 等待浏览器计算
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-            
-        // 保护1：正在创建中，跳过
-        if (this.isCreating) {
-            console.warn('Chart is already being created, skipping...');
-            return false;
+            // 等待浏览器重新渲染
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
         
-        // 保护2：已经初始化且实例存在，跳过
-        if (this.isInitialized && this.instance) {
-            console.log('Chart already initialized, returning existing instance');
-            return true;
+        // 确保容器有尺寸
+        if (container.clientWidth === 0 || container.clientHeight === 0) {
+            container.style.width = '100%';
+            container.style.height = '350px';
+            container.style.minHeight = '350px';
         }
-        
-        // ========== 关键修复：确保容器可见 ==========
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            if (container.style.display === 'none' || window.getComputedStyle(container).display === 'none') {
-                console.warn('Container was hidden, forcing display');
-                container.style.display = 'block';
-                container.style.visibility = 'visible';
-                container.style.opacity = '1';
-                
-                // 等待浏览器重新渲染
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            // 确保容器有尺寸
-            if (container.clientWidth === 0 || container.clientHeight === 0) {
-                container.style.width = '100%';
-                container.style.height = '350px';
-                container.style.minHeight = '350px';
-            }
-        }
-        // ========== 关键修复结束 ==========
-        
-        // 保护3：使用 Chart.getChart() 检查是否已有图表
-        const canvas = document.getElementById('progress-chart');
-        if (canvas && Chart) {
-            const existingChart = Chart.getChart(canvas);
-            if (existingChart) {
-                console.log('Found existing chart via Chart.getChart(), reusing');
-                this.instance = existingChart;
-                this.isInitialized = true;
-                return true;
-            }
-        }
-        
-        this.isCreating = true;
-        
-        try {
-            console.log('Creating new chart...');
-            
-            // 执行创建
-            await this.createChart();
+    }
+    // ========== 关键修复结束 ==========
+    
+    // 保护3：使用 Chart.getChart() 检查是否已有图表
+    const canvas = document.getElementById('progress-chart');
+    if (canvas && Chart) {
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            console.log('Found existing chart via Chart.getChart(), reusing');
+            this.instance = existingChart;
             this.isInitialized = true;
-            console.log('Chart initialization complete');
-            
             return true;
-        } catch (error) {
-            console.error('Chart initialization failed:', error);
-            this.showError();
-            return false;
-        } finally {
-            this.isCreating = false;
         }
-    },
+    }
+    
+    this.isCreating = true;
+    
+    try {
+        console.log('Creating new chart...');
+        
+        // 执行创建
+        await this.createChart();
+        this.isInitialized = true;
+        console.log('Chart initialization complete');
+        
+        return true;
+    } catch (error) {
+        console.error('Chart initialization failed:', error);
+        this.showError();
+        return false;
+    } finally {
+        this.isCreating = false;
+    }
+},
 
     // Create default tasks
     async createDefaultTasks() {
