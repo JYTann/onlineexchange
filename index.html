@@ -7402,10 +7402,44 @@ function formatDateTime(date) {
             });
         });
     }
+
+       function cleanupAllCharts() {
+    // 清理进度图表
+    if (window.progressChart && typeof window.progressChart.destroy === 'function') {
+        try {
+            window.progressChart.destroy();
+        } catch (e) {
+            console.error('Error destroying progress chart:', e);
+        }
+        window.progressChart = null;
+    }
+    
+    // 清理所有Chart.js实例
+    if (typeof Chart !== 'undefined' && Chart.instances) {
+        Object.keys(Chart.instances).forEach(key => {
+            try {
+                if (Chart.instances[key] && Chart.instances[key].destroy) {
+                    Chart.instances[key].destroy();
+                }
+            } catch (e) {
+                console.error('Error destroying chart instance:', e);
+            }
+        });
+    }
+    
+    // 清理所有Canvas元素
+    document.querySelectorAll('canvas').forEach(canvas => {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    });
+}
     
     // Navigation
  function navigateTo(pageId) {
     console.log('Navigate to page:', pageId);
+     cleanupAllCharts();
     
     // 清理旧的计时器
     if (window.countdownTimer) {
