@@ -7394,7 +7394,8 @@ function formatDateTime(date) {
     // Navigation
  function navigateTo(pageId) {
     console.log('Navigate to page:', pageId);
-         // 清理旧的计时器
+    
+    // 清理旧的计时器
     if (window.countdownTimer) {
         clearInterval(window.countdownTimer);
         window.countdownTimer = null;
@@ -7453,6 +7454,40 @@ function formatDateTime(date) {
                 case 'admin':
                     if (isAdmin) {
                         loadAdminData();
+                        
+                        // ==================== 修复3：重新初始化tracking功能 ====================
+                        setTimeout(() => {
+                            try {
+                                console.log('Initializing admin tracking features...');
+                                
+                                // 重新初始化task tracking系统
+                                if (window.taskTracking) {
+                                    window.taskTracking.initialize();
+                                }
+                                
+                                // 重新绑定事件监听器
+                                initTaskTracking();
+                                
+                                // 确保tracking标签页默认显示overview
+                                const trackingContainer = document.getElementById('admin-tracking');
+                                if (trackingContainer) {
+                                    console.log('Found tracking container, activating default tab...');
+                                    
+                                    // 激活默认的tracking标签页
+                                    const defaultTab = trackingContainer.querySelector('.tab[data-tab="tracking-overview"]');
+                                    if (defaultTab) {
+                                        defaultTab.click();
+                                    } else {
+                                        // 手动激活
+                                        activateTrackingTab('tracking-overview');
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Error initializing admin tracking:', error);
+                            }
+                        }, 1000); // 延迟1秒确保DOM完全加载
+                        // ==================== 修复3结束 ====================
+                        
                     } else {
                         navigateTo('dashboard');
                         showAlert('You do not have administrator permissions.', 'error');
@@ -7460,6 +7495,145 @@ function formatDateTime(date) {
                     break;
             }
         }, 100);
+    }
+}
+
+// ==================== 修复1：更新activateTrackingTab函数 ====================
+function activateTrackingTab(tabId) {
+    console.log('Activating tracking tab:', tabId);
+    
+    try {
+        // 只在tracking区域内查找元素
+        const trackingContainer = document.getElementById('admin-tracking');
+        if (!trackingContainer) {
+            console.error('Tracking container not found');
+            return;
+        }
+        
+        // 更新tracking区域内的tab
+        trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
+            t.classList.remove('active');
+        });
+        
+        const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+            console.log('Tab activated:', tabId);
+        } else {
+            console.error('Tab not found:', tabId);
+        }
+        
+        // 更新tracking区域内的tab内容
+        trackingContainer.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        const activeContent = document.getElementById(tabId);
+        if (activeContent) {
+            activeContent.classList.add('active');
+            console.log('Content activated:', tabId);
+        } else {
+            console.error('Content not found:', tabId);
+        }
+        
+        // 加载tab内容
+        loadTrackingTab(tabId);
+    } catch (error) {
+        console.error('Error activating tracking tab:', error);
+    }
+}
+
+// ==================== 修复2：更新initTaskTracking函数 ====================
+function initTaskTracking() {
+    console.log('Initializing task tracking...');
+    
+    // 延迟执行确保DOM加载完成
+    setTimeout(() => {
+        try {
+            // Add Task button
+            const addTaskBtn = document.getElementById('add-task-btn');
+            if (addTaskBtn) {
+                addTaskBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openTaskModal();
+                });
+                console.log('Add task button listener added');
+            }
+            
+            // Task form submission
+            const taskForm = document.getElementById('task-form');
+            if (taskForm) {
+                taskForm.addEventListener('submit', handleSaveTask);
+                console.log('Task form listener added');
+            }
+            
+            // Generate report button
+            const generateReportBtn = document.getElementById('generate-report');
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', handleGenerateReport);
+                console.log('Generate report button listener added');
+            }
+            
+            // Task tracking tabs - 使用事件委托
+            const trackingContainer = document.getElementById('admin-tracking');
+            if (trackingContainer) {
+                trackingContainer.addEventListener('click', function(e) {
+                    const tab = e.target.closest('.tab');
+                    if (tab && tab.closest('#admin-tracking')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const tabId = tab.getAttribute('data-tab');
+                        console.log('Tracking tab clicked:', tabId);
+                        if (tabId) {
+                            activateTrackingTab(tabId);
+                        }
+                    }
+                });
+                console.log('Tracking tabs listener added');
+            }
+            
+            console.log('Task tracking initialization complete');
+        } catch (error) {
+            console.error('Error initializing task tracking:', error);
+        }
+    }, 500);
+}
+
+// ==================== 修复4：简化loadTrackingTab函数 ====================
+async function loadTrackingTab(tabId) {
+    console.log('Loading tracking tab:', tabId);
+    
+    try {
+        switch(tabId) {
+            case 'tracking-overview':
+                await loadTrackingOverview();
+                break;
+            case 'tracking-tasks':
+                await loadManageTasks();
+                break;
+            case 'tracking-students':
+                await loadStudentProgressList();
+                break;
+            case 'tracking-reports':
+                // 清空之前的报告
+                const reportOutput = document.getElementById('report-output');
+                if (reportOutput) {
+                    reportOutput.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar"></i>
+                            <p>Select parameters and generate a report</p>
+                        </div>
+                    `;
+                }
+                break;
+            default:
+                console.warn('Unknown tracking tab:', tabId);
+        }
+        
+        console.log('Tracking tab loaded:', tabId);
+    } catch (error) {
+        console.error(`Error loading tracking tab ${tabId}:`, error);
+        showAlert(`Error loading ${tabId}: ${error.message}`, 'error');
     }
 }
        // 初始化倒计时页面
@@ -11548,58 +11722,103 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize task tracking event listeners
+// 修复initTaskTracking函数：
 function initTaskTracking() {
-    // Add Task button
-    document.getElementById('add-task-btn')?.addEventListener('click', () => openTaskModal());
-    
-    // Task form submission
-    document.getElementById('task-form')?.addEventListener('submit', handleSaveTask);
-    
-    // Generate report button
-    document.getElementById('generate-report')?.addEventListener('click', handleGenerateReport);
-    
-    // Task tracking tabs
-    document.querySelectorAll('#admin-tracking .tabs .tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            const tabId = this.getAttribute('data-tab');
-            activateTrackingTab(tabId);
-        });
-    });
+    // 确保DOM已加载
+    setTimeout(() => {
+        // Add Task button
+        const addTaskBtn = document.getElementById('add-task-btn');
+        if (addTaskBtn) {
+            addTaskBtn.addEventListener('click', () => openTaskModal());
+        }
+        
+        // Task form submission
+        const taskForm = document.getElementById('task-form');
+        if (taskForm) {
+            taskForm.addEventListener('submit', handleSaveTask);
+        }
+        
+        // Generate report button
+        const generateReportBtn = document.getElementById('generate-report');
+        if (generateReportBtn) {
+            generateReportBtn.addEventListener('click', handleGenerateReport);
+        }
+        
+        // Task tracking tabs - 使用事件委托
+        const trackingContainer = document.getElementById('admin-tracking');
+        if (trackingContainer) {
+            trackingContainer.addEventListener('click', function(e) {
+                const tab = e.target.closest('.tab');
+                if (tab && tab.closest('#admin-tracking')) {
+                    e.preventDefault();
+                    const tabId = tab.getAttribute('data-tab');
+                    if (tabId) {
+                        activateTrackingTab(tabId);
+                    }
+                }
+            });
+        }
+    }, 500); // 延迟确保DOM完全加载
 }
 
 // Activate tracking tab
+// 修复后的函数：
 function activateTrackingTab(tabId) {
-    // Update active tab
-    document.querySelectorAll('#admin-tracking .tabs .tab').forEach(t => {
+    // 只在tracking区域内查找元素
+    const trackingContainer = document.getElementById('admin-tracking');
+    if (!trackingContainer) return;
+    
+    // 更新tracking区域内的tab
+    trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
         t.classList.remove('active');
     });
-    document.querySelector(`#admin-tracking .tab[data-tab="${tabId}"]`).classList.add('active');
+    const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
     
-    // Update active content
-    document.querySelectorAll('#admin-tracking .tab-content').forEach(content => {
+    // 更新tracking区域内的tab内容
+    trackingContainer.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
-    document.getElementById(tabId).classList.add('active');
+    const activeContent = trackingContainer.querySelector(`#${tabId}`);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
     
-    // Load tab content
+    // 加载tab内容
     loadTrackingTab(tabId);
 }
 
 // Load tracking tab content
+// 简化loadTrackingTab函数，确保正确处理每个tab：
 async function loadTrackingTab(tabId) {
-    switch(tabId) {
-        case 'tracking-overview':
-            await loadTrackingOverview();
-            break;
-        case 'tracking-tasks':
-            await loadManageTasks();
-            break;
-        case 'tracking-students':
-            await loadStudentProgressList();
-            break;
-        case 'tracking-reports':
-            // Reports will be generated on demand
-            break;
+    console.log('Loading tracking tab:', tabId);
+    
+    try {
+        switch(tabId) {
+            case 'tracking-overview':
+                await loadTrackingOverview();
+                break;
+            case 'tracking-tasks':
+                await loadManageTasks();
+                break;
+            case 'tracking-students':
+                await loadStudentProgressList();
+                break;
+            case 'tracking-reports':
+                // 清空之前的报告
+                document.getElementById('report-output').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>Select parameters and generate a report</p>
+                    </div>
+                `;
+                break;
+        }
+    } catch (error) {
+        console.error(`Error loading tracking tab ${tabId}:`, error);
+        showAlert(`Error loading ${tabId}: ${error.message}`, 'error');
     }
 }
 
