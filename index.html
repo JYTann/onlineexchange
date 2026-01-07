@@ -2717,6 +2717,290 @@ footer::before {
     transform: translate(10px, 10px);
 }
 
+        /* Task Tracking Styles */
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.task-item {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(10px);
+}
+
+.task-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.task-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.task-info p {
+    margin: 0 0 10px 0;
+    color: var(--gray);
+    font-size: 0.95rem;
+}
+
+.task-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: var(--gray);
+    flex-wrap: wrap;
+}
+
+.task-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.type-manual {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: var(--info);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.type-auto {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Student Progress Styles */
+.student-progress-item {
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: var(--transition-smooth);
+}
+
+.student-progress-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.student-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.student-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--primary-dark);
+}
+
+.student-school {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.completion-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.completion-stats span {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.progress-bar-container {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: var(--light-gray);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+/* Task Checklist */
+.task-checklist {
+    margin-top: 20px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.checklist-item:last-child {
+    border-bottom: none;
+}
+
+.checkbox-container {
+    margin-right: 15px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.task-check-label {
+    flex: 1;
+}
+
+.task-check-label h5 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    color: var(--dark);
+}
+
+.task-check-label p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.completion-date {
+    font-size: 0.85rem;
+    color: var(--success);
+    font-weight: 500;
+}
+
+/* Statistics Cards for Tracking */
+.stat-card {
+    background: var(--gradient-glass);
+    border: var(--glass-border);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: var(--gray);
+}
+
+/* Recent Activities */
+.recent-activity-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--transition-quick);
+}
+
+.recent-activity-item:hover {
+    background: rgba(67, 97, 238, 0.05);
+    border-radius: var(--border-radius-sm);
+}
+
+/* Reports Output */
+.report-content {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 25px;
+    box-shadow: var(--shadow-md);
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.report-table th {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.report-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.report-table tr:hover {
+    background: rgba(67, 97, 238, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .student-progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .completion-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .task-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .task-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
         /* ==================== 倒计时页面样式 ==================== */
 
 .countdown-container {
@@ -3869,6 +4153,7 @@ footer::before {
                 <button class="tab" data-tab="admin-users">User Management</button>
                 <button class="tab" data-tab="admin-content">Content Management</button>
                 <button class="tab" data-tab="admin-settings">System Settings</button>
+                <button class="tab" data-tab="admin-tracking">Task Tracking</button>
             </div>
             
             <div id="admin-dashboard" class="tab-content active">
@@ -3974,6 +4259,153 @@ footer::before {
                     </div>
                 </div>
             </div>
+
+<!-- Task Tracking Content -->
+<div id="admin-tracking" class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-tasks"></i>
+            <h3>Student Task Tracking</h3>
+        </div>
+        <div class="card-body">
+            <div class="tabs" style="margin-bottom: 20px;">
+                <button class="tab active" data-tab="tracking-overview">Overview</button>
+                <button class="tab" data-tab="tracking-tasks">Manage Tasks</button>
+                <button class="tab" data-tab="tracking-students">Student Progress</button>
+                <button class="tab" data-tab="tracking-reports">Reports</button>
+            </div>
+            
+            <!-- Overview Tab -->
+            <div id="tracking-overview" class="tab-content active">
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-user-check"></i>
+                            <h3>Completion Statistics</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="tracking-stats">
+                                <p>Loading statistics...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Progress Overview</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="progress-chart-container" style="height: 300px;">
+                                <canvas id="progress-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-clock"></i>
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="recent-tracked-activities" style="max-height: 300px; overflow-y: auto;">
+                                <p>Loading recent activities...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Manage Tasks Tab -->
+            <div id="tracking-tasks" class="tab-content">
+                <div class="form-container">
+                    <h3>Manage Tracked Tasks</h3>
+                    
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h4>Available Tasks</h4>
+                            <button id="add-task-btn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add New Task
+                            </button>
+                        </div>
+                        
+                        <div id="tasks-list" class="tasks-list">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading tasks...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Student Progress Tab -->
+            <div id="tracking-students" class="tab-content">
+                <div class="form-container">
+                    <h3>Student Task Progress</h3>
+                    
+                    <div class="form-group">
+                        <label for="student-filter">Filter Students</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="student-filter" class="form-control" placeholder="Search by name or email" onkeyup="filterStudents()">
+                            <select id="school-filter" class="form-control" onchange="filterStudents()">
+                                <option value="">All Schools</option>
+                                <option value="fyhs">Foon Yew High School</option>
+                                <option value="kshs">Kaohsiung Senior High School</option>
+                            </select>
+                            <select id="completion-filter" class="form-control" onchange="filterStudents()">
+                                <option value="">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In Progress</option>
+                            </select>
+                        </div>
+                        
+                        <div id="students-progress-list">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading student progress...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div id="tracking-reports" class="tab-content">
+                <div class="form-container">
+                    <h3>Tracking Reports</h3>
+                    
+                    <div class="form-group">
+                        <label for="report-type">Report Type</label>
+                        <select id="report-type" class="form-control">
+                            <option value="completion">Completion Report</option>
+                            <option value="progress">Progress Report</option>
+                            <option value="comparison">School Comparison</option>
+                            <option value="timeline">Timeline Analysis</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date-range">Date Range</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="date" id="start-date" class="form-control">
+                            <input type="date" id="end-date" class="form-control" value="2026-12-31">
+                            <button id="generate-report" class="btn btn-primary">Generate Report</button>
+                        </div>
+                    </div>
+                    
+                    <div id="report-output" style="margin-top: 30px;">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar"></i>
+                            <p>Select parameters and generate a report</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             
             <div id="admin-settings" class="tab-content">
                 <div class="form-container">
@@ -4040,6 +4472,8 @@ footer::before {
             </div>
         </section>
     </main>
+
+            
     
     <!-- Footer -->
     <footer>
@@ -4494,7 +4928,77 @@ footer::before {
     <div><kbd>Ctrl+Z</kbd> Undo</div>
     <div><kbd>Delete</kbd> Delete</div>
 </div>
-    
+
+            <!-- Task Management Modal -->
+<div id="task-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="task-modal-title">Manage Task</h3>
+            <button class="modal-close" data-modal="task-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="task-name">Task Name *</label>
+                    <input type="text" id="task-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Task Description</label>
+                    <textarea id="task-description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-type">Task Type *</label>
+                    <select id="task-type" class="form-control" required>
+                        <option value="manual">Manual Tracking</option>
+                        <option value="auto-registration">Auto: Registration</option>
+                        <option value="auto-post">Auto: Wall Post</option>
+                        <option value="auto-event">Auto: Event Participation</option>
+                        <option value="auto-announcement">Auto: Read Announcement</option>
+                        <option value="auto-profile">Auto: Profile Completion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-points">Points (Optional)</label>
+                    <input type="number" id="task-points" class="form-control" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="task-deadline">Deadline (Optional)</label>
+                    <input type="date" id="task-deadline" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="task-active">Status</label>
+                    <div style="margin-top: 10px;">
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" id="task-active" checked> 
+                            <span style="margin-left: 10px;">Active (Visible to students)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Task</button>
+                    <button type="button" class="btn btn-outline" data-modal="task-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Student Progress Detail Modal -->
+<div id="student-progress-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="student-progress-title">Student Progress</h3>
+            <button class="modal-close" data-modal="student-progress-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="student-progress-detail">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+            
     <!-- Alert Container -->
     <div id="alert-container" style="position: fixed; top: 100px; right: 20px; z-index: 10000; max-width: 350px;"></div>
     
@@ -4664,6 +5168,13 @@ const CLOUDINARY_CONFIG = {
             }
         }
     });
+
+       setTimeout(() => {
+        if (window.taskTracking) {
+            taskTracking.initialize();
+        }
+        initTaskTracking();
+    }, 2000);
        
         setTimeout(() => {
         initImageLazyLoading();
@@ -10645,6 +11156,1404 @@ window.openEditEventModal = openEditEventModal;
             console.error('Error loading user data:', error);
         }
     }
+
+       // ==================== Task Tracking System ====================
+const taskTracking = {
+    // Default tasks
+    defaultTasks: [
+        {
+            id: 'task-register',
+            name: 'Complete Registration',
+            description: 'Complete user registration process on the platform',
+            type: 'auto-registration',
+            points: 10,
+            active: true,
+            createdAt: new Date(),
+            order: 1
+        },
+        {
+            id: 'task-profile',
+            name: 'Complete Profile',
+            description: 'Fill in all profile information including school, grade, and interests',
+            type: 'auto-profile',
+            points: 15,
+            active: true,
+            createdAt: new Date(),
+            order: 2
+        },
+        {
+            id: 'task-first-post',
+            name: 'First Wall Post',
+            description: 'Create your first post on the exchange wall',
+            type: 'auto-post',
+            points: 20,
+            active: true,
+            createdAt: new Date(),
+            order: 3
+        },
+        {
+            id: 'task-read-announcement',
+            name: 'Read Announcements',
+            description: 'Read at least 3 announcements from the announcements board',
+            type: 'auto-announcement',
+            points: 10,
+            active: true,
+            createdAt: new Date(),
+            order: 4
+        },
+        {
+            id: 'task-join-event',
+            name: 'Join Exchange Event',
+            description: 'Participate in at least one online exchange event',
+            type: 'auto-event',
+            points: 25,
+            active: true,
+            createdAt: new Date(),
+            order: 5
+        }
+    ],
+
+    // Initialize task tracking
+    async initialize() {
+        try {
+            // Check if tasks collection exists, if not create default tasks
+            const tasksSnapshot = await db.collection('trackingTasks').limit(1).get();
+            if (tasksSnapshot.empty) {
+                await this.createDefaultTasks();
+            }
+            
+            // Initialize auto-tracking listeners
+            this.setupAutoTracking();
+            
+            console.log('Task tracking system initialized');
+        } catch (error) {
+            console.error('Error initializing task tracking:', error);
+        }
+    },
+
+    // Create default tasks
+    async createDefaultTasks() {
+        try {
+            for (const task of this.defaultTasks) {
+                await db.collection('trackingTasks').doc(task.id).set({
+                    ...task,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: 'system'
+                });
+            }
+            console.log('Default tasks created');
+        } catch (error) {
+            console.error('Error creating default tasks:', error);
+        }
+    },
+
+    // Setup auto-tracking listeners
+    setupAutoTracking() {
+        // Listen for new user registrations
+        db.collection('users').onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === 'added') {
+                    const userId = change.doc.id;
+                    const userData = change.doc.data();
+                    
+                    // Auto-complete registration task
+                    await this.updateTaskCompletion(userId, 'task-register', true, false);
+                    
+                    // Check profile completion
+                    if (userData.school && userData.grade) {
+                        await this.updateTaskCompletion(userId, 'task-profile', true, false);
+                    }
+                }
+            });
+        });
+
+        // Listen for new wall posts
+        db.collection('wallPosts').onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === 'added') {
+                    const postData = change.doc.data();
+                    const userId = postData.authorId;
+                    
+                    if (userId) {
+                        // Check if this is user's first post
+                        const userPosts = await db.collection('wallPosts')
+                            .where('authorId', '==', userId)
+                            .get();
+                        
+                        if (userPosts.size === 1) {
+                            await this.updateTaskCompletion(userId, 'task-first-post', true, false);
+                        }
+                    }
+                }
+            });
+        });
+
+        // Listen for event participation
+        // This would need additional setup based on how event participation is tracked
+    },
+
+    // Get all active tasks
+    async getAllTasks(activeOnly = true) {
+        try {
+            let query = db.collection('trackingTasks').orderBy('order');
+            if (activeOnly) {
+                query = query.where('active', '==', true);
+            }
+            
+            const snapshot = await query.get();
+            const tasks = [];
+            snapshot.forEach(doc => {
+                tasks.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            return tasks;
+        } catch (error) {
+            console.error('Error getting tasks:', error);
+            return [];
+        }
+    },
+
+    // Get student progress
+    async getStudentProgress(studentId) {
+        try {
+            const progressSnapshot = await db.collection('taskProgress')
+                .where('studentId', '==', studentId)
+                .get();
+            
+            const progress = {};
+            progressSnapshot.forEach(doc => {
+                const data = doc.data();
+                progress[data.taskId] = data;
+            });
+            
+            return progress;
+        } catch (error) {
+            console.error('Error getting student progress:', error);
+            return {};
+        }
+    },
+
+    // Update task completion
+    async updateTaskCompletion(studentId, taskId, completed = true, manualUpdate = false) {
+        try {
+            const taskData = {
+                studentId: studentId,
+                taskId: taskId,
+                completed: completed,
+                completedAt: completed ? firebase.firestore.FieldValue.serverTimestamp() : null,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: manualUpdate ? (currentUser?.uid || 'system') : 'auto-system',
+                manualUpdate: manualUpdate
+            };
+
+            await db.collection('taskProgress').doc(`${studentId}_${taskId}`).set(taskData, { merge: true });
+
+            // Log activity
+            await this.logActivity(studentId, taskId, completed, manualUpdate);
+            
+            return true;
+        } catch (error) {
+            console.error('Error updating task completion:', error);
+            return false;
+        }
+    },
+
+    // Log activity
+    async logActivity(studentId, taskId, completed, manualUpdate = false) {
+        try {
+            // Get student info
+            const studentDoc = await db.collection('users').doc(studentId).get();
+            const studentData = studentDoc.exists ? studentDoc.data() : { name: 'Unknown Student' };
+            
+            // Get task info
+            const taskDoc = await db.collection('trackingTasks').doc(taskId).get();
+            const taskData = taskDoc.exists ? taskDoc.data() : { name: 'Unknown Task' };
+
+            const activityData = {
+                studentId: studentId,
+                studentName: studentData.name || 'Unknown Student',
+                taskId: taskId,
+                taskName: taskData.name || 'Unknown Task',
+                action: completed ? 'completed' : 'reset',
+                manualUpdate: manualUpdate,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                processedBy: manualUpdate ? (currentUser?.uid || 'system') : 'auto-system'
+            };
+            
+            await db.collection('taskActivityLogs').add(activityData);
+        } catch (error) {
+            console.error('Error logging activity:', error);
+        }
+    },
+
+    // Get completion statistics
+    async getStatistics() {
+        try {
+            // Get total students
+            const studentsSnapshot = await db.collection('users').get();
+            const totalStudents = studentsSnapshot.size;
+
+            // Get total tasks
+            const tasksSnapshot = await db.collection('trackingTasks')
+                .where('active', '==', true)
+                .get();
+            const totalTasks = tasksSnapshot.size;
+
+            // Get completed tasks count
+            const completedSnapshot = await db.collection('taskProgress')
+                .where('completed', '==', true)
+                .get();
+            const totalCompletions = completedSnapshot.size;
+
+            // Calculate average completion rate
+            const avgCompletion = totalStudents > 0 && totalTasks > 0 ? 
+                Math.round((totalCompletions / (totalStudents * totalTasks)) * 100) : 0;
+
+            // Get today's completions
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaySnapshot = await db.collection('taskActivityLogs')
+                .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(today))
+                .where('action', '==', 'completed')
+                .get();
+
+            return {
+                totalStudents,
+                totalTasks,
+                totalCompletions,
+                avgCompletion,
+                todayCompletions: todaySnapshot.size
+            };
+        } catch (error) {
+            console.error('Error getting statistics:', error);
+            return null;
+        }
+    },
+
+    // Get recent activities
+    async getRecentActivities(limit = 10) {
+        try {
+            const snapshot = await db.collection('taskActivityLogs')
+                .orderBy('timestamp', 'desc')
+                .limit(limit)
+                .get();
+            
+            const activities = [];
+            snapshot.forEach(doc => {
+                activities.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            return activities;
+        } catch (error) {
+            console.error('Error getting recent activities:', error);
+            return [];
+        }
+    },
+
+    // Generate report
+    async generateReport(type, startDate, endDate) {
+        try {
+            let reportData = {};
+            
+            switch(type) {
+                case 'completion':
+                    reportData = await this.generateCompletionReport(startDate, endDate);
+                    break;
+                case 'progress':
+                    reportData = await this.generateProgressReport(startDate, endDate);
+                    break;
+                case 'comparison':
+                    reportData = await this.generateComparisonReport(startDate, endDate);
+                    break;
+                case 'timeline':
+                    reportData = await this.generateTimelineReport(startDate, endDate);
+                    break;
+            }
+            
+            return reportData;
+        } catch (error) {
+            console.error('Error generating report:', error);
+            return null;
+        }
+    },
+
+    // Generate completion report
+    async generateCompletionReport(startDate, endDate) {
+        const tasks = await this.getAllTasks();
+        const students = await db.collection('users').get();
+        
+        const report = {
+            title: 'Task Completion Report',
+            period: `${formatDate(startDate)} to ${formatDate(endDate)}`,
+            data: []
+        };
+        
+        for (const task of tasks) {
+            const completions = await db.collection('taskProgress')
+                .where('taskId', '==', task.id)
+                .where('completed', '==', true)
+                .where('completedAt', '>=', firebase.firestore.Timestamp.fromDate(startDate))
+                .where('completedAt', '<=', firebase.firestore.Timestamp.fromDate(endDate))
+                .get();
+            
+            report.data.push({
+                task: task.name,
+                completions: completions.size,
+                completionRate: Math.round((completions.size / students.size) * 100)
+            });
+        }
+        
+        return report;
+    },
+
+    // Generate progress report
+    async generateProgressReport(startDate, endDate) {
+        const students = await db.collection('users').get();
+        const tasks = await this.getAllTasks();
+        
+        const report = {
+            title: 'Student Progress Report',
+            period: `${formatDate(startDate)} to ${formatDate(endDate)}`,
+            data: []
+        };
+        
+        students.forEach(doc => {
+            const student = doc.data();
+            report.data.push({
+                name: student.name,
+                school: student.school,
+                email: student.email,
+                tasksCompleted: 0, // Will be populated below
+                completionRate: 0
+            });
+        });
+        
+        return report;
+    }
+};
+
+// Initialize task tracking when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        taskTracking.initialize();
+    }, 2000);
+    
+    // Initialize task tracking event listeners
+    initTaskTracking();
+});
+
+// Initialize task tracking event listeners
+function initTaskTracking() {
+    // Add Task button
+    document.getElementById('add-task-btn')?.addEventListener('click', () => openTaskModal());
+    
+    // Task form submission
+    document.getElementById('task-form')?.addEventListener('submit', handleSaveTask);
+    
+    // Generate report button
+    document.getElementById('generate-report')?.addEventListener('click', handleGenerateReport);
+    
+    // Task tracking tabs
+    document.querySelectorAll('#admin-tracking .tabs .tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            activateTrackingTab(tabId);
+        });
+    });
+}
+
+// Activate tracking tab
+function activateTrackingTab(tabId) {
+    // Update active tab
+    document.querySelectorAll('#admin-tracking .tabs .tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    document.querySelector(`#admin-tracking .tab[data-tab="${tabId}"]`).classList.add('active');
+    
+    // Update active content
+    document.querySelectorAll('#admin-tracking .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+    
+    // Load tab content
+    loadTrackingTab(tabId);
+}
+
+// Load tracking tab content
+async function loadTrackingTab(tabId) {
+    switch(tabId) {
+        case 'tracking-overview':
+            await loadTrackingOverview();
+            break;
+        case 'tracking-tasks':
+            await loadManageTasks();
+            break;
+        case 'tracking-students':
+            await loadStudentProgressList();
+            break;
+        case 'tracking-reports':
+            // Reports will be generated on demand
+            break;
+    }
+}
+
+// Load tracking overview
+async function loadTrackingOverview() {
+    try {
+        // Load statistics
+        const stats = await taskTracking.getStatistics();
+        if (stats) {
+            document.getElementById('tracking-stats').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.totalStudents}</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.totalTasks}</div>
+                        <div class="stat-label">Active Tasks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.totalCompletions}</div>
+                        <div class="stat-label">Total Completions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.avgCompletion}%</div>
+                        <div class="stat-label">Average Completion</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.todayCompletions || 0}</div>
+                        <div class="stat-label">Today's Completions</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load recent activities
+        const recentActivities = await taskTracking.getRecentActivities(5);
+        if (recentActivities.length > 0) {
+            let html = '';
+            recentActivities.forEach(activity => {
+                const timeAgo = formatTimeAgo(activity.timestamp?.toDate());
+                const actionIcon = activity.action === 'completed' ? '✅' : '🔄';
+                html += `
+                    <div class="recent-activity-item">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <span style="font-weight: 600;">${activity.studentName}</span>
+                                <span style="margin: 0 10px;">${actionIcon}</span>
+                                <span>${activity.taskName}</span>
+                            </div>
+                            <span style="font-size: 0.9rem; color: var(--gray);">${timeAgo}</span>
+                        </div>
+                        ${activity.manualUpdate ? 
+                            '<div style="font-size: 0.85rem; color: var(--warning); margin-top: 5px;">Manual update by admin</div>' : 
+                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px;">Auto-tracked by system</div>'}
+                    </div>
+                `;
+            });
+            document.getElementById('recent-tracked-activities').innerHTML = html;
+        } else {
+            document.getElementById('recent-tracked-activities').innerHTML = 
+                '<div class="empty-state"><p>No recent activities</p></div>';
+        }
+
+        // Initialize chart
+        await initializeProgressChart();
+
+    } catch (error) {
+        console.error('Error loading tracking overview:', error);
+    }
+}
+
+// Initialize progress chart
+async function initializeProgressChart() {
+    try {
+        const canvas = document.getElementById('progress-chart');
+        if (!canvas) return;
+
+        // Remove existing chart if any
+        if (window.progressChart) {
+            window.progressChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        
+        // Get data for chart
+        const tasks = await taskTracking.getAllTasks();
+        const students = await db.collection('users').get();
+        
+        // Calculate completion per task
+        const taskNames = [];
+        const completionCounts = [];
+        
+        for (const task of tasks) {
+            const completions = await db.collection('taskProgress')
+                .where('taskId', '==', task.id)
+                .where('completed', '==', true)
+                .get();
+            
+            taskNames.push(task.name);
+            completionCounts.push(completions.size);
+        }
+
+        // Create chart data
+        const chartData = {
+            labels: taskNames,
+            datasets: [{
+                label: 'Number of Completions',
+                data: completionCounts,
+                backgroundColor: 'rgba(67, 97, 238, 0.6)',
+                borderColor: 'rgba(67, 97, 238, 1)',
+                borderWidth: 2
+            }]
+        };
+
+        window.progressChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Completions'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tasks'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error initializing chart:', error);
+    }
+}
+
+// Load manage tasks
+async function loadManageTasks() {
+    try {
+        const tasks = await taskTracking.getAllTasks(false);
+        const container = document.getElementById('tasks-list');
+        
+        if (!tasks || tasks.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>No tasks found</p></div>';
+            return;
+        }
+
+        let html = '';
+        tasks.forEach(task => {
+            html += `
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>${task.name} ${!task.active ? '<span style="color: var(--gray); font-size: 0.9rem;">(Inactive)</span>' : ''}</h4>
+                        <p>${task.description || 'No description provided'}</p>
+                        <div class="task-meta">
+                            <span class="task-type-badge ${task.type.startsWith('auto') ? 'type-auto' : 'type-manual'}">
+                                ${task.type.replace('auto-', '').replace('-', ' ')}
+                            </span>
+                            ${task.points ? `<span><i class="fas fa-star" style="color: var(--warning);"></i> ${task.points} points</span>` : ''}
+                            ${task.deadline ? `<span><i class="fas fa-calendar-alt"></i> ${formatDate(new Date(task.deadline))}</span>` : ''}
+                            <span><i class="fas fa-clock"></i> Created: ${formatDate(task.createdAt?.toDate())}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-small btn-outline edit-task" data-task-id="${task.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-outline delete-task" data-task-id="${task.id}" 
+                                style="color: var(--danger); border-color: var(--danger);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+        // Add event listeners
+        document.querySelectorAll('.edit-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const taskId = this.getAttribute('data-task-id');
+                openTaskModal(taskId);
+            });
+        });
+
+        document.querySelectorAll('.delete-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const taskId = this.getAttribute('data-task-id');
+                deleteTask(taskId);
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+        document.getElementById('tasks-list').innerHTML = 
+            '<div class="empty-state"><p>Error loading tasks</p></div>';
+    }
+}
+
+// Open task modal
+async function openTaskModal(taskId = null) {
+    const modal = document.getElementById('task-modal');
+    const title = document.getElementById('task-modal-title');
+    const form = document.getElementById('task-form');
+    
+    if (taskId) {
+        title.textContent = 'Edit Task';
+        // Load task data
+        const taskDoc = await db.collection('trackingTasks').doc(taskId).get();
+        if (taskDoc.exists) {
+            const task = taskDoc.data();
+            document.getElementById('task-id').value = taskId;
+            document.getElementById('task-name').value = task.name || '';
+            document.getElementById('task-description').value = task.description || '';
+            document.getElementById('task-type').value = task.type || 'manual';
+            document.getElementById('task-points').value = task.points || '';
+            
+            if (task.deadline) {
+                const deadlineDate = new Date(task.deadline);
+                document.getElementById('task-deadline').value = deadlineDate.toISOString().split('T')[0];
+            } else {
+                document.getElementById('task-deadline').value = '';
+            }
+            
+            document.getElementById('task-active').checked = task.active !== false;
+        }
+    } else {
+        title.textContent = 'Add New Task';
+        form.reset();
+        document.getElementById('task-id').value = '';
+        document.getElementById('task-active').checked = true;
+        
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('task-deadline').value = tomorrow.toISOString().split('T')[0];
+    }
+    
+    openModal('task-modal');
+}
+
+// Save task
+async function handleSaveTask(e) {
+    e.preventDefault();
+    
+    if (!isAdmin) {
+        showAlert('Administrator permissions required to manage tasks.', 'error');
+        return;
+    }
+    
+    const taskId = document.getElementById('task-id').value;
+    const taskData = {
+        name: document.getElementById('task-name').value.trim(),
+        description: document.getElementById('task-description').value.trim(),
+        type: document.getElementById('task-type').value,
+        points: parseInt(document.getElementById('task-points').value) || null,
+        deadline: document.getElementById('task-deadline').value || null,
+        active: document.getElementById('task-active').checked,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy: currentUser?.uid || 'admin'
+    };
+    
+    if (!taskData.name) {
+        showAlert('Task name is required.', 'error');
+        return;
+    }
+    
+    try {
+        if (!taskId) {
+            // New task
+            taskData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            taskData.createdBy = currentUser?.uid || 'admin';
+            taskData.order = await getNextTaskOrder();
+            
+            const newTaskRef = await db.collection('trackingTasks').add(taskData);
+            showAlert('Task created successfully!', 'success');
+        } else {
+            // Update task
+            await db.collection('trackingTasks').doc(taskId).update(taskData);
+            showAlert('Task updated successfully!', 'success');
+        }
+        
+        closeModal('task-modal');
+        loadManageTasks();
+        if (currentPage === 'admin' && document.getElementById('tracking-overview').classList.contains('active')) {
+            loadTrackingOverview();
+        }
+        
+    } catch (error) {
+        console.error('Error saving task:', error);
+        showAlert(`Failed to save task: ${error.message}`, 'error');
+    }
+}
+
+// Get next task order
+async function getNextTaskOrder() {
+    try {
+        const snapshot = await db.collection('trackingTasks')
+            .orderBy('order', 'desc')
+            .limit(1)
+            .get();
+        
+        if (snapshot.empty) return 1;
+        return snapshot.docs[0].data().order + 1;
+    } catch (error) {
+        console.error('Error getting next task order:', error);
+        return 1;
+    }
+}
+
+// Delete task
+async function deleteTask(taskId) {
+    if (!confirm('Are you sure you want to delete this task? This will also delete all progress records for this task.')) {
+        return;
+    }
+    
+    if (!isAdmin) {
+        showAlert('Administrator permissions required to delete tasks.', 'error');
+        return;
+    }
+    
+    try {
+        // Delete task
+        await db.collection('trackingTasks').doc(taskId).delete();
+        
+        // Delete all progress records for this task
+        const progressSnapshot = await db.collection('taskProgress')
+            .where('taskId', '==', taskId)
+            .get();
+        
+        const deletePromises = [];
+        progressSnapshot.forEach(doc => {
+            deletePromises.push(doc.ref.delete());
+        });
+        
+        if (deletePromises.length > 0) {
+            await Promise.all(deletePromises);
+        }
+        
+        showAlert('Task deleted successfully!', 'success');
+        loadManageTasks();
+        if (currentPage === 'admin' && document.getElementById('tracking-overview').classList.contains('active')) {
+            loadTrackingOverview();
+        }
+        
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        showAlert('Failed to delete task', 'error');
+    }
+}
+
+// Load student progress list
+async function loadStudentProgressList() {
+    try {
+        const studentsSnapshot = await db.collection('users').get();
+        const tasks = await taskTracking.getAllTasks();
+        
+        if (studentsSnapshot.empty) {
+            document.getElementById('students-progress-list').innerHTML = 
+                '<div class="empty-state"><p>No students found</p></div>';
+            return;
+        }
+        
+        let html = '';
+        studentsSnapshot.forEach(doc => {
+            const student = doc.data();
+            const studentId = doc.id;
+            
+            html += `
+                <div class="student-progress-item" data-student-id="${studentId}" data-student-name="${student.name || ''}" data-school="${student.school || ''}">
+                    <div class="student-progress-header">
+                        <div class="student-info">
+                            <h4>${student.name || 'Unknown Student'}</h4>
+                            <div class="student-school">
+                                ${student.school === 'fyhs' ? 'Foon Yew High School' : 
+                                  student.school === 'kshs' ? 'Kaohsiung Senior High School' : 
+                                  'School not set'}
+                                ${student.email ? `• ${student.email}` : ''}
+                            </div>
+                        </div>
+                        <div class="completion-stats">
+                            <span id="completed-count-${studentId}">0</span>/<span>${tasks.length}</span> tasks
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-bar-${studentId}" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="task-checklist" id="checklist-${studentId}">
+                        <div class="loading">
+                            <div class="spinner" style="width: 20px; height: 20px;"></div>
+                            <p>Loading tasks...</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 15px;">
+                        <button class="btn btn-small btn-primary view-details-btn" data-student-id="${studentId}">
+                            <i class="fas fa-chart-line"></i> View Details
+                        </button>
+                        <button class="btn btn-small btn-outline" onclick="openStudentProgressModal('${studentId}')">
+                            <i class="fas fa-eye"></i> Quick View
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('students-progress-list').innerHTML = html;
+
+        // Load progress for each student
+        studentsSnapshot.forEach(async doc => {
+            const studentId = doc.id;
+            await loadStudentProgress(studentId, tasks);
+        });
+
+        // Add event listeners for view details buttons
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const studentId = this.getAttribute('data-student-id');
+                openStudentProgressDetailModal(studentId);
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading student progress list:', error);
+        document.getElementById('students-progress-list').innerHTML = 
+            '<div class="empty-state"><p>Error loading student progress</p></div>';
+    }
+}
+
+// Filter students
+function filterStudents() {
+    const searchTerm = document.getElementById('student-filter').value.toLowerCase();
+    const schoolFilter = document.getElementById('school-filter').value;
+    const completionFilter = document.getElementById('completion-filter').value;
+    
+    const studentItems = document.querySelectorAll('.student-progress-item');
+    
+    studentItems.forEach(item => {
+        const studentId = item.getAttribute('data-student-id');
+        const studentName = item.getAttribute('data-student-name').toLowerCase();
+        const school = item.getAttribute('data-school');
+        const completedCount = parseInt(document.getElementById(`completed-count-${studentId}`)?.textContent || 0);
+        const totalTasks = parseInt(item.querySelector('.completion-stats span:nth-child(2)')?.textContent || 0);
+        
+        let shouldShow = true;
+        
+        // Search filter
+        if (searchTerm && !studentName.includes(searchTerm)) {
+            shouldShow = false;
+        }
+        
+        // School filter
+        if (schoolFilter && school !== schoolFilter) {
+            shouldShow = false;
+        }
+        
+        // Completion filter
+        if (completionFilter) {
+            const completionRate = totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0;
+            
+            switch(completionFilter) {
+                case 'completed':
+                    if (completionRate < 100) shouldShow = false;
+                    break;
+                case 'in-progress':
+                    if (completionRate <= 0 || completionRate >= 100) shouldShow = false;
+                    break;
+                case 'pending':
+                    if (completionRate > 0) shouldShow = false;
+                    break;
+            }
+        }
+        
+        item.style.display = shouldShow ? 'block' : 'none';
+    });
+}
+
+// Load individual student progress
+async function loadStudentProgress(studentId, tasks) {
+    try {
+        const progress = await taskTracking.getStudentProgress(studentId);
+        const completedCount = Object.values(progress).filter(p => p.completed).length;
+        const completionPercentage = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
+
+        // Update completion count and progress bar
+        const completedCountEl = document.getElementById(`completed-count-${studentId}`);
+        const progressBarEl = document.getElementById(`progress-bar-${studentId}`);
+        
+        if (completedCountEl) completedCountEl.textContent = completedCount;
+        if (progressBarEl) {
+            progressBarEl.style.width = `${completionPercentage}%`;
+            progressBarEl.style.backgroundColor = completionPercentage === 100 ? 
+                'var(--success)' : completionPercentage >= 50 ? 
+                'var(--warning)' : 'var(--primary)';
+        }
+
+        // Update checklist
+        const checklistEl = document.getElementById(`checklist-${studentId}`);
+        if (checklistEl) {
+            let checklistHtml = '';
+            tasks.forEach(task => {
+                const taskProgress = progress[task.id];
+                const isCompleted = taskProgress?.completed || false;
+                const completedDate = taskProgress?.completedAt?.toDate();
+                const updatedBy = taskProgress?.updatedBy;
+                
+                checklistHtml += `
+                    <div class="checklist-item">
+                        <div class="checkbox-container">
+                            <input type="checkbox" 
+                                   data-student-id="${studentId}" 
+                                   data-task-id="${task.id}"
+                                   ${isCompleted ? 'checked' : ''}
+                                   onchange="toggleTaskCompletion('${studentId}', '${task.id}', this.checked)"
+                                   ${!isAdmin && !(currentUser?.uid === studentId) ? 'disabled' : ''}>
+                        </div>
+                        <div class="task-check-label">
+                            <h5>${task.name} ${task.points ? `<span style="color: var(--warning); font-size: 0.9rem;">(${task.points} pts)</span>` : ''}</h5>
+                            <p style="font-size: 0.85rem;">${task.description || ''}</p>
+                            ${isCompleted && completedDate ? 
+                                `<span class="completion-date">
+                                    <i class="fas fa-check-circle"></i> 
+                                    Completed: ${formatDate(completedDate)}
+                                    ${updatedBy && updatedBy !== 'auto-system' ? ' (Manual)' : ''}
+                                </span>` : 
+                                '<span style="font-size: 0.85rem; color: var(--gray);"><i class="fas fa-clock"></i> Pending</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+            checklistEl.innerHTML = checklistHtml;
+        }
+
+    } catch (error) {
+        console.error(`Error loading progress for student ${studentId}:`, error);
+    }
+}
+
+// Toggle task completion
+async function toggleTaskCompletion(studentId, taskId, completed) {
+    if (!isAdmin && currentUser?.uid !== studentId) {
+        showAlert('You can only update your own tasks.', 'error');
+        return;
+    }
+    
+    const success = await taskTracking.updateTaskCompletion(studentId, taskId, completed, true);
+    if (success) {
+        // Reload the student's progress
+        const tasks = await taskTracking.getAllTasks();
+        await loadStudentProgress(studentId, tasks);
+        
+        // Update overview if on that tab
+        if (document.getElementById('tracking-overview')?.classList.contains('active')) {
+            loadTrackingOverview();
+        }
+        
+        showAlert(`Task ${completed ? 'marked as completed' : 'marked as pending'}`, 'success');
+    } else {
+        showAlert('Failed to update task completion', 'error');
+    }
+}
+
+// Open student progress detail modal
+async function openStudentProgressDetailModal(studentId) {
+    try {
+        const studentDoc = await db.collection('users').doc(studentId).get();
+        const tasks = await taskTracking.getAllTasks();
+        const progress = await taskTracking.getStudentProgress(studentId);
+        
+        if (!studentDoc.exists) {
+            showAlert('Student not found', 'error');
+            return;
+        }
+        
+        const student = studentDoc.data();
+        const completedCount = Object.values(progress).filter(p => p.completed).length;
+        const completionRate = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+        
+        let html = `
+            <div class="student-detail-header" style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-gray);">
+                <h4 style="color: var(--primary-dark); margin-bottom: 10px;">${student.name || 'Unknown Student'}</h4>
+                <div style="display: flex; gap: 20px; color: var(--gray);">
+                    <span><i class="fas fa-school"></i> ${student.school === 'fyhs' ? 'Foon Yew High School' : 
+                          student.school === 'kshs' ? 'Kaohsiung Senior High School' : 
+                          'School not set'}</span>
+                    <span><i class="fas fa-envelope"></i> ${student.email || 'No email'}</span>
+                    <span><i class="fas fa-chart-line"></i> ${completionRate}% Complete</span>
+                </div>
+            </div>
+            
+            <div class="progress-summary" style="margin-bottom: 25px;">
+                <h5 style="color: var(--primary); margin-bottom: 15px;">Task Progress Summary</h5>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div style="background: rgba(67, 97, 238, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">${completedCount}</div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">Tasks Completed</div>
+                    </div>
+                    <div style="background: rgba(247, 37, 133, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary);">${tasks.length - completedCount}</div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">Tasks Remaining</div>
+                    </div>
+                    <div style="background: rgba(46, 204, 113, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--success);">${completionRate}%</div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">Overall Progress</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-details">
+                <h5 style="color: var(--primary); margin-bottom: 15px;">Task Details</h5>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--light);">
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--light-gray);">Task</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid var(--light-gray);">Status</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid var(--light-gray);">Points</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--light-gray);">Completed On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        let totalPoints = 0;
+        let earnedPoints = 0;
+        
+        tasks.forEach(task => {
+            const taskProgress = progress[task.id];
+            const isCompleted = taskProgress?.completed || false;
+            const completedDate = taskProgress?.completedAt?.toDate();
+            totalPoints += task.points || 0;
+            
+            if (isCompleted) {
+                earnedPoints += task.points || 0;
+            }
+            
+            html += `
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                        <div><strong>${task.name}</strong></div>
+                        <div style="font-size: 0.85rem; color: var(--gray);">${task.description || ''}</div>
+                    </td>
+                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid var(--light-gray);">
+                        <span style="display: inline-block; padding: 4px 12px; border-radius: 20px; 
+                              background: ${isCompleted ? 'rgba(46, 204, 113, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; 
+                              color: ${isCompleted ? 'var(--success)' : 'var(--warning)'}; font-weight: 600;">
+                            ${isCompleted ? 'Completed' : 'Pending'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; text-align: center; border-bottom: 1px solid var(--light-gray);">
+                        ${task.points || 0}
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--light-gray);">
+                        ${completedDate ? formatDate(completedDate) : 'Not completed'}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="points-summary" style="margin-top: 25px; padding-top: 20px; border-top: 2px solid var(--light-gray);">
+                <h5 style="color: var(--primary); margin-bottom: 10px;">Points Summary</h5>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">
+                            ${earnedPoints} / ${totalPoints} points
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">
+                            ${Math.round((earnedPoints / totalPoints) * 100)}% of total points earned
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="printStudentProgress('${studentId}')">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('student-progress-detail').innerHTML = html;
+        document.getElementById('student-progress-title').textContent = `Progress: ${student.name || 'Student'}`;
+        openModal('student-progress-modal');
+        
+    } catch (error) {
+        console.error('Error opening student progress modal:', error);
+        showAlert('Error loading student details', 'error');
+    }
+}
+
+// Open student progress modal (quick view)
+async function openStudentProgressModal(studentId) {
+    try {
+        const studentDoc = await db.collection('users').doc(studentId).get();
+        const tasks = await taskTracking.getAllTasks();
+        const progress = await taskTracking.getStudentProgress(studentId);
+        
+        if (!studentDoc.exists) {
+            showAlert('Student not found', 'error');
+            return;
+        }
+        
+        const student = studentDoc.data();
+        const completedCount = Object.values(progress).filter(p => p.completed).length;
+        
+        let html = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h4 style="color: var(--primary-dark);">${student.name || 'Unknown Student'}</h4>
+                <p style="color: var(--gray);">
+                    ${student.school === 'fyhs' ? 'Foon Yew High School' : 
+                      student.school === 'kshs' ? 'Kaohsiung Senior High School' : 
+                      'School not set'}
+                </p>
+                <div style="margin: 20px 0;">
+                    <div style="font-size: 3rem; font-weight: 800; color: var(--primary);">${completedCount}/${tasks.length}</div>
+                    <div style="font-size: 1rem; color: var(--gray);">Tasks Completed</div>
+                </div>
+            </div>
+            
+            <div style="max-height: 300px; overflow-y: auto; margin-top: 20px;">
+        `;
+        
+        tasks.forEach(task => {
+            const taskProgress = progress[task.id];
+            const isCompleted = taskProgress?.completed || false;
+            
+            html += `
+                <div style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--light-gray);">
+                    <div style="margin-right: 15px;">
+                        ${isCompleted ? 
+                            '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.2rem;"></i>' : 
+                            '<i class="fas fa-clock" style="color: var(--warning); font-size: 1.2rem;"></i>'}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--dark);">${task.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--gray);">${task.description || ''}</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-small ${isCompleted ? 'btn-outline' : 'btn-primary'}" 
+                                onclick="toggleTaskCompletion('${studentId}', '${task.id}', ${!isCompleted})"
+                                style="min-width: 100px;">
+                            ${isCompleted ? 'Mark Pending' : 'Mark Complete'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="openStudentProgressDetailModal('${studentId}')">
+                    <i class="fas fa-chart-line"></i> View Full Report
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('student-progress-detail').innerHTML = html;
+        document.getElementById('student-progress-title').textContent = `Quick View: ${student.name || 'Student'}`;
+        openModal('student-progress-modal');
+        
+    } catch (error) {
+        console.error('Error opening student progress modal:', error);
+        showAlert('Error loading student progress', 'error');
+    }
+}
+
+// Print student progress
+function printStudentProgress(studentId) {
+    const studentDetail = document.getElementById('student-progress-detail');
+    const printWindow = window.open('', '_blank');
+    
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Student Progress Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #333; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th { background-color: #4361ee; color: white; padding: 10px; }
+                td { padding: 10px; border-bottom: 1px solid #ddd; }
+                .summary { background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            ${studentDetail.innerHTML}
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// Handle generate report
+async function handleGenerateReport() {
+    const reportType = document.getElementById('report-type').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    
+    if (!startDate || !endDate) {
+        showAlert('Please select a date range', 'error');
+        return;
+    }
+    
+    try {
+        showAlert('Generating report...', 'info');
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        
+        const report = await taskTracking.generateReport(reportType, start, end);
+        
+        if (!report) {
+            showAlert('Failed to generate report', 'error');
+            return;
+        }
+        
+        displayReport(report, reportType);
+        showAlert('Report generated successfully', 'success');
+        
+    } catch (error) {
+        console.error('Error generating report:', error);
+        showAlert(`Failed to generate report: ${error.message}`, 'error');
+    }
+}
+
+// Display report
+function displayReport(report, reportType) {
+    const output = document.getElementById('report-output');
+    
+    switch(reportType) {
+        case 'completion':
+            output.innerHTML = `
+                <div class="report-content">
+                    <h4 style="color: var(--primary); margin-bottom: 15px;">${report.title}</h4>
+                    <p style="color: var(--gray); margin-bottom: 20px;">Period: ${report.period}</p>
+                    
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Completions</th>
+                                <th>Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${report.data.map(item => `
+                                <tr>
+                                    <td>${item.task}</td>
+                                    <td style="text-align: center;">${item.completions}</td>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 10px; border-radius: 15px; 
+                                              background: ${item.completionRate >= 75 ? 'rgba(46, 204, 113, 0.2)' : 
+                                                          item.completionRate >= 50 ? 'rgba(243, 156, 18, 0.2)' : 
+                                                          'rgba(231, 76, 60, 0.2)'}; 
+                                              color: ${item.completionRate >= 75 ? 'var(--success)' : 
+                                                      item.completionRate >= 50 ? 'var(--warning)' : 
+                                                      'var(--danger)'};">
+                                            ${item.completionRate}%
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="exportReport('${reportType}')">
+                            <i class="fas fa-download"></i> Export as CSV
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'progress':
+            output.innerHTML = `
+                <div class="report-content">
+                    <h4 style="color: var(--primary); margin-bottom: 15px;">${report.title}</h4>
+                    <p style="color: var(--gray); margin-bottom: 20px;">Period: ${report.period}</p>
+                    <p>Progress report requires additional data processing...</p>
+                </div>
+            `;
+            break;
+            
+        default:
+            output.innerHTML = `
+                <div class="report-content">
+                    <h4 style="color: var(--primary); margin-bottom: 15px;">Report Generated</h4>
+                    <p>Report type: ${reportType}</p>
+                    <p>Period: ${report.period}</p>
+                    <p>Data processing complete.</p>
+                </div>
+            `;
+    }
+}
+
+// Export report
+function exportReport(reportType) {
+    // This would generate and download a CSV file
+    // For simplicity, we'll show an alert
+    showAlert(`Exporting ${reportType} report as CSV... (This would generate a download in a real implementation)`, 'info');
+}
+
+// Helper function: Format time ago
+function formatTimeAgo(date) {
+    if (!date) return 'Unknown time';
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+    
+    return formatDate(date);
+}
+
+// Make functions available globally
+window.openTaskModal = openTaskModal;
+window.toggleTaskCompletion = toggleTaskCompletion;
+window.openStudentProgressModal = openStudentProgressModal;
+window.openStudentProgressDetailModal = openStudentProgressDetailModal;
+window.filterStudents = filterStudents;
+window.printStudentProgress = printStudentProgress;
+window.exportReport = exportReport;
 </script>
 </body>
 </html>
