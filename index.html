@@ -508,6 +508,453 @@ main {
     margin: 0 auto;
     line-height: 1.8;
 }
+
+        /* ==================== 统计表格现代化设计 ==================== */
+
+/* 统计卡片样式增强 */
+#exchange-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid var(--primary);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-row:hover {
+    transform: translateY(-5px);
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-left-width: 8px;
+}
+
+.stat-row:nth-child(2) {
+    border-left-color: var(--success);
+}
+
+.stat-row:nth-child(3) {
+    border-left-color: var(--warning);
+}
+
+.stat-row:nth-child(4) {
+    border-left-color: var(--info);
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--dark);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.stat-label i {
+    width: 36px;
+    height: 36px;
+    background: rgba(67, 97, 238, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.stat-row:nth-child(2) .stat-label i {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--success);
+}
+
+.stat-row:nth-child(3) .stat-label i {
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--warning);
+}
+
+.stat-row:nth-child(4) .stat-label i {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--info);
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-row:nth-child(2) .stat-value {
+    color: var(--success);
+}
+
+.stat-row:nth-child(3) .stat-value {
+    color: var(--warning);
+}
+
+.stat-row:nth-child(4) .stat-value {
+    color: var(--info);
+}
+
+/* 统计图表容器 */
+.stats-chart-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.stats-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+}
+
+.stats-chart-header h4 {
+    font-size: 1.3rem;
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.chart-time-selector {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--light-gray);
+    padding: 0.5rem;
+    border-radius: var(--border-radius-sm);
+}
+
+.chart-time-selector button {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--border-radius-xs);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray);
+    cursor: pointer;
+    transition: var(--transition-quick);
+}
+
+.chart-time-selector button:hover {
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--dark);
+}
+
+.chart-time-selector button.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+/* 统计网格布局 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.stat-card-header i {
+    font-size: 2rem;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+.stat-card h4 {
+    font-size: 1.1rem;
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.stat-card-change.positive {
+    color: var(--success);
+}
+
+.stat-card-change.negative {
+    color: var(--danger);
+}
+
+.stat-card-change i {
+    font-size: 0.8rem;
+}
+
+/* 统计表格 */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.stats-table th {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.stats-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    font-size: 0.95rem;
+}
+
+.stats-table tr:last-child td {
+    border-bottom: none;
+}
+
+.stats-table tr:hover {
+    background: rgba(67, 97, 238, 0.03);
+}
+
+.stats-table .trend-up {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.stats-table .trend-up::before {
+    content: '↗ ';
+}
+
+.stats-table .trend-down {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.stats-table .trend-down::before {
+    content: '↘ ';
+}
+
+/* 统计数据比较 */
+.stats-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.comparison-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-md);
+    border-top: 4px solid var(--primary);
+}
+
+.comparison-card:nth-child(2) {
+    border-top-color: var(--secondary);
+}
+
+.comparison-card h4 {
+    font-size: 1.1rem;
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.comparison-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.comparison-item:last-child {
+    border-bottom: none;
+}
+
+.comparison-label {
+    font-size: 0.95rem;
+    color: var(--gray);
+}
+
+.comparison-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .stat-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        align-self: flex-end;
+    }
+    
+    .stats-comparison {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stats-table {
+        font-size: 0.9rem;
+    }
+    
+    .stats-table th,
+    .stats-table td {
+        padding: 1rem;
+    }
+    
+    .stat-card-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stat-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .stats-chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .chart-time-selector {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .chart-time-selector button {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* 统计动画效果 */
+@keyframes countUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-row {
+    animation: countUp 0.5s ease-out forwards;
+}
+
+.stat-row:nth-child(1) { animation-delay: 0.1s; }
+.stat-row:nth-child(2) { animation-delay: 0.2s; }
+.stat-row:nth-child(3) { animation-delay: 0.3s; }
+.stat-row:nth-child(4) { animation-delay: 0.4s; }
+
+/* 统计进度条 */
+.stat-progress {
+    margin-top: 1rem;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+
+/* 统计图标动画 */
+.stat-label i {
+    transition: var(--transition-smooth);
+}
+
+.stat-row:hover .stat-label i {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+        
 /* 添加到您的CSS中 */
 #batch-actions,
 #autosave-status,
@@ -3003,22 +3450,115 @@ footer::before {
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-users"></i>
-                        <h3>Exchange Statistics</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="exchange-stats">
-                            <p>Total Participants: <strong id="total-participants">0</strong></p>
-                            <p>Online Users: <strong id="online-users">0</strong></p>
-                            <p>Total Posts: <strong id="total-posts">0</strong></p>
-                            <p>Total Events: <strong id="total-events">0</strong></p>
-                        </div>
-                        <button class="btn btn-outline btn-small" style="margin-top: 15px;" data-page="wall">View Exchange Wall</button>
-                    </div>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-chart-line"></i>
+        <h3>Exchange Statistics</h3>
+    </div>
+    <div class="card-body">
+        <div id="exchange-stats">
+            <div class="stat-row">
+                <div class="stat-label">
+                    <i class="fas fa-users"></i>
+                    <span>Total Participants</span>
+                </div>
+                <div class="stat-value" id="total-participants">0</div>
+            </div>
+            
+            <div class="stat-row">
+                <div class="stat-label">
+                    <i class="fas fa-signal"></i>
+                    <span>Online Users</span>
+                </div>
+                <div class="stat-value" id="online-users">0</div>
+            </div>
+            
+            <div class="stat-row">
+                <div class="stat-label">
+                    <i class="fas fa-comments"></i>
+                    <span>Total Posts</span>
+                </div>
+                <div class="stat-value" id="total-posts">0</div>
+            </div>
+            
+            <div class="stat-row">
+                <div class="stat-label">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Total Events</span>
+                </div>
+                <div class="stat-value" id="total-events">0</div>
+            </div>
+        </div>
+        
+        <!-- 添加统计图表容器 -->
+        <div class="stats-chart-container" id="stats-chart-container" style="display: none;">
+            <div class="stats-chart-header">
+                <h4>Platform Growth</h4>
+                <div class="chart-time-selector">
+                    <button class="active" data-period="week">Week</button>
+                    <button data-period="month">Month</button>
+                    <button data-period="year">Year</button>
                 </div>
             </div>
+            <div id="stats-chart"></div>
+        </div>
+        
+        <div class="stats-grid" id="detailed-stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h4>Active Discussions</h4>
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="stat-card-value" id="active-discussions">0</div>
+                <div class="stat-card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% from last week</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h4>Response Rate</h4>
+                    <i class="fas fa-reply"></i>
+                </div>
+                <div class="stat-card-value" id="response-rate">0%</div>
+                <div class="stat-card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>5% increase</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h4>Exchange Partners</h4>
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="stat-card-value" id="exchange-partners">0</div>
+                <div class="stat-card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8 new this week</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h4>Avg. Session Time</h4>
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card-value" id="avg-session">0m</div>
+                <div class="stat-card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>15% longer</span>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn btn-outline btn-small" style="margin-top: 1.5rem;" onclick="toggleDetailedStats()" id="toggle-stats-btn">
+            <i class="fas fa-chart-bar"></i> Show Detailed Statistics
+        </button>
+        <button class="btn btn-outline btn-small" style="margin-top: 15px;" data-page="wall">View Exchange Wall</button>
+    </div>
+</div>
             
             <div class="page-header">
                 <h2>Featured Exchange Programs</h2>
@@ -7100,6 +7640,82 @@ function showCountdownMessage(message, type) {
             messageEl.style.borderColor = 'var(--info)';
             messageEl.style.color = 'var(--info)';
     }
+}
+
+            // 添加这个函数到您的JavaScript中
+function toggleDetailedStats() {
+    const chartContainer = document.getElementById('stats-chart-container');
+    const detailedStats = document.getElementById('detailed-stats');
+    const toggleBtn = document.getElementById('toggle-stats-btn');
+    
+    if (chartContainer.style.display === 'none') {
+        chartContainer.style.display = 'block';
+        detailedStats.style.display = 'grid';
+        toggleBtn.innerHTML = '<i class="fas fa-chart-bar"></i> Hide Detailed Statistics';
+        toggleBtn.classList.add('active');
+        
+        // 在这里可以添加加载统计图表的代码
+        loadStatisticsChart();
+    } else {
+        chartContainer.style.display = 'none';
+        detailedStats.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fas fa-chart-bar"></i> Show Detailed Statistics';
+        toggleBtn.classList.remove('active');
+    }
+}
+
+// 模拟加载统计图表数据
+function loadStatisticsChart() {
+    // 这里可以集成Chart.js或其他图表库
+    const chartContainer = document.getElementById('stats-chart');
+    if (chartContainer) {
+        // 创建简单的柱状图
+        chartContainer.innerHTML = `
+            <div style="height: 200px; display: flex; align-items: flex-end; gap: 10px; padding: 20px;">
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0;" data-value="80"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Mon</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 120px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Tue</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 160px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Wed</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 100px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Thu</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 180px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Fri</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 140px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Sat</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--primary-light)); width: 30px; border-radius: 5px 5px 0 0; height: 90px;"></div>
+                    <span style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Sun</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // 更新详细统计数据
+    updateDetailedStats();
+}
+
+// 更新详细统计数据
+function updateDetailedStats() {
+    // 这里可以添加从Firebase获取详细统计数据的代码
+    // 暂时使用模拟数据
+    document.getElementById('active-discussions').textContent = '24';
+    document.getElementById('response-rate').textContent = '89%';
+    document.getElementById('exchange-partners').textContent = '156';
+    document.getElementById('avg-session').textContent = '42m';
 }
 
 // 填充倒计时表单（管理员）
