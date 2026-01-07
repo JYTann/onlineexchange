@@ -9152,7 +9152,7 @@ async function updateAdminDashboardWithCountdown() {
     
     async function loadUserManagement() {
         const userManagement = document.getElementById('user-management');
-        userManagement.innerHTML = '<div class="loading"><div class="spinner"></div><p>正在加载用户数据...</p></div>';
+        userManagement.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading user data...</p></div>';
         
         try {
             const usersSnapshot = await db.collection('users').get();
@@ -9161,11 +9161,11 @@ async function updateAdminDashboardWithCountdown() {
             html += `
                 <thead>
                     <tr>
-                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">姓名</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">邮箱</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">学校</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">角色</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">操作</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">Name</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">Email</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">School</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">Role</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--light-gray);">Action</th>
                     </tr>
                 </thead>
                 <tbody>
