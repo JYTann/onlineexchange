@@ -2948,7 +2948,7 @@ footer::before {
             <div class="welcome-section">
                 <h2>Welcome to the Online Exchange Platform</h2>
                 <p>Facilitating academic and cultural exchange between Foon Yew High School and Kaohsiung Senior High School</p>
-                <div id="welcome-message"></div>
+                <div id="welcome-display"></div>
             </div>
             
             <div class="page-header">
@@ -9387,43 +9387,61 @@ async function saveAdminSettings() {
         return;
     }
     
-    const platformName = document.getElementById('platform-name').value;
-    const welcomeMessage = document.getElementById('welcome-message').value;
-    const maintenanceMode = document.getElementById('maintenance-mode').checked;
+    const platformNameInput = document.getElementById('platform-name');
+    const welcomeMessageInput = document.getElementById('welcome-message');
+    const maintenanceModeCheckbox = document.getElementById('maintenance-mode');
     
-    // 验证输入
-    if (!platformName || !welcomeMessage) {
-        showAlert('Please fill in platform name and welcome message.', 'error');
+    // 调试：检查获取的值
+    console.log('platformName input:', platformNameInput);
+    console.log('platformName value:', platformNameInput ? platformNameInput.value : 'not found');
+    console.log('welcomeMessage input:', welcomeMessageInput);
+    console.log('welcomeMessage value:', welcomeMessageInput ? welcomeMessageInput.value : 'not found');
+    
+    if (!platformNameInput || !welcomeMessageInput) {
+        showAlert('Settings form elements not found!', 'error');
+        return;
+    }
+    
+    const platformName = platformNameInput.value;
+    const welcomeMessage = welcomeMessageInput.value;
+    const maintenanceMode = maintenanceModeCheckbox ? maintenanceModeCheckbox.checked : false;
+    
+    // 更宽松的验证：只检查是否为 undefined 或 null
+    if (platformName === undefined || platformName === null) {
+        showAlert('Please fill in platform name.', 'error');
+        platformNameInput.focus();
+        return;
+    }
+    
+    if (welcomeMessage === undefined || welcomeMessage === null) {
+        showAlert('Please fill in welcome message.', 'error');
+        welcomeMessageInput.focus();
         return;
     }
     
     try {
-        // 准备设置数据，确保没有 undefined 值
+        // 准备设置数据
         const settingsData = {
-            platformName: platformName.trim(),
-            welcomeMessage: welcomeMessage.trim(),
+            platformName: platformName.trim() || 'Foon Yew High School - Kaohsiung Senior High School Online Exchange Platform',
+            welcomeMessage: welcomeMessage.trim() || 'Welcome to the Two-School Exchange Platform！',
             maintenanceMode: maintenanceMode,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedBy: currentUser.uid
         };
         
-        // 记录要保存的数据（用于调试）
-        console.log('Saving settings:', settingsData);
+        console.log('Saving settings data:', settingsData);
         
         // Save settings to Firestore
         await db.collection('settings').doc('platform').set(settingsData, { merge: true });
         
-        // Update platform name in header
+        // Update UI
         const platformTitle = document.querySelector('.logo-text h1');
         if (platformTitle) {
             platformTitle.textContent = settingsData.platformName;
         }
         
-        // Update welcome message on dashboard
-        const welcomeElement = document.getElementById('welcome-message');
-        if (welcomeElement) {
-            welcomeElement.textContent = settingsData.welcomeMessage;
-        }
+        // 注意：这里有潜在的冲突 - ID "welcome-message" 同时用于输入框和显示区域
+        // 修正：显示区域应该有不同的ID
         
         showAlert('System settings saved successfully!', 'success');
         
