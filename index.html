@@ -5181,8 +5181,25 @@ const CLOUDINARY_CONFIG = {
     let autoSaveTimer = null;
     let progressChartInstance = null;
 
-// 全局图表管理
-// ==================== 增强版 ChartManager ====================
+// ==================== 等待可见的工具函数 ====================
+function waitUntilVisible(el) {
+    return new Promise(resolve => {
+        const check = () => {
+            if (
+                el &&
+                el.offsetWidth > 0 &&
+                el.offsetHeight > 0
+            ) {
+                resolve();
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    });
+}
+
+// ==================== 修复版 ChartManager ====================
 const chartManager = {
     // 状态管理
     instance: null,
@@ -5190,8 +5207,48 @@ const chartManager = {
     isCreating: false,
     isDestroying: false,
     
-    // 初始化（带三重保护）
-        async initialize() {
+    // ==================== 修复的 show() 方法 ====================
+    async show() {
+        console.log('ChartManager.show() called');
+        
+        const container = document.getElementById('progress-chart-container');
+        const overviewTab = document.getElementById('tracking-overview');
+        
+        // 如果没有容器或overview标签不可见，直接返回
+        if (!container || !overviewTab || overviewTab.style.display === 'none') {
+            console.warn('Chart container or tracking overview not available');
+            return;
+        }
+        
+        // 关键修复：等待容器真正可见
+        await waitUntilVisible(container);
+        
+        console.log('Chart container is now visible, proceeding...');
+        
+        if (!this.isInitialized) {
+            // 第一次显示，需要初始化
+            await this.initialize();
+        } else if (this.instance) {
+            // 已经初始化，只是重新显示
+            const canvas = document.getElementById('progress-chart');
+            if (canvas) {
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart && existingChart !== this.instance) {
+                    // 如果Chart.js有不同实例，使用那个
+                    this.instance = existingChart;
+                }
+            }
+            
+            // 显示容器并刷新图表
+            container.style.display = 'block';
+            this.instance.resize();
+            await this.refresh();
+            console.log('Chart shown and resized');
+        }
+    },
+    
+    // ==================== 初始化方法 ====================
+    async initialize() {
         console.log('ChartManager.initialize() called');
         
         // 保护1：正在创建中，跳过
@@ -5204,40 +5261,6 @@ const chartManager = {
         if (this.isInitialized && this.instance) {
             console.log('Chart already initialized, returning existing instance');
             return true;
-        }
-        
-        // ========== 关键修复：确保容器可见 ==========
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            if (container.style.display === 'none' || window.getComputedStyle(container).display === 'none') {
-                console.warn('Container was hidden, forcing display');
-                container.style.display = 'block';
-                container.style.visibility = 'visible';
-                container.style.opacity = '1';
-                
-                // 等待浏览器重新渲染
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            // 确保容器有尺寸
-            if (container.clientWidth === 0 || container.clientHeight === 0) {
-                container.style.width = '100%';
-                container.style.height = '350px';
-                container.style.minHeight = '350px';
-            }
-        }
-        // ========== 关键修复结束 ==========
-        
-        // 保护3：使用 Chart.getChart() 检查是否已有图表
-        const canvas = document.getElementById('progress-chart');
-        if (canvas && Chart) {
-            const existingChart = Chart.getChart(canvas);
-            if (existingChart) {
-                console.log('Found existing chart via Chart.getChart(), reusing');
-                this.instance = existingChart;
-                this.isInitialized = true;
-                return true;
-            }
         }
         
         this.isCreating = true;
@@ -5260,8 +5283,8 @@ const chartManager = {
         }
     },
     
-    // 创建图表实例（带双重检查）
-       async createChart() {
+    // ==================== 创建图表实例 ====================
+    async createChart() {
         console.log('ChartManager.createChart() called');
         
         try {
@@ -5273,18 +5296,9 @@ const chartManager = {
                 return false;
             }
             
-            // ========== 双重检查容器可见性 ==========
-            const computedStyle = window.getComputedStyle(container);
-            if (computedStyle.display === 'none') {
-                console.error('Container is still hidden! Forcing display...');
-                container.style.display = 'block';
-                container.style.visibility = 'visible';
-                
-                // 等待重新渲染
-                await new Promise(resolve => setTimeout(resolve, 50));
-            }
+            // 确保容器可见且有尺寸
+            container.style.display = 'block';
             
-            // 确保容器有尺寸
             if (container.clientWidth === 0) {
                 container.style.width = '100%';
             }
@@ -5292,7 +5306,9 @@ const chartManager = {
                 container.style.height = '350px';
                 container.style.minHeight = '350px';
             }
-            // ========================================
+            
+            // 等待一小段时间确保DOM更新
+            await new Promise(resolve => setTimeout(resolve, 50));
             
             // 检查已有图表
             if (Chart) {
@@ -5314,7 +5330,9 @@ const chartManager = {
             if (this.instance) {
                 try {
                     this.instance.destroy();
-                } catch (e) {}
+                } catch (e) {
+                    console.warn('Error destroying old instance:', e);
+                }
                 this.instance = null;
             }
             
@@ -5343,7 +5361,7 @@ const chartManager = {
                 type: 'bar',
                 data: chartData,
                 options: {
-                    responsive: false,
+                    responsive: true,
                     maintainAspectRatio: false,
                     scales: {
                         y: {
@@ -5352,6 +5370,9 @@ const chartManager = {
                                 precision: 0
                             }
                         }
+                    },
+                    animation: {
+                        duration: 0 // 禁用初始动画避免闪烁
                     }
                 }
             });
@@ -5367,7 +5388,7 @@ const chartManager = {
         }
     },
     
-    // 获取图表数据
+    // ==================== 获取图表数据 ====================
     async getChartData() {
         try {
             console.log('Fetching chart data...');
@@ -5419,7 +5440,7 @@ const chartManager = {
         }
     },
     
-    // 空图表数据
+    // ==================== 空图表数据 ====================
     getEmptyChartData() {
         return {
             labels: ['No Data Available'],
@@ -5433,27 +5454,7 @@ const chartManager = {
         };
     },
     
-    // 显示图表
-    show() {
-        console.log('ChartManager.show() called');
-        
-        if (!this.isInitialized) {
-            console.log('Chart not initialized, initializing first...');
-            this.initialize();
-            return;
-        }
-        
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            container.style.display = 'block';
-            console.log('Chart container shown');
-        }
-        
-        // 确保图表可见时更新尺寸
-        setTimeout(() => this.refresh(), 100);
-    },
-    
-    // 隐藏图表
+    // ==================== 隐藏图表 ====================
     hide() {
         console.log('ChartManager.hide() called');
         
@@ -5464,7 +5465,7 @@ const chartManager = {
         }
     },
     
-    // 刷新数据
+    // ==================== 刷新数据 ====================
     async refresh() {
         console.log('ChartManager.refresh() called');
         
@@ -5494,7 +5495,7 @@ const chartManager = {
         }
     },
     
-    // 安全销毁
+    // ==================== 安全销毁 ====================
     destroy() {
         console.log('ChartManager.destroy() called');
         
@@ -5535,7 +5536,7 @@ const chartManager = {
         }
     },
     
-    // 完全重置
+    // ==================== 完全重置 ====================
     reset() {
         console.log('ChartManager.reset() called');
         this.destroy();
@@ -5543,7 +5544,7 @@ const chartManager = {
         this.isCreating = false;
     },
     
-    // 显示加载状态
+    // ==================== 显示加载状态 ====================
     showLoading() {
         const loading = document.getElementById('chart-loading');
         if (loading) {
@@ -5555,7 +5556,7 @@ const chartManager = {
         }
     },
     
-    // 隐藏加载状态
+    // ==================== 隐藏加载状态 ====================
     hideLoading() {
         const loading = document.getElementById('chart-loading');
         if (loading) {
@@ -5563,7 +5564,7 @@ const chartManager = {
         }
     },
     
-    // 显示错误状态
+    // ==================== 显示错误状态 ====================
     showError() {
         const error = document.getElementById('chart-error');
         if (error) {
@@ -5575,20 +5576,27 @@ const chartManager = {
         }
     },
     
-    // 检查状态
-    getStatus: function() {
+    // ==================== 检查状态 ====================
+    getStatus() {
         return {
             isInitialized: this.isInitialized,
             isCreating: this.isCreating,
             isDestroying: this.isDestroying,
             instanceExists: !!this.instance,
             canvasExists: !!document.getElementById('progress-chart'),
-            chartOnCanvas: Chart ? !!Chart.getChart(document.getElementById('progress-chart')) : false
+            chartOnCanvas: Chart ? !!Chart.getChart(document.getElementById('progress-chart')) : false,
+            containerVisible: (() => {
+                const container = document.getElementById('progress-chart-container');
+                return container ? 
+                    container.style.display !== 'none' && 
+                    container.offsetWidth > 0 && 
+                    container.offsetHeight > 0 : false;
+            })()
         };
     },
     
-    // ==== 新增：调试函数 ====
-    debug: function() {
+    // ==================== 调试函数 ====================
+    debug() {
         const status = this.getStatus();
         console.log('=== ChartManager Debug Info ===');
         console.log('Status:', status);
@@ -8029,12 +8037,9 @@ function formatDateTime(date) {
         window.wallTimer = null;
     }
 
-    // ⚠️ 重要：如果还在 admin 页面，不要 reset chart
-    if (currentPage === 'admin' && pageId === 'admin') {
-        console.log('Staying in admin page, no chart reset needed');
-    } else if (currentPage === 'admin' && pageId !== 'admin') {
-        console.log('Leaving admin page, soft reset chart manager');
-        chartManager.hide();  // 只隐藏，不重置
+    if (currentPage === 'admin' && pageId !== 'admin') {
+        console.log('Leaving admin page, hiding chart...');
+        chartManager.hide();
     }
 
          // 清理图表（新增）
@@ -8171,9 +8176,11 @@ function activateTrackingTab(tabId) {
         // 图表处理：只在 tracking-overview 显示图表
         if (tabId === 'tracking-overview') {
             console.log('Showing chart for tracking-overview');
+            // 使用 setTimeout 确保 DOM 更新完成
             setTimeout(() => {
+                chartManager.show();
                 loadTrackingOverview();
-            }, 100); // 延迟确保DOM更新
+            }, 100);
         } else {
             console.log('Hiding chart for non-overview tab');
             chartManager.hide();
@@ -8204,7 +8211,6 @@ function activateTrackingTab(tabId) {
         console.error('Error activating tracking tab:', error);
     }
 }
-
 // ==================== 修复2：更新initTaskTracking函数 ====================
 function initTaskTracking() {
     console.log('Initializing task tracking...');
@@ -12613,13 +12619,10 @@ async function loadTrackingOverview() {
             chartContainer.style.display = 'block';
         }
         
-        // 使用 ChartManager 安全地初始化图表
-        await chartManager.initialize();
+        // 现在 ChartManager.show() 会等待容器可见后才初始化图表
+        await chartManager.show();
         
-        // 刷新图表数据
-        await chartManager.refresh();
-        
-        // 加载统计数据（保持不变）
+        // 加载统计数据...
         const stats = await taskTracking.getStatistics();
         if (stats) {
             document.getElementById('tracking-stats').innerHTML = `
@@ -12648,7 +12651,7 @@ async function loadTrackingOverview() {
             `;
         }
         
-        // 加载最近活动（保持不变）
+        // 加载最近活动...
         const recentActivities = await taskTracking.getRecentActivities(5);
         if (recentActivities.length > 0) {
             let html = '';
@@ -12684,6 +12687,7 @@ async function loadTrackingOverview() {
         showAlert('Error loading tracking overview', 'error');
     }
 }
+
 
 // Initialize progress chart
 /*function initializeProgressChart() {
