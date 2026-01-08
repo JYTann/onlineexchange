@@ -9616,10 +9616,39 @@ function closeModal(modalId) {
 }
     
     // Data Loading Functions
-    async function loadDashboardData() {
-        // Load recent announcements
-        try {
-                    const today = new Date();
+async function loadDashboardData() {
+    // Load recent announcements
+    try {
+        const announcementsSnapshot = await db.collection('announcements')
+            .orderBy('createdAt', 'desc')
+            .limit(3)
+            .get();
+        
+        const recentAnnouncements = document.getElementById('recent-announcements');
+        if (announcementsSnapshot.empty) {
+            recentAnnouncements.innerHTML = '<p>No announcements available.</p>';
+        } else {
+            let html = '';
+            announcementsSnapshot.forEach(doc => {
+                const data = doc.data();
+                html += `
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                        <strong>${data.title}</strong>
+                        <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${data.content.substring(0, 80)}${data.content.length > 80 ? '...' : ''}</p>
+                        <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
+                    </div>
+                `;
+            });
+            recentAnnouncements.innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Error loading announcements:', error);
+        document.getElementById('recent-announcements').innerHTML = '<p>Failed to load announcements.</p>';
+    }
+    
+    // Load upcoming events (next 7 days) - 修复版本
+    try {
+        const today = new Date();
         today.setHours(0, 0, 0, 0); // 设置为当天开始
         const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
         
@@ -9653,97 +9682,38 @@ function closeModal(modalId) {
         console.error('Error loading events:', error);
         document.getElementById('upcoming-events').innerHTML = '<p>Failed to load events.</p>';
     }
-            const announcementsSnapshot = await db.collection('announcements')
-                .orderBy('createdAt', 'desc')
-                .limit(3)
-                .get();
-            
-            const recentAnnouncements = document.getElementById('recent-announcements');
-            if (announcementsSnapshot.empty) {
-                recentAnnouncements.innerHTML = '<p>No announcements available.</p>';
-            } else {
-                let html = '';
-                announcementsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    html += `
-                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                            <strong>${data.title}</strong>
-                            <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">${data.content.substring(0, 80)}${data.content.length > 80 ? '...' : ''}</p>
-                            <small style="color: #666;">${formatDate(data.createdAt?.toDate())}</small>
-                        </div>
-                    `;
-                });
-                recentAnnouncements.innerHTML = html;
-            }
-        } catch (error) {
-            console.error('Error loading announcements:', error);
-            document.getElementById('recent-announcements').innerHTML = '<p>Failed to load announcements.</p>';
-        }
+    
+    // Update statistics
+    try {
+        // Get total users count
+        const usersSnapshot = await db.collection('users').get();
+        const totalUsers = usersSnapshot.size;
         
-        // Load upcoming events (next 7 days)
-        try {
-            const today = new Date();
-            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            const eventsSnapshot = await db.collection('events')
-                .where('date', '>=', today)
-                .where('date', '<=', nextWeek)
-                .orderBy('date')
-                .limit(3)
-                .get();
-            
-            const upcomingEvents = document.getElementById('upcoming-events');
-            if (eventsSnapshot.empty) {
-                upcomingEvents.innerHTML = '<p>No upcoming events.</p>';
-            } else {
-                let html = '';
-                eventsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    html += `
-                        <div style="margin-bottom: 12px; padding: 10px; background-color: rgba(44, 90, 160, 0.05); border-radius: 8px;">
-                            <strong>${data.title}</strong>
-                            <p style="font-size: 0.9rem; margin-top: 5px; color: #555;">${formatDate(data.date?.toDate())} ${data.time || ''}</p>
-                        </div>
-                    `;
-                });
-                upcomingEvents.innerHTML = html;
-            }
-        } catch (error) {
-            console.error('Error loading events:', error);
-            document.getElementById('upcoming-events').innerHTML = '<p>Failed to load events.</p>';
-        }
+        // Get total posts count
+        const postsSnapshot = await db.collection('wallPosts').get();
+        const totalPosts = postsSnapshot.size;
         
-        // Update statistics
-        try {
-            // Get total users count
-            const usersSnapshot = await db.collection('users').get();
-            const totalUsers = usersSnapshot.size;
-            
-            // Get total posts count
-            const postsSnapshot = await db.collection('wallPosts').get();
-            const totalPosts = postsSnapshot.size;
-            
-            // Get total events count
-            const eventsSnapshot = await db.collection('events').get();
-            const totalEvents = eventsSnapshot.size;
-            
-            // Update statistics display
-            document.getElementById('total-participants').textContent = totalUsers;
-            document.getElementById('total-posts').textContent = totalPosts;
-            document.getElementById('total-events').textContent = totalEvents;
-            
-            // Online users is estimated (users active in last 15 minutes)
-            const activeTime = new Date(Date.now() - 15 * 60 * 1000);
-            const activeUsersQuery = await db.collection('users')
-                .where('lastLogin', '>=', activeTime)
-                .get();
-            
-            document.getElementById('online-users').textContent = activeUsersQuery.size;
-            
-        } catch (error) {
-            console.error('Error loading statistics:', error);
-        }
+        // Get total events count
+        const eventsSnapshot = await db.collection('events').get();
+        const totalEvents = eventsSnapshot.size;
+        
+        // Update statistics display
+        document.getElementById('total-participants').textContent = totalUsers;
+        document.getElementById('total-posts').textContent = totalPosts;
+        document.getElementById('total-events').textContent = totalEvents;
+        
+        // Online users is estimated (users active in last 15 minutes)
+        const activeTime = new Date(Date.now() - 15 * 60 * 1000);
+        const activeUsersQuery = await db.collection('users')
+            .where('lastLogin', '>=', activeTime)
+            .get();
+        
+        document.getElementById('online-users').textContent = activeUsersQuery.size;
+        
+    } catch (error) {
+        console.error('Error loading statistics:', error);
     }
+}
     
   async function loadAnnouncements() {
     const announcementsList = document.getElementById('announcements-list');
