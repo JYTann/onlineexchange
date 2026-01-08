@@ -5209,43 +5209,31 @@ const chartManager = {
     
     // ==================== 修复的 show() 方法 ====================
     async show() {
-        console.log('ChartManager.show() called');
-        
-        const container = document.getElementById('progress-chart-container');
-        const overviewTab = document.getElementById('tracking-overview');
-        
-        // 如果没有容器或overview标签不可见，直接返回
-        if (!container || !overviewTab || overviewTab.style.display === 'none') {
-            console.warn('Chart container or tracking overview not available');
-            return;
-        }
-        
-        // 关键修复：等待容器真正可见
-        await waitUntilVisible(container);
-        
-        console.log('Chart container is now visible, proceeding...');
-        
-        if (!this.isInitialized) {
-            // 第一次显示，需要初始化
-            await this.initialize();
-        } else if (this.instance) {
-            // 已经初始化，只是重新显示
-            const canvas = document.getElementById('progress-chart');
-            if (canvas) {
-                const existingChart = Chart.getChart(canvas);
-                if (existingChart && existingChart !== this.instance) {
-                    // 如果Chart.js有不同实例，使用那个
-                    this.instance = existingChart;
-                }
-            }
-            
-            // 显示容器并刷新图表
-            container.style.display = 'block';
-            this.instance.resize();
-            await this.refresh();
-            console.log('Chart shown and resized');
-        }
-    },
+    console.log('ChartManager.show() called');
+
+    const container = document.getElementById('progress-chart-container');
+    const overviewTab = document.getElementById('tracking-overview');
+
+    // ✅ 正确的可见性判断
+    if (!container || !overviewTab || overviewTab.offsetParent === null) {
+        console.warn('Tracking overview not active yet');
+        return;
+    }
+
+    await waitUntilVisible(container);
+
+    console.log('Chart container is now visible, proceeding...');
+
+    if (!this.isInitialized) {
+        await this.initialize();
+    }
+
+    if (this.instance) {
+        container.style.display = 'block';
+        this.instance.resize();
+        await this.refresh();
+    }
+},
     
     // ==================== 初始化方法 ====================
     async initialize() {
