@@ -541,19 +541,36 @@ main {
 
 
 /* 添加更强大的强制显示规则 */
+/* 在CSS中添加或修改 */
 #progress-chart-container {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     width: 100% !important;
     height: 350px !important;
+    min-height: 350px !important;
+    max-height: 350px !important;
     position: relative !important;
     background: white !important;
-    border: 2px solid #4361ee !important;
+    border: 2px solid red !important; /* 临时改为红色边框便于识别 */
     border-radius: 12px !important;
     padding: 20px !important;
     margin: 20px 0 !important;
+    box-sizing: border-box !important;
     overflow: visible !important;
+    z-index: 999 !important;
+}
+
+#progress-chart {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    box-sizing: border-box !important;
 }
 
 /* 确保在任何状态下都显示 */
@@ -565,19 +582,6 @@ main {
 #progress-chart-container[style*="display:none"] {
     display: block !important;
     visibility: visible !important;
-}
-
-/* Canvas样式 */
-#progress-chart {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    top: 20px !important;
-    left: 20px !important;
-    right: 20px !important;
-    bottom: 20px !important;
-    box-sizing: border-box !important;
 }
 
 /* 修复Chart.js的响应式问题 */
@@ -5197,73 +5201,141 @@ const chartManager = {
     
     // 初始化（带三重保护）
         async initialize() {
-        console.log('ChartManager.initialize() called');
-        
-        // 保护1：正在创建中，跳过
-        if (this.isCreating) {
-            console.warn('Chart is already being created, skipping...');
-            return false;
-        }
-        
-        // 保护2：已经初始化且实例存在，跳过
-        if (this.isInitialized && this.instance) {
-            console.log('Chart already initialized, returning existing instance');
-            return true;
-        }
-        
-        // ========== 关键修复：确保容器可见 ==========
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            if (container.style.display === 'none' || window.getComputedStyle(container).display === 'none') {
-                console.warn('Container was hidden, forcing display');
-                container.style.display = 'block';
-                container.style.visibility = 'visible';
-                container.style.opacity = '1';
-                
-                // 等待浏览器重新渲染
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            // 确保容器有尺寸
-            if (container.clientWidth === 0 || container.clientHeight === 0) {
-                container.style.width = '100%';
-                container.style.height = '350px';
-                container.style.minHeight = '350px';
-            }
-        }
-        // ========== 关键修复结束 ==========
-        
-        // 保护3：使用 Chart.getChart() 检查是否已有图表
-        const canvas = document.getElementById('progress-chart');
-        if (canvas && Chart) {
+    console.log('ChartManager.initialize() called - Emergency fix');
+    
+    // 立即显示容器
+    const container = document.getElementById('progress-chart-container');
+    const canvas = document.getElementById('progress-chart');
+    
+    if (!container || !canvas) {
+        console.error('Chart elements not found');
+        return false;
+    }
+    
+    // ========== 紧急修复：强制设置尺寸 ==========
+    // 1. 确保容器可见并有尺寸
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
+    
+    // 2. 强制设置容器尺寸
+    container.style.width = '100%';
+    container.style.height = '350px';
+    container.style.minHeight = '350px';
+    
+    // 3. 等待一帧确保DOM更新
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    
+    // 4. 获取计算后的尺寸
+    const containerWidth = container.clientWidth || container.offsetWidth;
+    const containerHeight = container.clientHeight || container.offsetHeight;
+    
+    console.log('Container dimensions:', {
+        clientWidth: container.clientWidth,
+        clientHeight: container.clientHeight,
+        offsetWidth: container.offsetWidth,
+        offsetHeight: container.offsetHeight,
+        styleWidth: container.style.width,
+        styleHeight: container.style.height
+    });
+    
+    // 5. 如果容器尺寸为0，使用默认值
+    const finalWidth = containerWidth > 0 ? containerWidth : 500;
+    const finalHeight = containerHeight > 0 ? containerHeight : 350;
+    
+    // 6. 直接设置Canvas尺寸（不依赖CSS）
+    canvas.width = finalWidth;
+    canvas.height = finalHeight;
+    
+    console.log('Canvas dimensions set to:', { width: canvas.width, height: canvas.height });
+    
+    // ========== 继续原有逻辑 ==========
+    if (this.isCreating) {
+        console.warn('Chart is already being created, skipping...');
+        return false;
+    }
+    
+    this.isCreating = true;
+    
+    try {
+        // 检查是否已有图表
+        if (Chart) {
             const existingChart = Chart.getChart(canvas);
             if (existingChart) {
-                console.log('Found existing chart via Chart.getChart(), reusing');
+                console.log('Found existing chart, reusing');
                 this.instance = existingChart;
-                this.isInitialized = true;
+                
+                // 重新设置尺寸
+                existingChart.resize();
+                
+                // 更新数据
+                const chartData = await this.getChartData();
+                existingChart.data = chartData;
+                existingChart.update('active');
+                
                 return true;
             }
         }
         
-        this.isCreating = true;
-        
-        try {
-            console.log('Creating new chart...');
-            
-            // 执行创建
-            await this.createChart();
-            this.isInitialized = true;
-            console.log('Chart initialization complete');
-            
-            return true;
-        } catch (error) {
-            console.error('Chart initialization failed:', error);
-            this.showError();
-            return false;
-        } finally {
-            this.isCreating = false;
+        // 清理旧实例
+        if (this.instance) {
+            try {
+                this.instance.destroy();
+            } catch (e) {
+                console.error('Error destroying old chart:', e);
+            }
+            this.instance = null;
         }
-    },
+        
+        // 创建新图表
+        this.showLoading();
+        const chartData = await this.getChartData();
+        const ctx = canvas.getContext('2d');
+        
+        // 创建具有明确尺寸的图表
+        this.instance = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: false, // 禁用响应式，我们手动控制尺寸
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0 // 禁用动画以加快显示
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 强制重新渲染
+        this.instance.update();
+        
+        this.hideLoading();
+        this.isInitialized = true;
+        
+        console.log('Chart created successfully with dimensions:', {
+            width: canvas.width,
+            height: canvas.height,
+            chartWidth: this.instance.width,
+            chartHeight: this.instance.height
+        });
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Chart creation error:', error);
+        this.showError();
+        return false;
+    } finally {
+        this.isCreating = false;
+    }
+},
     
     // 创建图表实例（带双重检查）
        async createChart() {
@@ -5569,6 +5641,7 @@ hide() {
             loading.style.display = 'none';
         }
     },
+
     
     // 检查状态
     getStatus: function() {
@@ -5581,6 +5654,36 @@ hide() {
             chartOnCanvas: Chart ? !!Chart.getChart(document.getElementById('progress-chart')) : false
         };
     },
+
+    // 添加这个函数到 chartManager 对象中
+refresh: function() {
+    console.log('Forcing chart refresh');
+    
+    if (!this.instance) {
+        console.log('No chart instance, initializing...');
+        return this.initialize();
+    }
+    
+    // 强制重置Canvas尺寸
+    const canvas = document.getElementById('progress-chart');
+    const container = document.getElementById('progress-chart-container');
+    
+    if (canvas && container) {
+        const width = container.clientWidth || 500;
+        const height = container.clientHeight || 350;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        console.log('Canvas resized to:', { width, height });
+        
+        // 更新图表
+        this.instance.resize();
+        this.instance.update();
+    }
+    
+    return true;
+}
     
     // ==== 新增：调试函数 ====
     debug: function() {
@@ -12698,27 +12801,34 @@ async function loadTrackingOverview() {
     try {
         console.log('Loading tracking overview...');
         
-        // 强制显示图表容器
+        // 1. 确保容器存在且可见
         const chartContainer = document.getElementById('progress-chart-container');
         if (chartContainer) {
+            // 强制显示
             chartContainer.style.display = 'block';
             chartContainer.style.visibility = 'visible';
             chartContainer.style.opacity = '1';
+            
+            // 强制设置尺寸
+            chartContainer.style.width = '100%';
+            chartContainer.style.height = '350px';
+            chartContainer.style.minHeight = '350px';
+            
+            // 添加一个红色边框用于调试（可选）
+            chartContainer.style.border = '2px solid red';
         }
         
-        // 使用安全的方式初始化图表
-        if (!chartManager.isInitialized) {
-            console.log('Chart not initialized, initializing...');
-            await chartManager.initialize();
-        } else {
-            console.log('Chart already initialized, refreshing...');
-            // 确保使用正确的 refresh 方法
-            if (typeof chartManager.refresh === 'function') {
-                await chartManager.refresh();
-            } else {
-                console.error('chartManager.refresh is not a function, reinitializing...');
-                await chartManager.initialize();
-            }
+        // 2. 使用setTimeout确保DOM更新
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 3. 初始化图表
+        console.log('Initializing chart...');
+        const success = await chartManager.initialize();
+        
+        if (!success) {
+            console.warn('Chart initialization failed, trying emergency mode');
+            // 尝试使用最简单的方式创建图表
+            await createSimpleChart();
         }
         
         // 加载统计数据
@@ -12786,6 +12896,7 @@ async function loadTrackingOverview() {
         
     } catch (error) {
         console.error('Error loading tracking overview:', error);
+        showAlert('Chart error - Please refresh the page', 'error');
         
         // 显示用户友好的错误信息
         const trackingStats = document.getElementById('tracking-stats');
@@ -12811,38 +12922,107 @@ async function loadTrackingOverview() {
     }
 }
 
+       // 备用：最简单的图表创建函数
+async function createSimpleChart() {
+    try {
+        const canvas = document.getElementById('progress-chart');
+        if (!canvas) return;
+        
+        // 确保Canvas有尺寸
+        canvas.width = 500;
+        canvas.height = 350;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // 创建最基本的图表
+        const basicChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Default'],
+                datasets: [{
+                    label: 'Chart loaded in emergency mode',
+                    data: [1],
+                    backgroundColor: '#4361ee'
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false
+            }
+        });
+        
+        chartManager.instance = basicChart;
+        chartManager.isInitialized = true;
+        
+        console.log('Emergency chart created');
+        
+    } catch (error) {
+        console.error('Even emergency chart failed:', error);
+    }
+}
+
        function debugChart() {
-    console.log('=== Chart Debug Info ===');
+    console.log('=== CHART DEBUG INFORMATION ===');
+    
     const container = document.getElementById('progress-chart-container');
     const canvas = document.getElementById('progress-chart');
     
-    console.log('Container:', {
-        exists: !!container,
-        display: container ? getComputedStyle(container).display : 'none',
-        visibility: container ? getComputedStyle(container).visibility : 'none',
-        width: container ? container.offsetWidth : 0,
-        height: container ? container.offsetHeight : 0
-    });
+    // 检查元素是否存在
+    console.log('1. Elements check:');
+    console.log('Container exists:', !!container);
+    console.log('Canvas exists:', !!canvas);
     
-    console.log('Canvas:', {
-        exists: !!canvas,
-        width: canvas ? canvas.width : 0,
-        height: canvas ? canvas.height : 0
-    });
+    if (container) {
+        console.log('2. Container styles:');
+        console.log('- display:', getComputedStyle(container).display);
+        console.log('- visibility:', getComputedStyle(container).visibility);
+        console.log('- opacity:', getComputedStyle(container).opacity);
+        console.log('- width:', container.offsetWidth, 'px');
+        console.log('- height:', container.offsetHeight, 'px');
+        console.log('- clientWidth:', container.clientWidth, 'px');
+        console.log('- clientHeight:', container.clientHeight, 'px');
+        console.log('- parent display:', getComputedStyle(container.parentElement).display);
+    }
     
-    console.log('ChartManager status:', chartManager.getStatus());
+    if (canvas) {
+        console.log('3. Canvas properties:');
+        console.log('- width attribute:', canvas.width);
+        console.log('- height attribute:', canvas.height);
+        console.log('- style.width:', canvas.style.width);
+        console.log('- style.height:', canvas.style.height);
+        console.log('- offsetWidth:', canvas.offsetWidth, 'px');
+        console.log('- offsetHeight:', canvas.offsetHeight, 'px');
+    }
     
-    // 强制显示并重新初始化
+    console.log('4. ChartManager status:');
+    console.log(chartManager.getStatus());
+    
+    // 强制修复
+    console.log('5. Applying fixes...');
+    
+    // 强制设置尺寸
     if (container) {
         container.style.display = 'block';
         container.style.visibility = 'visible';
+        container.style.width = '100%';
+        container.style.height = '350px';
+        container.style.border = '2px solid green'; // 改为绿色表示修复中
     }
     
+    if (canvas) {
+        canvas.width = 500;
+        canvas.height = 350;
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+    }
+    
+    // 重新初始化图表
     setTimeout(() => {
         chartManager.initialize();
-    }, 100);
+    }, 500);
+    
+    console.log('=== DEBUG COMPLETE ===');
 }
-
 // Initialize progress chart
 /*function initializeProgressChart() {
     const canvas = document.getElementById('progress-chart');
@@ -13705,8 +13885,19 @@ function applyEmergencyFix() {
 }
 
 // 页面加载完成后调用
+// 在DOMContentLoaded事件中添加
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(applyEmergencyFix, 1000);
+    // 页面加载完成后延迟执行修复
+    setTimeout(() => {
+        // 如果当前在admin页面且是tracking-overview标签页
+        if (document.getElementById('admin-page')?.classList.contains('active')) {
+            const activeTab = document.querySelector('#admin-tracking .tab.active');
+            if (activeTab?.getAttribute('data-tab') === 'tracking-overview') {
+                console.log('Auto-fixing chart on page load...');
+                loadTrackingOverview();
+            }
+        }
+    }, 2000);
 });
 </script>
 </body>
