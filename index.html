@@ -8273,25 +8273,7 @@ function debugReset() {
     console.log('Current tab:', document.querySelector('.tab.active')?.getAttribute('data-tab'));
     console.log('Chart status:', chartManager.getStatus());
 }
-
-
-function switchTab(tabId) {
-
-  // 先隐藏所有 page
-  document.querySelectorAll('.page').forEach(p => {
-    p.style.display = 'none';
-  });
-
-  // 显示当前 page
-  const page = document.getElementById(tabId);
-  page.style.display = 'block';
-
-  // ⭐ 如果是 tracking 页
-  if (tabId === 'tracking-page') {
-    chartManager.show();
-  }
-}
-
+       
 // ==================== 修复4：简化loadTrackingTab函数 ====================
 async function loadTrackingTab(tabId) {
     console.log('Loading tracking tab via unified system:', tabId);
