@@ -5199,6 +5199,61 @@ function waitUntilVisible(el) {
     });
 }
 
+       // ==================== 强制显示图表函数 ====================
+function forceShowProgressChart() {
+    console.log('Force showing progress chart...');
+    
+    const container = document.getElementById('progress-chart-container');
+    if (!container) {
+        console.warn('Progress chart container not found');
+        return;
+    }
+    
+    // 强制设置所有可能影响显示的样式
+    container.style.display = 'block !important';
+    container.style.visibility = 'visible !important';
+    container.style.opacity = '1 !important';
+    container.style.width = '100% !important';
+    container.style.height = '350px !important';
+    container.style.minHeight = '350px !important';
+    container.style.position = 'relative !important';
+    container.style.background = 'white !important';
+    container.style.zIndex = '100 !important';
+    container.style.overflow = 'hidden !important';
+    
+    // 递归处理所有父元素
+    let el = container;
+    let level = 0;
+    
+    while (el) {
+        // 确保父元素也不会隐藏图表
+        el.style.display = 'block';
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+        el.style.overflow = 'visible';
+        
+        // 对于某些特定父元素进行额外处理
+        if (el.classList) {
+            el.classList.remove('hidden', 'd-none');
+        }
+        
+        el = el.parentElement;
+        level++;
+        
+        // 最多遍历10层父元素
+        if (level > 10) break;
+    }
+    
+    console.log('✅ Progress chart forced visible');
+    
+    // 延迟确保DOM更新后刷新图表
+    setTimeout(() => {
+        if (chartManager && chartManager.refresh) {
+            chartManager.refresh();
+        }
+    }, 100);
+}
+
 // ==================== 修复版 ChartManager ====================
 const chartManager = {
     // 状态管理
@@ -5210,7 +5265,7 @@ const chartManager = {
     // ==================== 修复的 show() 方法 ====================
     async show() {
         console.log('ChartManager.show() called');
-        
+        forceShowProgressChart();
         const container = document.getElementById('progress-chart-container');
         const overviewTab = document.getElementById('tracking-overview');
         
@@ -8176,11 +8231,15 @@ function activateTrackingTab(tabId) {
         // 图表处理：只在 tracking-overview 显示图表
         if (tabId === 'tracking-overview') {
             console.log('Showing chart for tracking-overview');
-            // 使用 setTimeout 确保 DOM 更新完成
+            
+            // 强制显示图表容器
+            forceShowProgressChart();
+            
+            // 延迟确保DOM更新完成
             setTimeout(() => {
                 chartManager.show();
                 loadTrackingOverview();
-            }, 100);
+            }, 150);
         } else {
             console.log('Hiding chart for non-overview tab');
             chartManager.hide();
