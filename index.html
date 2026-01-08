@@ -5454,45 +5454,35 @@ const chartManager = {
     },
     
     // 隐藏图表
-    hide() {
-        console.log('ChartManager.hide() called');
-        
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            container.style.display = 'none';
-            console.log('Chart container hidden');
-        }
-    },
+  // 在 chartManager 对象中修改 hide 方法
+hide() {
+    console.log('ChartManager.hide() called - Safe mode');
     
-    // 刷新数据
-    async refresh() {
-        console.log('ChartManager.refresh() called');
-        
-        if (!this.instance || !this.isInitialized) {
-            console.log('Chart not ready for refresh, initializing...');
-            await this.initialize();
-            return;
-        }
-        
-        try {
-            this.showLoading();
-            
-            const chartData = await this.getChartData();
-            
-            // 安全更新数据
-            if (this.instance && !this.instance.destroyed) {
-                this.instance.data = chartData;
-                this.instance.update('none'); // 使用 'none' 防止动画冲突
-                console.log('Chart data refreshed');
+    // 安全模式：只隐藏图表内容，不隐藏容器
+    const canvas = document.getElementById('progress-chart');
+    if (canvas) {
+        // 清理图表但保持画布可见
+        if (this.instance && !this.instance.destroyed) {
+            try {
+                this.instance.destroy();
+            } catch (e) {
+                console.warn('Error destroying chart:', e);
             }
-            
-            this.hideLoading();
-            
-        } catch (error) {
-            console.error('Error refreshing chart:', error);
-            this.showError();
+            this.instance = null;
         }
-    },
+        
+        // 只隐藏画布，不隐藏容器
+        canvas.style.visibility = 'hidden';
+        console.log('Chart hidden (safe mode)');
+    }
+    
+    // 保持容器可见
+    const container = document.getElementById('progress-chart-container');
+    if (container) {
+        container.style.display = 'block'; // 确保容器显示
+        container.style.visibility = 'visible';
+    }
+},
     
     // 安全销毁
     destroy() {
@@ -8205,6 +8195,33 @@ function activateTrackingTab(tabId) {
     }
 }
 
+       function initTaskTrackingTabs() {
+    const trackingContainer = document.getElementById('admin-tracking');
+    if (!trackingContainer) return;
+    
+    // 移除可能重复的事件监听器
+    const tabs = trackingContainer.querySelector('.tabs');
+    if (tabs) {
+        // 克隆节点并替换，以移除旧的事件监听器
+        const newTabs = tabs.cloneNode(true);
+        tabs.parentNode.replaceChild(newTabs, tabs);
+    }
+    
+    // 添加新的事件监听器
+    trackingContainer.addEventListener('click', function(e) {
+        const tab = e.target.closest('.tab');
+        if (tab && tab.closest('#admin-tracking')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const tabId = tab.getAttribute('data-tab');
+            console.log('Tracking tab clicked:', tabId);
+            if (tabId) {
+                activateTrackingTab(tabId);
+            }
+        }
+    });
+}
+
 // ==================== 修复2：更新initTaskTracking函数 ====================
 function initTaskTracking() {
     console.log('Initializing task tracking...');
@@ -8253,6 +8270,7 @@ function initTaskTracking() {
                 });
                 console.log('Tracking tabs listener added');
             }
+            initTaskTrackingTabs();
             
             console.log('Task tracking initialization complete');
         } catch (error) {
@@ -12454,33 +12472,89 @@ function initTaskTracking() {
 
 // Activate tracking tab
 // 修复后的函数：
+// 修复后的 activateTrackingTab 函数
 function activateTrackingTab(tabId) {
-    // 只在tracking区域内查找元素
-    const trackingContainer = document.getElementById('admin-tracking');
-    if (!trackingContainer) return;
+    console.log('Activating tracking tab:', tabId);
     
-    // 更新tracking区域内的tab
-    trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
-        t.classList.remove('active');
-    });
-    const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
+    try {
+        const trackingContainer = document.getElementById('admin-tracking');
+        if (!trackingContainer) {
+            console.error('Tracking container not found');
+            return;
+        }
+        
+        // 更新tab状态
+        trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
+            t.classList.remove('active');
+        });
+        
+        const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+        
+        // 更新内容显示
+        trackingContainer.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        const activeContent = document.getElementById(tabId);
+        if (activeContent) {
+            activeContent.classList.add('active');
+        }
+        
+        // ========== 关键修复：只在需要时隐藏图表 ==========
+        if (tabId === 'tracking-overview') {
+            console.log('Showing chart for tracking-overview');
+            // 确保图表容器可见
+            const chartContainer = document.getElementById('progress-chart-container');
+            if (chartContainer) {
+                chartContainer.style.display = 'block';
+            }
+            
+            // 延迟加载图表，确保DOM更新完成
+            setTimeout(() => {
+                chartManager.show();
+                loadTrackingOverview();
+            }, 100);
+        } else {
+            console.log('Hiding chart for non-overview tab, but keeping container visible');
+            // 只隐藏图表，不隐藏容器
+            chartManager.hide();
+            
+            // 但确保容器仍然可见（如果需要显示其他内容）
+            const chartContainer = document.getElementById('progress-chart-container');
+            if (chartContainer && chartContainer.closest('.tab-content.active')) {
+                // 如果在当前活动标签页中，保持容器显示
+                chartContainer.style.display = 'block';
+            }
+            
+            // 加载其他标签页内容
+            switch(tabId) {
+                case 'tracking-tasks':
+                    loadManageTasks();
+                    break;
+                case 'tracking-students':
+                    loadStudentProgressList();
+                    break;
+                case 'tracking-reports':
+                    const reportOutput = document.getElementById('report-output');
+                    if (reportOutput) {
+                        reportOutput.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Select parameters and generate a report</p>
+                            </div>
+                        `;
+                    }
+                    break;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error activating tracking tab:', error);
     }
-    
-    // 更新tracking区域内的tab内容
-    trackingContainer.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    const activeContent = trackingContainer.querySelector(`#${tabId}`);
-    if (activeContent) {
-        activeContent.classList.add('active');
-    }
-    
-    // 加载tab内容
-    loadTrackingTab(tabId);
 }
-
 // 图表清理辅助函数
 function cleanupCharts() {
     chartManager.destroy();
@@ -13517,6 +13591,39 @@ window.openStudentProgressDetailModal = openStudentProgressDetailModal;
 window.filterStudents = filterStudents;
 window.printStudentProgress = printStudentProgress;
 window.exportReport = exportReport;
+
+       // 紧急修复函数
+function applyEmergencyFix() {
+    console.log('Applying emergency fix for tracking page...');
+    
+    // 强制显示图表容器
+    const chartContainer = document.getElementById('progress-chart-container');
+    if (chartContainer) {
+        chartContainer.style.display = 'block';
+        chartContainer.style.visibility = 'visible';
+        chartContainer.style.opacity = '1';
+    }
+    
+    // 修复标签页状态
+    const activeTab = document.querySelector('#admin-tracking .tab.active');
+    if (activeTab) {
+        const tabId = activeTab.getAttribute('data-tab');
+        if (tabId === 'tracking-overview') {
+            // 如果是overview标签页，确保图表显示
+            setTimeout(() => {
+                chartManager.show();
+                loadTrackingOverview();
+            }, 500);
+        }
+    }
+    
+    console.log('Emergency fix applied');
+}
+
+// 页面加载完成后调用
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(applyEmergencyFix, 1000);
+});
 </script>
 </body>
 </html>
