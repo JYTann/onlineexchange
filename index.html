@@ -5433,25 +5433,61 @@ const chartManager = {
         };
     },
     
-    // 显示图表
-    show() {
-        console.log('ChartManager.show() called');
+ show() {
+    console.log('ChartManager.show() called');
+    
+    // 获取容器
+    const container = document.getElementById('progress-chart-container');
+    if (!container) {
+        console.error('Chart container not found');
+        return;
+    }
+    
+    // 关键修复：等待容器真正可见
+    const waitUntilVisible = (element) => {
+        return new Promise(resolve => {
+            const check = () => {
+                // 检查容器是否有实际尺寸
+                if (element.offsetWidth > 0 && element.offsetHeight > 0) {
+                    console.log('Container is now visible:', {
+                        width: element.offsetWidth,
+                        height: element.offsetHeight
+                    });
+                    resolve();
+                } else {
+                    console.log('Container not visible yet, checking again...');
+                    requestAnimationFrame(check);
+                }
+            };
+            check();
+        });
+    };
+    
+    // 确保容器显示
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
+    
+    // 等待容器可见，然后初始化图表
+    waitUntilVisible(container).then(async () => {
+        console.log('Container visible, initializing chart...');
         
-        if (!this.isInitialized) {
-            console.log('Chart not initialized, initializing first...');
-            this.initialize();
-            return;
+        // 确保Canvas尺寸正确
+        const canvas = document.getElementById('progress-chart');
+        if (canvas) {
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
         }
         
-        const container = document.getElementById('progress-chart-container');
-        if (container) {
-            container.style.display = 'block';
-            console.log('Chart container shown');
-        }
+        // 等待一个渲染周期
+        await new Promise(resolve => setTimeout(resolve, 50));
         
-        // 确保图表可见时更新尺寸
-        setTimeout(() => this.refresh(), 100);
-    },
+        // 初始化图表
+        await this.initialize();
+    }).catch(error => {
+        console.error('Error waiting for container visibility:', error);
+    });
+},
     
     // 隐藏图表
     hide() {
@@ -12454,33 +12490,41 @@ function initTaskTracking() {
 
 // Activate tracking tab
 // 修复后的函数：
-function activateTrackingTab(tabId) {
-    // 只在tracking区域内查找元素
-    const trackingContainer = document.getElementById('admin-tracking');
-    if (!trackingContainer) return;
+show() {
+    console.log('ChartManager.show() called');
     
-    // 更新tracking区域内的tab
-    trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
-        t.classList.remove('active');
-    });
-    const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
+    // 获取容器
+    const container = document.getElementById('progress-chart-container');
+    if (!container) {
+        console.error('Chart container not found');
+        return;
     }
     
-    // 更新tracking区域内的tab内容
-    trackingContainer.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    const activeContent = trackingContainer.querySelector(`#${tabId}`);
-    if (activeContent) {
-        activeContent.classList.add('active');
+    // 关键：检查容器是否真的可见
+    const checkVisibility = () => {
+        return container.offsetWidth > 0 && container.offsetHeight > 0;
+    };
+    
+    if (!checkVisibility()) {
+        console.warn('Container not visible, waiting...');
+        
+        // 如果不可见，等待一下再重试
+        setTimeout(() => {
+            if (checkVisibility()) {
+                this.initialize();
+            } else {
+                console.error('Container still not visible after waiting');
+            }
+        }, 300);
+        return;
     }
     
-    // 加载tab内容
-    loadTrackingTab(tabId);
+    // 如果可见，直接初始化
+    console.log('Container visible, initializing chart...');
+    this.initialize();
 }
 
+       
 // 图表清理辅助函数
 function cleanupCharts() {
     chartManager.destroy();
