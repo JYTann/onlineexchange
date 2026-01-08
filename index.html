@@ -8013,9 +8013,19 @@ function formatDateTime(date) {
 }
     
     // Navigation
- function navigateTo(pageId) {
+       function navigateTo(pageId) {
     console.log('Navigate to page:', pageId);
-     cleanupAllCharts();
+    
+    // ⚠️ 重要修复：只在离开 admin 页面时清理图表
+    if (currentPage === 'admin' && pageId !== 'admin') {
+        console.log('Leaving admin page, soft reset chart manager');
+        chartManager.destroy();  // 完全销毁
+    }
+    
+    // 如果从其他页面进入 admin，重置图表状态
+    if (pageId === 'admin') {
+        chartManager.reset();
+    }
     
     // 清理旧的计时器
     if (window.countdownTimer) {
@@ -8029,22 +8039,6 @@ function formatDateTime(date) {
         window.wallTimer = null;
     }
 
-    // ⚠️ 重要：如果还在 admin 页面，不要 reset chart
-    if (currentPage === 'admin' && pageId === 'admin') {
-        console.log('Staying in admin page, no chart reset needed');
-    } else if (currentPage === 'admin' && pageId !== 'admin') {
-        console.log('Leaving admin page, soft reset chart manager');
-        chartManager.hide();  // 只隐藏，不重置
-    }
-
-         // 清理图表（新增）
-    if (window.progressChart) {
-        window.progressChart.destroy();
-        window.progressChart = null;
-    }
-
-     cleanupCharts();
-    
     // 更新活动导航链接
     navLinks.forEach(link => {
         if (link.getAttribute('data-page') === pageId || link.getAttribute('href').substring(1) === pageId) {
@@ -8078,7 +8072,6 @@ function formatDateTime(date) {
                     loadAnnouncements();
                     break;
                 case 'wall':
-                    // 确保页面完全显示后再加载贴文
                     loadWallPosts();
                     updateAddNoteButton();
                     break;
@@ -8093,7 +8086,7 @@ function formatDateTime(date) {
                     if (isAdmin) {
                         loadAdminData();
                         
-                        // ==================== 修复3：重新初始化tracking功能 ====================
+                        // 延迟初始化 tracking 功能
                         setTimeout(() => {
                             try {
                                 console.log('Initializing admin tracking features...');
@@ -8109,23 +8102,21 @@ function formatDateTime(date) {
                                 // 确保tracking标签页默认显示overview
                                 const trackingContainer = document.getElementById('admin-tracking');
                                 if (trackingContainer) {
-                                    console.log('Found tracking container, activating default tab...');
+                                    // 先显示容器
+                                    trackingContainer.style.display = 'block';
                                     
-                                    // 激活默认的tracking标签页
-                                    const defaultTab = trackingContainer.querySelector('.tab[data-tab="tracking-overview"]');
-                                    if (defaultTab) {
-                                        defaultTab.click();
-                                    } else {
-                                        // 手动激活
-                                        activateTrackingTab('tracking-overview');
-                                    }
+                                    // 延迟激活默认标签页
+                                    setTimeout(() => {
+                                        const defaultTab = trackingContainer.querySelector('.tab[data-tab="tracking-overview"]');
+                                        if (defaultTab) {
+                                            defaultTab.click();
+                                        }
+                                    }, 100);
                                 }
                             } catch (error) {
                                 console.error('Error initializing admin tracking:', error);
                             }
-                        }, 1000); // 延迟1秒确保DOM完全加载
-                        // ==================== 修复3结束 ====================
-                        
+                        }, 500); // 增加延迟时间
                     } else {
                         navigateTo('dashboard');
                         showAlert('You do not have administrator permissions.', 'error');
@@ -8148,6 +8139,9 @@ function activateTrackingTab(tabId) {
             return;
         }
         
+        // 确保容器可见
+        trackingContainer.style.display = 'block';
+        
         // 更新tab状态
         trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
             t.classList.remove('active');
@@ -8168,15 +8162,26 @@ function activateTrackingTab(tabId) {
             activeContent.classList.add('active');
         }
         
-        // 图表处理：只在 tracking-overview 显示图表
+        // ⚠️ 关键修复：正确处理图表显示/隐藏
         if (tabId === 'tracking-overview') {
             console.log('Showing chart for tracking-overview');
+            // 确保图表容器可见
+            const chartContainer = document.getElementById('progress-chart-container');
+            if (chartContainer) {
+                chartContainer.style.display = 'block';
+            }
+            
+            // 延迟加载图表
             setTimeout(() => {
                 loadTrackingOverview();
-            }, 100); // 延迟确保DOM更新
+            }, 200); // 增加延迟确保DOM更新
         } else {
             console.log('Hiding chart for non-overview tab');
-            chartManager.hide();
+            // 只隐藏图表容器，不销毁图表
+            const chartContainer = document.getElementById('progress-chart-container');
+            if (chartContainer) {
+                chartContainer.style.display = 'none';
+            }
             
             // 加载其他标签页内容
             switch(tabId) {
@@ -12605,21 +12610,24 @@ function loadChartJS() {
 // Load tracking overview
 async function loadTrackingOverview() {
     try {
-        console.log('Loading tracking overview via ChartManager...');
+        console.log('Loading tracking overview...');
         
-        // 确保图表容器可见
+        // 首先确保图表容器存在且可见
         const chartContainer = document.getElementById('progress-chart-container');
-        if (chartContainer) {
-            chartContainer.style.display = 'block';
+        if (!chartContainer) {
+            console.error('Chart container not found');
+            return;
         }
+        
+        chartContainer.style.display = 'block';
+        
+        // 等待DOM更新
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // 使用 ChartManager 安全地初始化图表
         await chartManager.initialize();
         
-        // 刷新图表数据
-        await chartManager.refresh();
-        
-        // 加载统计数据（保持不变）
+        // 加载统计数据
         const stats = await taskTracking.getStatistics();
         if (stats) {
             document.getElementById('tracking-stats').innerHTML = `
@@ -12648,7 +12656,7 @@ async function loadTrackingOverview() {
             `;
         }
         
-        // 加载最近活动（保持不变）
+        // 加载最近活动
         const recentActivities = await taskTracking.getRecentActivities(5);
         if (recentActivities.length > 0) {
             let html = '';
@@ -12667,7 +12675,7 @@ async function loadTrackingOverview() {
                         </div>
                         ${activity.manualUpdate ? 
                             '<div style="font-size: 0.85rem; color: var(--warning); margin-top: 5px;">Manual update by admin</div>' : 
-                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px);">Auto-tracked by system</div>'}
+                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px;">Auto-tracked by system</div>'}
                     </div>
                 `;
             });
@@ -12683,6 +12691,7 @@ async function loadTrackingOverview() {
         console.error('Error loading tracking overview:', error);
         showAlert('Error loading tracking overview', 'error');
     }
+}
 }
 
 // Initialize progress chart
