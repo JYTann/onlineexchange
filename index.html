@@ -9596,11 +9596,63 @@ function closeModal(modalId) {
             showAlert(`Failed to signed out: ${error.message}`, 'error');
         }
     }
+
+       function formatEventDateForDisplay(timestamp) {
+    if (!timestamp) return 'Unknown Date';
+    
+    try {
+        const date = timestamp.toDate();
+        // 使用本地时区，但只提取日期部分
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // getMonth() 返回 0-11
+        const day = date.getDate();
+        
+        // 返回标准格式的日期字符串
+        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return 'Invalid Date';
+    }
+}
     
     // Data Loading Functions
     async function loadDashboardData() {
         // Load recent announcements
         try {
+                    const today = new Date();
+        today.setHours(0, 0, 0, 0); // 设置为当天开始
+        const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+        
+        const eventsSnapshot = await db.collection('events')
+            .where('date', '>=', today)
+            .where('date', '<=', nextWeek)
+            .orderBy('date')
+            .limit(3)
+            .get();
+        
+        const upcomingEvents = document.getElementById('upcoming-events');
+        if (eventsSnapshot.empty) {
+            upcomingEvents.innerHTML = '<p>No upcoming events.</p>';
+        } else {
+            let html = '';
+            eventsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const eventDate = data.date?.toDate();
+                const displayDate = eventDate ? formatEventDateForDisplay(data.date) : 'Unknown Date';
+                
+                html += `
+                    <div style="margin-bottom: 12px; padding: 10px; background-color: rgba(44, 90, 160, 0.05); border-radius: 8px;">
+                        <strong>${data.title}</strong>
+                        <p style="font-size: 0.9rem; margin-top: 5px; color: #555;">${displayDate} ${data.time || ''}</p>
+                    </div>
+                `;
+            });
+            upcomingEvents.innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Error loading events:', error);
+        document.getElementById('upcoming-events').innerHTML = '<p>Failed to load events.</p>';
+    }
             const announcementsSnapshot = await db.collection('announcements')
                 .orderBy('createdAt', 'desc')
                 .limit(3)
@@ -10150,110 +10202,134 @@ function formatLocalDate(date) {
     return `${year}-${month}-${day}`;
 }
     
-    function generateCalendar(date) {
-        const calendar = document.getElementById('calendar');
-        if (!calendar) return;
-        
-        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
-        // Update month display
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const monthDisplay = document.getElementById('current-month');
-        if (monthDisplay) {
-            monthDisplay.textContent = `${date.getFullYear()} ${monthNames[date.getMonth()]}`;
-        }
-        
-        // Get first day of month
-        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-        // Get last day of month
-        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-        
-        // Calculate days in month
-        const daysInMonth = lastDay.getDate();
-        // Calculate day of week for first day (0 = Sunday, 1 = Monday, etc.)
-        const firstDayOfWeek = firstDay.getDay();
-        
-        // Create header
-        let html = '';
-        daysOfWeek.forEach(day => {
-            html += `<div class="calendar-day header">${day}</div>`;
-        });
-        
-        // Add empty cells for days before first day of month
-        for (let i = 0; i < firstDayOfWeek; i++) {
-            html += `<div class="calendar-day"></div>`;
-        }
-        
-        // Add cells for each day of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dayDate = new Date(date.getFullYear(), date.getMonth(), day);
-            const isToday = isSameDay(dayDate, new Date());
-            
-            html += `
-                <div class="calendar-day" data-date="${dayDate.toISOString().split('T')[0]}">
-                    <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">${day}</div>
-                    <div id="events-${dayDate.toISOString().split('T')[0]}"></div>
-                    ${currentUser ? `<button class="add-event-btn" data-date="${dayDate.toISOString().split('T')[0]}"><i class="fas fa-plus"></i></button>` : ''}
-                </div>
-            `;
-        }
-        
-        calendar.innerHTML = html;
-        
-        // Add event listeners to add event buttons
-        document.querySelectorAll('.add-event-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const date = this.getAttribute('data-date');
-                document.getElementById('event-date').value = date;
-                document.querySelector('[data-tab="add-event"]').click();
-            });
-        });
+    // 替换现有的 generateCalendar 函数
+function generateCalendar(date) {
+    const calendar = document.getElementById('calendar');
+    if (!calendar) return;
+    
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    // Update month display
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthDisplay = document.getElementById('current-month');
+    if (monthDisplay) {
+        monthDisplay.textContent = `${date.getFullYear()} ${monthNames[date.getMonth()]}`;
     }
     
-    async function loadCalendarEvents() {
-        const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
+    // Get first day of month (本地时间)
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1, 12, 0, 0); // 使用中午12点避免时区问题
+    // Get last day of month
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0, 12, 0, 0);
+    
+    // Calculate days in month
+    const daysInMonth = lastDay.getDate();
+    // Calculate day of week for first day (0 = Sunday, 1 = Monday, etc.)
+    const firstDayOfWeek = firstDay.getDay();
+    
+    // Create header
+    let html = '';
+    daysOfWeek.forEach(day => {
+        html += `<div class="calendar-day header">${day}</div>`;
+    });
+    
+    // Add empty cells for days before first day of month
+    for (let i = 0; i < firstDayOfWeek; i++) {
+        html += `<div class="calendar-day"></div>`;
+    }
+    
+    // Add cells for each day of the month
+    const today = new Date();
+    const todayString = today.toDateString();
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayDate = new Date(date.getFullYear(), date.getMonth(), day, 12, 0, 0);
+        const dayString = dayDate.toDateString();
+        const isToday = dayString === todayString;
         
-        // Clear existing events
-        calendarDays.forEach(day => {
-            const eventContainer = day.querySelector('div[id^="events-"]');
-            if (eventContainer) {
-                eventContainer.innerHTML = '';
+        // 使用 ISO 格式的日期字符串（没有时间部分）
+        const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        html += `
+            <div class="calendar-day" data-date="${dateString}">
+                <div class="day-number" style="${isToday ? 'color: var(--primary); font-weight: bold;' : ''}">${day}</div>
+                <div id="events-${dateString}"></div>
+                ${currentUser ? `<button class="add-event-btn" data-date="${dateString}"><i class="fas fa-plus"></i></button>` : ''}
+            </div>
+        `;
+    }
+    
+    calendar.innerHTML = html;
+    
+    // Add event listeners to add event buttons
+    document.querySelectorAll('.add-event-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const date = this.getAttribute('data-date');
+            document.getElementById('event-date').value = date;
+            document.querySelector('[data-tab="add-event"]').click();
+        });
+    });
+}
+    
+    // 替换现有的 loadCalendarEvents 函数
+async function loadCalendarEvents() {
+    const calendarDays = document.querySelectorAll('.calendar-day[data-date]');
+    
+    // Clear existing events
+    calendarDays.forEach(day => {
+        const eventContainer = day.querySelector('div[id^="events-"]');
+        if (eventContainer) {
+            eventContainer.innerHTML = '';
+        }
+    });
+    
+    try {
+        // 获取当前日历视图的第一天和最后一天（只比较日期部分）
+        const viewDate = currentCalendarDate;
+        const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1, 12, 0, 0);
+        const lastDay = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0, 12, 0, 0);
+        
+        // 获取这个月的所有事件
+        const eventsSnapshot = await db.collection('events')
+            .orderBy('date')
+            .get();
+        
+        // 处理每个事件
+        eventsSnapshot.forEach(doc => {
+            const data = doc.data();
+            const eventTimestamp = data.date;
+            
+            if (!eventTimestamp) return;
+            
+            // 将Firestore时间戳转换为Date对象
+            const eventDate = eventTimestamp.toDate();
+            
+            // 检查事件是否在当前日历月份
+            if (eventDate >= firstDay && eventDate <= lastDay) {
+                // 获取事件的日期部分（忽略时间）
+                const eventYear = eventDate.getFullYear();
+                const eventMonth = eventDate.getMonth() + 1; // getMonth() 返回 0-11
+                const eventDay = eventDate.getDate();
+                
+                // 创建日期字符串用于匹配
+                const dateString = `${eventYear}-${String(eventMonth).padStart(2, '0')}-${String(eventDay).padStart(2, '0')}`;
+                const eventContainer = document.getElementById(`events-${dateString}`);
+                
+                if (eventContainer) {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'calendar-event';
+                    eventElement.textContent = data.title;
+                    eventElement.setAttribute('data-id', doc.id);
+                    eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
+                    
+                    eventContainer.appendChild(eventElement);
+                }
             }
         });
-        
-        try {
-            // Get first and last day of current month view
-            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
-            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
-            
-            const eventsSnapshot = await db.collection('events')
-                .where('date', '>=', firstDay)
-                .where('date', '<=', lastDay)
-                .orderBy('date')
-                .get();
-            
-            eventsSnapshot.forEach(doc => {
-                const data = doc.data();
-                const date = data.date?.toDate();
-                if (date) {
-                    const dateString = date.toISOString().split('T')[0];
-                    const eventContainer = document.getElementById(`events-${dateString}`);
-                    
-                    if (eventContainer) {
-                        const eventElement = document.createElement('div');
-                        eventElement.className = 'calendar-event';
-                        eventElement.textContent = data.title;
-                        eventElement.setAttribute('data-id', doc.id);
-                        eventElement.addEventListener('click', () => showEventDetail(doc.id, data));
-                        
-                        eventContainer.appendChild(eventElement);
-                    }
-                }
-            });
-        } catch (error) {
-            console.error('Error loading calendar events:', error);
-        }
+    } catch (error) {
+        console.error('Error loading calendar events:', error);
+        // 即使出错也不要影响页面其他部分
     }
+}
     
    async function loadAdminData() {
     try {
@@ -10929,75 +11005,82 @@ async function handleUpdateProfile(e) {
         }
     }
     
-    async function handleAddEvent(e) {
-        e.preventDefault();
-        
-        if (!currentUser) {
-            showAlert('Please login first', 'error');
-            return;
-        }
-        
-        const title = document.getElementById('event-title').value;
-        const description = document.getElementById('event-description').value;
-        const date = document.getElementById('event-date').value;
-        const time = document.getElementById('event-time').value;
-        const type = document.getElementById('event-type').value;
-        const school = document.getElementById('event-school').value;
-        
-        if (!title || !date) {
-            showAlert('Please enter the title and date.', 'error');
-            return;
-        }
-        
-        try {
-            // 修复日期问题：使用本地时区
-            const eventDate = new Date(date + 'T12:00:00'); // 使用中午12点避免时区问题
-
-if (time) {
-    const [hours, minutes] = time.split(':');
-    eventDate.setHours(parseInt(hours), parseInt(minutes));
-}
-
-const eventData = {
-    title: title,
-    description: description,
-    date: firebase.firestore.Timestamp.fromDate(eventDate), // 使用Firestore时间戳
-    time: time || '',
-    type: type,
-    school: school,
-    authorId: currentUser.uid,
-    authorName: userName.textContent,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-};
-            
-            const docRef = await db.collection('events').add(eventData);
-            
-            // 修复：使用本地日期字符串显示
-            const dateString = eventDate.toISOString().split('T')[0];
-            const eventContainer = document.getElementById(`events-${dateString}`);
-            
-            if (eventContainer) {
-                const eventElement = document.createElement('div');
-                eventElement.className = 'calendar-event';
-                eventElement.textContent = title;
-                eventElement.setAttribute('data-id', docRef.id);
-                eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
-                
-                eventContainer.appendChild(eventElement);
-            }
-            
-            eventForm.reset();
-            document.querySelector('[data-tab="view-calendar"]').click();
-            showAlert('活动已添加', 'success');
-            
-            loadDashboardData();
-            if (isAdmin) loadAdminData();
-            
-        } catch (error) {
-            console.error('Error adding event:', error);
-            showAlert(`Failed to add the post: ${error.message}`, 'error');
-        }
+    // 替换现有的 handleAddEvent 函数
+async function handleAddEvent(e) {
+    e.preventDefault();
+    
+    if (!currentUser) {
+        showAlert('Please login first', 'error');
+        return;
     }
+    
+    const title = document.getElementById('event-title').value;
+    const description = document.getElementById('event-description').value;
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const type = document.getElementById('event-type').value;
+    const school = document.getElementById('event-school').value;
+    
+    if (!title || !date) {
+        showAlert('Please enter the title and date.', 'error');
+        return;
+    }
+    
+    try {
+        // 修复：使用本地时区，中午12点作为基准时间
+        const eventDate = new Date(date + 'T12:00:00');
+        
+        if (time) {
+            const [hours, minutes] = time.split(':');
+            eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        }
+        
+        // 创建一个只包含日期部分的对象用于存储和比较
+        const dateForStorage = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        
+        const eventData = {
+            title: title,
+            description: description,
+            date: firebase.firestore.Timestamp.fromDate(dateForStorage),
+            time: time || '',
+            type: type,
+            school: school,
+            authorId: currentUser.uid,
+            authorName: userName.textContent,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            // 添加时区信息
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            // 添加原始日期字符串用于显示
+            displayDate: date
+        };
+        
+        const docRef = await db.collection('events').add(eventData);
+        
+        // 修复：使用日期字符串显示
+        const eventContainer = document.getElementById(`events-${date}`);
+        
+        if (eventContainer) {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'calendar-event';
+            eventElement.textContent = title;
+            eventElement.setAttribute('data-id', docRef.id);
+            eventElement.addEventListener('click', () => showEventDetail(docRef.id, eventData));
+            
+            eventContainer.appendChild(eventElement);
+        }
+        
+        eventForm.reset();
+        document.querySelector('[data-tab="view-calendar"]').click();
+        showAlert('活动已添加', 'success');
+        
+        loadDashboardData();
+        if (isAdmin) loadAdminData();
+        
+    } catch (error) {
+        console.error('Error adding event:', error);
+        showAlert(`Failed to add the post: ${error.message}`, 'error');
+    }
+}
     
     async function handleAdminAddAnnouncement(e) {
         e.preventDefault();
@@ -11187,95 +11270,111 @@ async function saveAdminSettings() {
     }
 }
     
-    async function showEventDetail(eventId, eventData) {
-        document.getElementById('event-detail-title').textContent = eventData.title;
+    // 替换 showEventDetail 函数中的日期显示部分
+async function showEventDetail(eventId, eventData) {
+    document.getElementById('event-detail-title').textContent = eventData.title;
+    
+    // 修复：正确处理日期对象
+    let eventDate;
+    if (eventData.date && typeof eventData.date.toDate === 'function') {
+        eventDate = eventData.date.toDate();
+    } else if (eventData.date instanceof Date) {
+        eventDate = eventData.date;
+    } else if (eventData.date) {
+        eventDate = new Date(eventData.date);
+    }
+    
+    let html = `
+        <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
+    `;
+    
+    if (eventDate) {
+        // 修复：使用本地时区显示日期，只显示日期部分
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            timeZone: 'Asia/Taipei' // 根据您的需要调整
+        };
         
-        // 修复：正确处理日期对象
-        let eventDate;
-        if (eventData.date && typeof eventData.date.toDate === 'function') {
-            eventDate = eventData.date.toDate();
-        } else if (eventData.date instanceof Date) {
-            eventDate = eventData.date;
-        } else if (eventData.date) {
-            eventDate = new Date(eventData.date);
-        }
-        
-        let html = `
-            <p><strong>Description:</strong> ${eventData.description || 'No description'}</p>
-        `;
-        
-        if (eventDate) {
-            // 修复：使用本地时区显示日期
-            const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
+        // 如果有显示日期字段，优先使用
+        if (eventData.displayDate) {
+            const [year, month, day] = eventData.displayDate.split('-');
+            const displayDate = new Date(year, month - 1, day);
+            html += `<p><strong>Date:</strong> ${displayDate.toLocaleDateString('zh-CN', options)}</p>`;
+        } else {
             html += `<p><strong>Date:</strong> ${eventDate.toLocaleDateString('zh-CN', options)}</p>`;
         }
-        
-        if (eventData.time) {
-            html += `<p><strong>Time:</strong> ${eventData.time}</p>`;
-        }
-        
-        if (eventData.type) {
-            const typeMap = {
-                'academic': 'Academic Seminar',
-                'cultural': 'Cultural Exchange',
-                'competition': 'Joint Competition',
-                'language': 'Language Exchange',
-                'other': 'Other'
-            };
-            html += `<p><strong>Type:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
-        }
-        
-        if (eventData.school) {
-            const schoolMap = {
-                'both': 'Joint by Both Schools',
-                'fyhs': 'Foon Yew High School',
-                'kshs': 'Kaohsiung Senior High School'
-            };
-            html += `<p><strong>Organizer:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
-        }
-        
-        html += `<p><strong>Creator:</strong> ${eventData.authorName || 'Unknown User'}</p>`;
-        
-        document.getElementById('event-detail-content').innerHTML = html;
-        
-        const actions = document.getElementById('event-detail-actions');
-        actions.innerHTML = '';
-        
-        if (isAdmin || currentUser?.uid === eventData.authorId) {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.type = 'button';
-            deleteBtn.className = 'btn btn-outline';
-            deleteBtn.style.color = 'var(--danger)';
-            deleteBtn.style.borderColor = 'var(--danger)';
-            deleteBtn.textContent = 'Delete Events';
-            deleteBtn.onclick = () => {
-                if (confirm('Are you sure you want to delete this event?？')) {
-                    deleteEvent(eventId);
-                    closeModal('eventDetail');
-                }
-            };
-            actions.appendChild(deleteBtn);
-            
-            const editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.className = 'btn btn-primary';
-            editBtn.textContent = 'Edit Events';
-            editBtn.onclick = () => {
-                closeModal('eventDetail');
-                openEditEventModal(eventId, eventData);
-            };
-            actions.appendChild(editBtn);
-        }
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'btn btn-outline';
-        closeBtn.textContent = 'Close';
-        closeBtn.onclick = () => closeModal('eventDetail');
-        actions.appendChild(closeBtn);
-        
-        openModal('eventDetail');
     }
+    
+    if (eventData.time) {
+        html += `<p><strong>Time:</strong> ${eventData.time}</p>`;
+    }
+    
+    if (eventData.type) {
+        const typeMap = {
+            'academic': 'Academic Seminar',
+            'cultural': 'Cultural Exchange',
+            'competition': 'Joint Competition',
+            'language': 'Language Exchange',
+            'other': 'Other'
+        };
+        html += `<p><strong>Type:</strong> ${typeMap[eventData.type] || eventData.type}</p>`;
+    }
+    
+    if (eventData.school) {
+        const schoolMap = {
+            'both': 'Joint by Both Schools',
+            'fyhs': 'Foon Yew High School',
+            'kshs': 'Kaohsiung Senior High School'
+        };
+        html += `<p><strong>Organizer:</strong> ${schoolMap[eventData.school] || eventData.school}</p>`;
+    }
+    
+    html += `<p><strong>Creator:</strong> ${eventData.authorName || 'Unknown User'}</p>`;
+    
+    document.getElementById('event-detail-content').innerHTML = html;
+    
+    const actions = document.getElementById('event-detail-actions');
+    actions.innerHTML = '';
+    
+    if (isAdmin || currentUser?.uid === eventData.authorId) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-outline';
+        deleteBtn.style.color = 'var(--danger)';
+        deleteBtn.style.borderColor = 'var(--danger)';
+        deleteBtn.textContent = 'Delete Events';
+        deleteBtn.onclick = () => {
+            if (confirm('Are you sure you want to delete this event?？')) {
+                deleteEvent(eventId);
+                closeModal('eventDetail');
+            }
+        };
+        actions.appendChild(deleteBtn);
+        
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-primary';
+        editBtn.textContent = 'Edit Events';
+        editBtn.onclick = () => {
+            closeModal('eventDetail');
+            openEditEventModal(eventId, eventData);
+        };
+        actions.appendChild(editBtn);
+    }
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.textContent = 'Close';
+    closeBtn.onclick = () => closeModal('eventDetail');
+    actions.appendChild(closeBtn);
+    
+    openModal('eventDetail');
+}
+
+       
     
     // Helper Functions
     async function deleteWallPost(postId) {
