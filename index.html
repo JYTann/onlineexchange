@@ -5192,7 +5192,7 @@ const chartManager = {
     isDestroying: false,
     
     // 核心修复：新的 show() 方法
-    show() {
+    show: function() {
         console.log('ChartManager.show() called');
         
         // 获取容器
@@ -8128,69 +8128,67 @@ function formatDateTime(date) {
 // ==================== 修复1：更新activateTrackingTab函数 ====================
 // 激活跟踪标签页
 function activateTrackingTab(tabId) {
-    console.log('Activating tracking tab:', tabId);
+    console.log('🚀 activateTrackingTab called for:', tabId);
     
-    try {
-        const trackingContainer = document.getElementById('admin-tracking');
-        if (!trackingContainer) {
-            console.error('Tracking container not found');
-            return;
-        }
-        
-        // 更新tab状态
-        trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
-            t.classList.remove('active');
-        });
-        
-        const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
-        if (activeTab) {
-            activeTab.classList.add('active');
-        }
-        
-        // 更新内容显示
-        trackingContainer.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        
-        const activeContent = document.getElementById(tabId);
-        if (activeContent) {
-            activeContent.classList.add('active');
-        }
-        
-        // 图表处理：只在 tracking-overview 显示图表
-        if (tabId === 'tracking-overview') {
-            console.log('Showing chart for tracking-overview');
-            setTimeout(() => {
-                loadTrackingOverview();
-            }, 100); // 延迟确保DOM更新
-        } else {
-            console.log('Hiding chart for non-overview tab');
-            chartManager.hide();
-            
-            // 加载其他标签页内容
-            switch(tabId) {
-                case 'tracking-tasks':
-                    loadManageTasks();
-                    break;
-                case 'tracking-students':
-                    loadStudentProgressList();
-                    break;
-                case 'tracking-reports':
-                    const reportOutput = document.getElementById('report-output');
-                    if (reportOutput) {
-                        reportOutput.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-chart-bar"></i>
-                                <p>Select parameters and generate a report</p>
-                            </div>
-                        `;
-                    }
-                    break;
+    // 只在tracking区域内查找元素
+    const trackingContainer = document.getElementById('admin-tracking');
+    if (!trackingContainer) return;
+    
+    // 更新tracking区域内的tab
+    trackingContainer.querySelectorAll('.tabs .tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    const activeTab = trackingContainer.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+    
+    // 更新tracking区域内的tab内容
+    trackingContainer.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const activeContent = trackingContainer.querySelector(`#${tabId}`);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
+    
+    // 图表处理：只在 tracking-overview 显示图表
+    if (tabId === 'tracking-overview') {
+        console.log('Showing chart for tracking-overview');
+        setTimeout(() => {
+            // 确保容器可见
+            const container = document.getElementById('progress-chart-container');
+            if (container) {
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
             }
-        }
+            // 调用修复后的 show() 方法
+            chartManager.show();
+        }, 100); // 延迟确保DOM更新
+    } else {
+        console.log('Hiding chart for non-overview tab');
+        chartManager.hide();
         
-    } catch (error) {
-        console.error('Error activating tracking tab:', error);
+        // 加载其他标签页内容
+        switch(tabId) {
+            case 'tracking-tasks':
+                loadManageTasks();
+                break;
+            case 'tracking-students':
+                loadStudentProgressList();
+                break;
+            case 'tracking-reports':
+                const reportOutput = document.getElementById('report-output');
+                if (reportOutput) {
+                    reportOutput.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar"></i>
+                            <p>Select parameters and generate a report</p>
+                        </div>
+                    `;
+                }
+                break;
+        }
     }
 }
 
