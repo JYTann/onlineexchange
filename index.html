@@ -540,32 +540,31 @@ main {
 }
 
 
-/* 强制图表容器始终显示 */
+/* 添加更强大的强制显示规则 */
 #progress-chart-container {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     width: 100% !important;
     height: 350px !important;
-    min-height: 350px !important;
-    max-height: 350px !important;
     position: relative !important;
     background: white !important;
     border: 2px solid #4361ee !important;
     border-radius: 12px !important;
     padding: 20px !important;
     margin: 20px 0 !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-    z-index: 100 !important;
+    overflow: visible !important;
 }
 
-/* 移除所有可能隐藏容器的样式 */
-#progress-chart-container[style*="display: none"],
-#progress-chart-container[style*="display:none"],
+/* 确保在任何状态下都显示 */
+#progress-chart-container,
 #progress-chart-container.hidden,
-#progress-chart-container.d-none {
+#progress-chart-container.d-none,
+#progress-chart-container[hidden],
+#progress-chart-container[style*="display: none"],
+#progress-chart-container[style*="display:none"] {
     display: block !important;
+    visibility: visible !important;
 }
 
 /* Canvas样式 */
@@ -4560,6 +4559,12 @@ footer::before {
                     </div>
                 </div>
             </div>
+
+            <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+    <button class="btn btn-small" onclick="debugChart()" style="background: #f72585; color: white;">
+        <i class="fas fa-bug"></i> Debug Chart
+    </button>
+</div>
         </section>
     </main>
 
@@ -8005,7 +8010,6 @@ function formatDateTime(date) {
     // Navigation
  function navigateTo(pageId) {
     console.log('Navigate to page:', pageId);
-     cleanupAllCharts();
     
     // 清理旧的计时器
     if (window.countdownTimer) {
@@ -8019,21 +8023,21 @@ function formatDateTime(date) {
         window.wallTimer = null;
     }
 
-    // ⚠️ 重要：如果还在 admin 页面，不要 reset chart
-    if (currentPage === 'admin' && pageId === 'admin') {
-        console.log('Staying in admin page, no chart reset needed');
-    } else if (currentPage === 'admin' && pageId !== 'admin') {
-        console.log('Leaving admin page, soft reset chart manager');
-        chartManager.hide();  // 只隐藏，不重置
+    // ⚠️ 重要：只在离开admin页面时软隐藏图表，不销毁
+    if (currentPage === 'admin' && pageId !== 'admin') {
+        console.log('Leaving admin page, soft hide chart');
+        chartManager.hide();
     }
 
-         // 清理图表（新增）
+    // 清理图表（仅在需要时）
     if (window.progressChart) {
-        window.progressChart.destroy();
+        try {
+            window.progressChart.destroy();
+        } catch(e) {
+            console.warn('Error destroying chart:', e);
+        }
         window.progressChart = null;
     }
-
-     cleanupCharts();
     
     // 更新活动导航链接
     navLinks.forEach(link => {
@@ -8068,7 +8072,6 @@ function formatDateTime(date) {
                     loadAnnouncements();
                     break;
                 case 'wall':
-                    // 确保页面完全显示后再加载贴文
                     loadWallPosts();
                     updateAddNoteButton();
                     break;
@@ -8083,7 +8086,7 @@ function formatDateTime(date) {
                     if (isAdmin) {
                         loadAdminData();
                         
-                        // ==================== 修复3：重新初始化tracking功能 ====================
+                        // 延迟初始化tracking功能
                         setTimeout(() => {
                             try {
                                 console.log('Initializing admin tracking features...');
@@ -8114,7 +8117,6 @@ function formatDateTime(date) {
                                 console.error('Error initializing admin tracking:', error);
                             }
                         }, 1000); // 延迟1秒确保DOM完全加载
-                        // ==================== 修复3结束 ====================
                         
                     } else {
                         navigateTo('dashboard');
@@ -8158,14 +8160,29 @@ function activateTrackingTab(tabId) {
             activeContent.classList.add('active');
         }
         
-        // 图表处理：只在 tracking-overview 显示图表
+        // 确保图表容器总是可见
+        const chartContainer = document.getElementById('progress-chart-container');
+        if (chartContainer) {
+            chartContainer.style.display = 'block';
+            chartContainer.style.visibility = 'visible';
+        }
+        
+        // 图表处理
         if (tabId === 'tracking-overview') {
             console.log('Showing chart for tracking-overview');
+            // 确保图表可见
             setTimeout(() => {
+                // 强制显示图表容器
+                if (chartContainer) {
+                    chartContainer.style.display = 'block';
+                    chartContainer.style.visibility = 'visible';
+                }
+                // 初始化并加载图表
                 loadTrackingOverview();
-            }, 100); // 延迟确保DOM更新
+            }, 100);
         } else {
             console.log('Hiding chart for non-overview tab');
+            // 只隐藏图表内容，不隐藏容器
             chartManager.hide();
             
             // 加载其他标签页内容
@@ -12681,11 +12698,12 @@ async function loadTrackingOverview() {
     try {
         console.log('Loading tracking overview...');
         
-        // 确保图表容器可见
+        // 强制显示图表容器
         const chartContainer = document.getElementById('progress-chart-container');
         if (chartContainer) {
             chartContainer.style.display = 'block';
             chartContainer.style.visibility = 'visible';
+            chartContainer.style.opacity = '1';
         }
         
         // 使用安全的方式初始化图表
@@ -12791,6 +12809,38 @@ async function loadTrackingOverview() {
         
         showAlert('Error loading tracking overview. Please try refreshing the page.', 'error');
     }
+}
+
+       function debugChart() {
+    console.log('=== Chart Debug Info ===');
+    const container = document.getElementById('progress-chart-container');
+    const canvas = document.getElementById('progress-chart');
+    
+    console.log('Container:', {
+        exists: !!container,
+        display: container ? getComputedStyle(container).display : 'none',
+        visibility: container ? getComputedStyle(container).visibility : 'none',
+        width: container ? container.offsetWidth : 0,
+        height: container ? container.offsetHeight : 0
+    });
+    
+    console.log('Canvas:', {
+        exists: !!canvas,
+        width: canvas ? canvas.width : 0,
+        height: canvas ? canvas.height : 0
+    });
+    
+    console.log('ChartManager status:', chartManager.getStatus());
+    
+    // 强制显示并重新初始化
+    if (container) {
+        container.style.display = 'block';
+        container.style.visibility = 'visible';
+    }
+    
+    setTimeout(() => {
+        chartManager.initialize();
+    }, 100);
 }
 
 // Initialize progress chart
