@@ -5655,6 +5655,29 @@ hide() {
         };
     },
 
+        debug: function() {
+        const status = this.getStatus();
+        console.log('=== ChartManager Debug Info ===');
+        console.log('Status:', status);
+        
+        if (status.canvasExists) {
+            const canvas = document.getElementById('progress-chart');
+            console.log('Canvas dimensions:', {
+                width: canvas.width,
+                height: canvas.height,
+                offsetWidth: canvas.offsetWidth,
+                offsetHeight: canvas.offsetHeight,
+                styleWidth: canvas.style.width,
+                styleHeight: canvas.style.height
+            });
+        }
+        
+        if (Chart && status.chartOnCanvas) {
+            console.log('Chart.js instances count:', Object.keys(Chart.instances || {}).length);
+        }
+        
+        return status;
+    },
     // 添加这个函数到 chartManager 对象中
 refresh: function() {
     console.log('Forcing chart refresh');
@@ -5685,30 +5708,6 @@ refresh: function() {
     return true;
 }
     
-    // ==== 新增：调试函数 ====
-    debug: function() {
-        const status = this.getStatus();
-        console.log('=== ChartManager Debug Info ===');
-        console.log('Status:', status);
-        
-        if (status.canvasExists) {
-            const canvas = document.getElementById('progress-chart');
-            console.log('Canvas dimensions:', {
-                width: canvas.width,
-                height: canvas.height,
-                offsetWidth: canvas.offsetWidth,
-                offsetHeight: canvas.offsetHeight,
-                styleWidth: canvas.style.width,
-                styleHeight: canvas.style.height
-            });
-        }
-        
-        if (Chart && status.chartOnCanvas) {
-            console.log('Chart.js instances count:', Object.keys(Chart.instances || {}).length);
-        }
-        
-        return status;
-    }
 };
        
        function initImageLazyLoading() {
