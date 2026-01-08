@@ -12676,24 +12676,34 @@ function loadChartJS() {
 }
 
 // Load tracking overview
-// Load tracking overview
+// 修复 loadTrackingOverview 函数
 async function loadTrackingOverview() {
     try {
-        console.log('Loading tracking overview via ChartManager...');
+        console.log('Loading tracking overview...');
         
         // 确保图表容器可见
         const chartContainer = document.getElementById('progress-chart-container');
         if (chartContainer) {
             chartContainer.style.display = 'block';
+            chartContainer.style.visibility = 'visible';
         }
         
-        // 使用 ChartManager 安全地初始化图表
-        await chartManager.initialize();
+        // 使用安全的方式初始化图表
+        if (!chartManager.isInitialized) {
+            console.log('Chart not initialized, initializing...');
+            await chartManager.initialize();
+        } else {
+            console.log('Chart already initialized, refreshing...');
+            // 确保使用正确的 refresh 方法
+            if (typeof chartManager.refresh === 'function') {
+                await chartManager.refresh();
+            } else {
+                console.error('chartManager.refresh is not a function, reinitializing...');
+                await chartManager.initialize();
+            }
+        }
         
-        // 刷新图表数据
-        await chartManager.refresh();
-        
-        // 加载统计数据（保持不变）
+        // 加载统计数据
         const stats = await taskTracking.getStatistics();
         if (stats) {
             document.getElementById('tracking-stats').innerHTML = `
@@ -12720,9 +12730,12 @@ async function loadTrackingOverview() {
                     </div>
                 </div>
             `;
+        } else {
+            document.getElementById('tracking-stats').innerHTML = 
+                '<p style="color: var(--gray); text-align: center;">Unable to load statistics</p>';
         }
         
-        // 加载最近活动（保持不变）
+        // 加载最近活动
         const recentActivities = await taskTracking.getRecentActivities(5);
         if (recentActivities.length > 0) {
             let html = '';
@@ -12741,7 +12754,7 @@ async function loadTrackingOverview() {
                         </div>
                         ${activity.manualUpdate ? 
                             '<div style="font-size: 0.85rem; color: var(--warning); margin-top: 5px;">Manual update by admin</div>' : 
-                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px);">Auto-tracked by system</div>'}
+                            '<div style="font-size: 0.85rem; color: var(--success); margin-top: 5px;">Auto-tracked by system</div>'}
                     </div>
                 `;
             });
@@ -12755,7 +12768,28 @@ async function loadTrackingOverview() {
         
     } catch (error) {
         console.error('Error loading tracking overview:', error);
-        showAlert('Error loading tracking overview', 'error');
+        
+        // 显示用户友好的错误信息
+        const trackingStats = document.getElementById('tracking-stats');
+        if (trackingStats) {
+            trackingStats.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 2rem;"></i>
+                    <p style="color: var(--gray);">Error loading statistics</p>
+                </div>
+            `;
+        }
+        
+        const activitiesContainer = document.getElementById('recent-tracked-activities');
+        if (activitiesContainer) {
+            activitiesContainer.innerHTML = `
+                <div class="empty-state">
+                    <p style="color: var(--gray);">Error loading recent activities</p>
+                </div>
+            `;
+        }
+        
+        showAlert('Error loading tracking overview. Please try refreshing the page.', 'error');
     }
 }
 
